@@ -1,7 +1,9 @@
 /**
  * Types of the HRM tables the app reads (`bcel_hrm_v3`, data source `hrm`). Written by hand: HRM's columns are
  * upper case, and `CamelCasePlugin` reads `NAME_LAO` as `nameLao` only when the query names the column, so these
- * keys are the camelCase of the column names, and only the columns the app uses are listed. Decoding follows the
+ * keys are the camelCase of the column names. PascalCase columns (`hrm_position.PostName`) are written in lower case
+ * (`postname`): MariaDB column names ignore case, and camelCase would turn `postName` into `post_name`. Only the
+ * columns the app uses are listed. Decoding follows the
  * platform's source rules: `DECIMAL` and `DATE` are strings, `DATETIME` is a `Date`, `TINYINT(1)` is a number.
  * Structure: `test/sources/hrm.schema.sql`.
  */
@@ -24,11 +26,11 @@ export interface HrmEmployeeTable {
 }
 
 export interface HrmPositionTable {
-  postId: number
-  postName: string | null
-  postNameEng: string | null
-  postType: number | null
-  postStatus: string | null
+  postid: number
+  postname: string | null
+  postnameeng: string | null
+  posttype: number | null
+  poststatus: string | null
 }
 
 export interface HrmBranchTable {
