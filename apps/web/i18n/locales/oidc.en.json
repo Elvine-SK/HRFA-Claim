@@ -1,0 +1,45 @@
+{
+  "oidc": {
+    "or": "or",
+    "continueWith": "Continue with {label}",
+    "card": {
+      "title": "Single sign-on",
+      "text": "Sign in with an account you already have at your organisation's provider.",
+      "linked": "Linked",
+      "notLinked": "Not linked",
+      "loading": "Loading your sign-in methods…",
+      "loadFailed": "Could not load your sign-in methods.",
+      "email": "Account: {email}",
+      "linkedAt": "Linked {date}",
+      "lastUsed": "Last used {date}",
+      "neverUsed": "Not used to sign in yet",
+      "connect": "Connect",
+      "unlink": "Unlink",
+      "connectTitle": "Connect {label}",
+      "connectText": "Enter your password, then sign in at {label} to link that account.",
+      "unlinkTitle": "Unlink {label}?",
+      "unlinkText": "You will no longer be able to sign in with {label}.",
+      "linkedToast": "{label} is linked",
+      "linkedToastText": "You can now sign in with it.",
+      "unlinked": "{label} is unlinked",
+      "linkFailed": "Could not link the account"
+    },
+    "errors": {
+      "unknown_provider": "Unknown sign-in provider.",
+      "invalid_redirect": "The redirect must be a path on this site.",
+      "state_invalid": "The sign-in attempt expired or is invalid. Please try again.",
+      "provider_error": "The sign-in provider did not complete the sign-in.",
+      "discovery_failed": "The sign-in provider is unavailable.",
+      "token_failed": "The sign-in provider rejected the sign-in.",
+      "id_token_invalid": "The sign-in provider returned an invalid response.",
+      "email_unverified": "Your provider account has no verified email address.",
+      "domain_not_allowed": "Your email domain may not sign in with this provider.",
+      "no_account": "No account matches this email address. Ask an administrator to invite you.",
+      "account_inactive": "This account is not active.",
+      "last_sign_in_method": "Link another provider or set a password before removing this one.",
+      "identity_taken": "This provider account is already linked to another user.",
+      "already_linked": "You already have an account at this provider linked.",
+      "failed": "Single sign-on failed. Please try again."
+    }
+  }
+}

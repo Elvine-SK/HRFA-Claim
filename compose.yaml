@@ -1,0 +1,17 @@
+services:
+  mariadb:
+    image: mariadb:11.4
+    command: ['--character-set-server=utf8mb4', '--collation-server=utf8mb4_general_ci']
+    environment:
+      MARIADB_ROOT_PASSWORD: root_dev
+      MARIADB_DATABASE: 'hr_fam_dev'
+      MARIADB_USER: app
+      MARIADB_PASSWORD: app_dev
+    ports:
+      - '3308:3306'
+    volumes:
+      - ./tooling/db-init:/docker-entrypoint-initdb.d:ro
+      - mariadb-data:/var/lib/mysql
+
+volumes:
+  mariadb-data:

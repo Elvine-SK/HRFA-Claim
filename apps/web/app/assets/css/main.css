@@ -1,0 +1,279 @@
+@import 'tailwindcss';
+@import '@nuxt/ui';
+@import './tokens.css';
+
+@theme {
+  --font-sans: var(--app-font);
+  --font-mono: var(--app-mono);
+}
+
+@theme inline {
+  --color-canvas: var(--app-bg);
+  --color-surface: var(--app-surface);
+  --color-surface-2: var(--app-surface-2);
+  --color-line: var(--app-border);
+  --color-hover: var(--app-hover);
+  --color-ink: var(--app-text);
+  --color-subtle: var(--app-muted);
+  --color-accent: var(--app-accent);
+  --color-ok: var(--app-ok);
+  --color-warn: var(--app-warn);
+  --color-bad: var(--app-bad);
+  --color-info: var(--app-info);
+  --color-grad-fg: var(--app-grad-fg);
+  --ease-emphasized: var(--app-ease);
+}
+
+@utility bg-grad {
+  background: var(--app-grad);
+  color: var(--app-grad-fg);
+}
+
+@utility text-grad {
+  background: var(--app-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility mono {
+  font-family: var(--app-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* Not `overline`: Tailwind's built-in utility of that name adds text-decoration. */
+@utility eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--app-muted);
+}
+
+@utility tone-tint {
+  background: color-mix(in oklab, var(--tone) 13%, transparent);
+  color: color-mix(in oklab, var(--tone) 75%, var(--app-text));
+}
+
+@layer base {
+  html {
+    font-size: 16px;
+  }
+
+  body {
+    min-height: 100vh;
+    background: var(--app-bg);
+    color: var(--app-text);
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+    transition:
+      background-color var(--app-dur-moderate) ease,
+      color var(--app-dur-moderate) ease;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: var(--app-texture);
+    background-size: var(--app-texture-size);
+    mask-image: radial-gradient(ellipse 120% 80% at 50% 0%, #000 30%, transparent 80%);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--app-accent);
+    outline-offset: 2px;
+  }
+
+  /* Lao needs ~15–20 % more leading; uppercase tracking only suits Latin. */
+  html:lang(lo) body {
+    line-height: 1.7;
+  }
+  html:lang(lo) .eyebrow {
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  [data-slot='error'][id$='-error'] {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  [data-slot='error'][id$='-error']::before {
+    content: '';
+    flex: none;
+    width: 13px;
+    height: 13px;
+    background: currentColor;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cline x1='12' x2='12' y1='8' y2='12'/%3E%3Cline x1='12' x2='12.01' y1='16' y2='16'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+  }
+}
+
+@layer components {
+  .card {
+    min-width: 0;
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-r-lg);
+    background: var(--app-surface);
+    box-shadow: var(--app-shadow-sm);
+  }
+  .card-h {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 12px;
+    padding: 16px var(--app-pad, 20px) 0;
+  }
+  .card-h > h2,
+  .card-h > div > h2 {
+    font-size: 15px;
+    font-weight: 700;
+  }
+  .card-h > p,
+  .card-h > div > p {
+    flex-basis: 100%;
+    color: var(--app-muted);
+    font-size: 13px;
+    line-height: 1.55;
+  }
+  .card-b {
+    padding: 16px var(--app-pad, 20px) var(--app-pad, 20px);
+  }
+  .card-list {
+    margin-top: 12px;
+    border-top: 1px solid var(--app-border);
+  }
+  .card-list > li,
+  .card-list > .row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 14px;
+    padding: 12px var(--app-pad, 20px);
+    border-bottom: 1px solid var(--app-border);
+  }
+  .card-list > :last-child {
+    border-bottom: 0;
+  }
+  .muted {
+    color: var(--app-muted);
+  }
+  /* A file in a list (the demo's Documents rows): kind badge, name and detail, size, actions. */
+  .file-row {
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr) auto auto;
+    gap: 14px;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px dashed var(--app-border);
+    font-size: 13px;
+  }
+  .file-row:last-child {
+    border-bottom: 0;
+  }
+  .file-row small {
+    display: block;
+    color: var(--app-muted);
+    font-size: 12px;
+  }
+  .file-kind {
+    display: grid;
+    flex: none;
+    width: 40px;
+    height: 40px;
+    place-items: center;
+    overflow: hidden;
+    border-radius: var(--app-r-sm);
+    background: var(--k);
+    color: #fff;
+    font: 700 10px var(--app-mono);
+  }
+  /* Rows of a files list come and go (TransitionGroup name="file-list"). */
+  .file-list-enter-active,
+  .file-list-leave-active {
+    transition:
+      opacity 0.18s var(--ease-out, ease-out),
+      transform 0.18s var(--ease-out, ease-out);
+  }
+  .file-list-enter-from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  .file-list-leave-to {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+  /* An uploaded row gives way to the same file's row in the list: no cross-fade of the two. */
+  .file-list-leave-active[data-upload][data-state='done'] {
+    display: none;
+  }
+  /* A bar floating over the bottom of the content: unsaved changes, selected rows (Transition name="floatbar"). */
+  .floatbar {
+    position: fixed;
+    right: 24px;
+    bottom: 20px;
+    left: calc(var(--side, var(--app-side-w, 264px)) + 24px);
+    z-index: 40;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    max-width: calc(var(--app-content-max, 1400px) - 48px);
+    margin-inline: auto;
+    padding: 12px 18px;
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-r-lg);
+    background: color-mix(in oklab, var(--app-surface) 92%, transparent);
+    box-shadow: var(--app-shadow-lg);
+    backdrop-filter: blur(10px);
+  }
+  @media (max-width: 900px) {
+    .floatbar {
+      right: 12px;
+      left: 12px;
+    }
+  }
+  .floatbar-enter-active,
+  .floatbar-leave-active {
+    transition:
+      transform var(--app-dur-base) var(--app-ease),
+      opacity var(--app-dur-base);
+  }
+  .floatbar-enter-from,
+  .floatbar-leave-to {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@keyframes app-view-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@keyframes app-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

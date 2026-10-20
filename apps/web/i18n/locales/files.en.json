@@ -1,0 +1,121 @@
+{
+  "files": {
+    "nav": {
+      "mine": "My files",
+      "admin": "Files"
+    },
+    "title": "Files",
+    "upload": "Upload",
+    "dropBrowse": "Drop files here or click to browse",
+    "dropMore": "Drop more files or click to browse",
+    "dropNow": "Drop to upload",
+    "limits": "{types} · up to {max}",
+    "limitsMore": "{types} and {n} more · up to {max}",
+    "limitsSize": "Up to {max} per file",
+    "draftNote": "Files are attached when you save.",
+    "submitNote": "Files are uploaded when you save.",
+    "empty": "No files yet",
+    "remove": "Remove {name}",
+    "stillUploading": "Files are still uploading",
+    "by": "{name} · {when}",
+    "download": "Download {name}",
+    "delete": "Delete {name}",
+    "deleteTitle": "Delete this file?",
+    "deleteText": "{name} is removed for everyone.",
+    "deleted": "{name} deleted",
+    "preview": "Preview {name}",
+    "open": "Open {name} in a new tab",
+    "cancel": "Cancel upload of {name}",
+    "dismiss": "Dismiss",
+    "retry": "Retry upload of {name}",
+    "uploaded": "Uploaded",
+    "ready": "Ready to upload",
+    "readySummary": "{n} file ready · {size} | {n} files ready · {size}",
+    "uploadN": "Upload {n} file | Upload {n} files",
+    "clear": "Clear",
+    "someFailed": "Some files could not be uploaded. Retry or remove them, then save again.",
+    "summary": "{n} file · {size} | {n} files · {size}",
+    "uploading": "Uploading {n} file… | Uploading {n} files…",
+    "refused": {
+      "empty": "The file is empty",
+      "too_large": "Larger than {max}",
+      "type_not_allowed": "This file type is not allowed"
+    },
+    "failed": "Upload failed",
+    "unavailable": "Record no longer available",
+    "notAttached": "Not attached",
+    "columns": {
+      "file": "File",
+      "size": "Size",
+      "record": "Record",
+      "uploader": "Uploaded by",
+      "uploaded": "Uploaded"
+    },
+    "kinds": {
+      "all": "All types",
+      "image": "Images",
+      "document": "Documents",
+      "other": "Other"
+    },
+    "allRecords": "All records",
+    "stats": {
+      "files": "Files",
+      "storage": "Storage used",
+      "image": "Images",
+      "document": "Documents",
+      "other": "Other",
+      "trash": "In trash"
+    },
+    "storage": {
+      "title": "Storage",
+      "byType": "By type",
+      "byRecord": "By record",
+      "largest": "Largest files",
+      "uploaders": "Top uploaders",
+      "share": "{size} · {n} file | {size} · {n} files",
+      "empty": "No files stored yet.",
+      "find": "Find {name} in the list",
+      "trash": "{n} file in the trash · {size} is freed when it is removed | {n} files in the trash · {size} is freed when they are removed",
+      "openTrash": "Open trash",
+      "inTrash": "{n} in trash",
+      "expand": "Show storage details",
+      "collapse": "Hide storage details"
+    },
+    "admin": {
+      "title": "Files",
+      "subtitle": "Every file uploaded in the workspace.",
+      "entities": "files"
+    },
+    "mine": {
+      "title": "My files",
+      "subtitle": "Files you uploaded, wherever they are attached.",
+      "entities": "files"
+    },
+    "trash": {
+      "title": "Trash",
+      "viewLabel": "Files or trash",
+      "hint": "Deleted files stay here until the date shown, then they are removed for good. Restore one to put it back where it was.",
+      "entities": "deleted files",
+      "deletedBy": "Deleted by",
+      "deleted": "Deleted",
+      "purgeAt": "Removed for good on",
+      "restore": "Restore {name}",
+      "restored": "{name} restored",
+      "destroyOne": "Delete {name} permanently",
+      "destroy": "Delete permanently",
+      "destroyTitle": "Delete this file permanently?",
+      "destroyText": "{name} and its content are removed now. This cannot be undone.",
+      "destroyed": "{name} deleted permanently",
+      "hintMine": "Files you uploaded and deleted yourself stay here until the date shown, then they are removed for good. Restore one to put it back where it was.",
+      "empty": "Empty trash",
+      "emptyTitle": "Empty the trash?",
+      "emptyText": "{n} file and its content are removed now. This cannot be undone. | {n} files and their content are removed now. This cannot be undone.",
+      "emptied": "{n} file deleted permanently | {n} files deleted permanently",
+      "emptyFailed": "{n} file could not be removed and is still in the trash | {n} files could not be removed and are still in the trash",
+      "word": "Delete"
+    },
+    "openRecord": "Open the record",
+    "unknownUser": "Unknown user",
+    "sizeBytes": "Size (bytes)"
+  }
+}

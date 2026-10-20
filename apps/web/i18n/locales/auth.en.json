@@ -1,0 +1,288 @@
+{
+  "auth": {
+    "footer": "© {year} Nelvine · Protected by two-step verification",
+    "backToSignIn": "Back to sign in",
+    "brand": {
+      "title": "Approvals, records and audit in one calm workspace",
+      "text": "Every decision is traceable, every permission is explicit and every change is on the record.",
+      "f1": "Approvals that move",
+      "f1Text": "Multi-stage workflows with clear owners, due dates and a full trail.",
+      "f2": "Least-privilege access",
+      "f2Text": "Roles, groups and conditional policies decide what each person can see and do.",
+      "f3": "Audit by default",
+      "f3Text": "Sign-ins, changes and decisions are recorded and searchable."
+    },
+    "fields": {
+      "identifier": "Email or username",
+      "identifierPlaceholder": "name{'@'}company.com or username",
+      "email": "Email",
+      "emailPlaceholder": "name{'@'}company.com",
+      "password": "Password",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm new password",
+      "displayName": "Your name"
+    },
+    "errors": {
+      "identifierRequired": "Enter your email or username",
+      "passwordRequired": "Enter your password",
+      "codeRequired": "Enter the full code",
+      "emailInvalid": "Enter a valid email address",
+      "nameRequired": "Enter your name"
+    },
+    "signIn": {
+      "title": "Welcome back",
+      "subtitle": "Sign in to continue to your workspace.",
+      "forgot": "Forgot password?",
+      "remember": "Keep me signed in on this device",
+      "submit": "Sign in",
+      "noAccount": "No account? Ask your administrator for an invite.",
+      "setupOpen": "This workspace has no administrator yet."
+    },
+    "mfa": {
+      "title": "Two-step verification",
+      "subtitle": {
+        "totp": "Enter the 6-digit code from your authenticator app.",
+        "email": "We sent a 6-digit code to {email}.",
+        "recovery": "Enter one of the recovery codes you saved when you set up two-step verification."
+      },
+      "methodLabel": "Verification method",
+      "method": {
+        "totp": "Authenticator app",
+        "email": "Email code",
+        "recovery": "Recovery code"
+      },
+      "codeLabel": "Verification code",
+      "recoveryLabel": "Recovery code",
+      "recoveryHint": "Each code works once.",
+      "submit": "Verify",
+      "resend": "Send a new code",
+      "resendIn": "Send a new code in {s}s",
+      "otherAccount": "Sign in with a different account"
+    },
+    "enroll": {
+      "title": "Set up two-step verification",
+      "subtitle": "Your workspace requires a second step when you sign in. Choose how you want to receive codes.",
+      "totpHint": "Use an app like Google Authenticator, 1Password or Authy.",
+      "emailHint": "Receive a code at your email address each time.",
+      "totpStep1": "Scan the QR code with your authenticator app, or enter the key by hand.",
+      "totpStep2": "Enter the 6-digit code the app shows.",
+      "qrLabel": "QR code for your authenticator app",
+      "manual": "Setup key",
+      "emailSent": "We sent a 6-digit code to your email address.",
+      "passwordHint": "Confirm it's you before adding a sign-in method.",
+      "confirm": "Turn on",
+      "otherMethod": "Other method"
+    },
+    "recovery": {
+      "title": "Recovery codes",
+      "text": "Use these if you lose access to your phone or email. Each code works once.",
+      "warning": "These codes are shown only once. Store them somewhere safe, like a password manager.",
+      "saved": "I have saved these codes",
+      "fileHeader": "Nelvine recovery codes: each code can be used once."
+    },
+    "password": {
+      "show": "Show password",
+      "hide": "Hide password",
+      "strength": "Strength",
+      "score0": "Empty",
+      "score1": "Too weak",
+      "score2": "Fair",
+      "score3": "Good",
+      "score4": "Strong",
+      "ruleLength": "At least {n} characters",
+      "ruleCommon": "Not a common or predictable password",
+      "rulePersonal": "Doesn't contain your name or email",
+      "met": "met",
+      "notMet": "not met",
+      "mismatch": "The passwords don't match",
+      "weak": "Choose a password that meets every rule"
+    },
+    "forgot": {
+      "title": "Reset your password",
+      "subtitle": "Enter your email or username and we'll send a reset link to your email address.",
+      "submit": "Send reset link",
+      "sentTitle": "Check your email",
+      "sentText": "If an account with an email address exists for {email}, a reset link is on its way. The link expires in 30 minutes. If your account has no email, ask an administrator for a temporary password.",
+      "tryAgain": "Try a different name"
+    },
+    "reset": {
+      "title": "Choose a new password",
+      "subtitle": "You'll be signed out on every other device.",
+      "submit": "Save new password",
+      "doneTitle": "Password updated",
+      "doneText": "Sign in with your new password.",
+      "invalidText": "Reset links work once and expire after 30 minutes. Request a new one.",
+      "requestNew": "Request a new link"
+    },
+    "link": {
+      "invalidTitle": "This link no longer works"
+    },
+    "changePassword": {
+      "title": "Choose your own password",
+      "subtitle": "You signed in with a temporary password. Replace it to continue.",
+      "temporary": "Temporary password",
+      "submit": "Save and continue"
+    },
+    "invite": {
+      "title": "Join your workspace",
+      "subtitle": "You were invited as {email}. Set your name and a password to finish.",
+      "submit": "Create account",
+      "doneTitle": "You're all set",
+      "doneText": "Your account is ready. Sign in to get started.",
+      "invalidText": "This invite was used already or has expired. Ask your administrator to send a new one."
+    },
+    "setup": {
+      "cta": "Set up",
+      "title": "Set up your workspace",
+      "subtitle": "Create the first administrator. You'll use this account to invite everyone else.",
+      "step": "Step {n} of {total}",
+      "token": "Setup token",
+      "tokenHint": "Printed in the API server log on first start.",
+      "tokenRequired": "Enter the setup token",
+      "tokenInvalid": "This setup token is not valid",
+      "submit": "Create administrator",
+      "doneTitle": "Workspace ready",
+      "doneText": "The administrator account was created. Sign in to continue.",
+      "closedTitle": "Setup is complete",
+      "closedText": "This workspace already has an administrator."
+    },
+    "verify": {
+      "title": "Verify email",
+      "working": "Confirming your email…",
+      "doneTitle": "Email confirmed",
+      "doneText": "Thanks. Your email address is verified.",
+      "invalidText": "Verification links work once and expire. Send yourself a new one.",
+      "resend": "Resend verification email",
+      "resent": "A new verification email is on its way."
+    },
+    "reauth": {
+      "text": "Enter your password to confirm it's you."
+    },
+    "captcha": {
+      "prompt": "Confirm that you're a person to continue.",
+      "failed": "The check didn't pass or has expired. Please try it again.",
+      "unavailable": "The check couldn't load. Check your connection and retry."
+    }
+  },
+  "account": {
+    "title": "Your account",
+    "subtitle": "Profile, sign-in security and active sessions.",
+    "tabs": {
+      "profile": "Profile",
+      "security": "Security",
+      "sessions": "Sessions",
+      "notifications": "Notifications",
+      "delegations": "Delegations"
+    },
+    "profile": {
+      "title": "Profile",
+      "subtitle": "How you appear to others, and your language and time zone.",
+      "verified": "Verified",
+      "unverified": "Not verified",
+      "changeEmail": "Change email",
+      "changeEmailText": "We'll send a link to the new address. The change applies once you open it.",
+      "newEmail": "New email",
+      "emailSent": "Check {email} to confirm the change",
+      "noEmail": "No email address",
+      "addEmail": "Add email",
+      "addEmailText": "We'll send a link to the address. It is added to your account once you open it.",
+      "username": "Username",
+      "usernameHelp": "Signs in like your email. Only an administrator can change it.",
+      "usernameNone": "None",
+      "locale": "Language",
+      "localeAuto": "Same as this browser",
+      "timezone": "Time zone",
+      "timezoneAuto": "Automatic ({tz})"
+    },
+    "security": {
+      "passwordTitle": "Password",
+      "passwordText": "Changing your password signs you out on every other device.",
+      "changePassword": "Change password",
+      "passwordChanged": "Password changed",
+      "passwordChangedText": "Other sessions were signed out.",
+      "mfaTitle": "Two-step verification",
+      "mfaText": "A second step when you sign in keeps your account safe even if your password leaks.",
+      "addMethod": "Add method",
+      "mfaAdded": "Sign-in method added",
+      "mfaRemoved": "Sign-in method removed",
+      "noMethods": "Two-step verification is off. Add a method to protect your account.",
+      "added": "Added {date}",
+      "lastUsed": "last used {when}",
+      "neverUsed": "never used",
+      "codesLeft": "No codes left | 1 code left | {n} codes left",
+      "regenerate": "New recovery codes",
+      "regenerateText": "Your current recovery codes stop working. Enter your password to continue.",
+      "removeTitle": "Remove this sign-in method?",
+      "removeText": "You'll no longer receive codes this way. Enter your password to confirm.",
+      "tokensTitle": "Personal API tokens",
+      "tokensText": "Tokens let scripts call the API as you.",
+      "tokensEmpty": "Not available yet",
+      "tokensUnavailable": "This server doesn't offer personal API tokens. Integrations use client credentials set up by an administrator."
+    },
+    "sessions": {
+      "title": "Active sessions",
+      "text": "Devices that are signed in to your account. Sign out of any you don't recognise.",
+      "current": "This device",
+      "remembered": "Remembered",
+      "unknownDevice": "Unknown device",
+      "signedIn": "signed in {when}",
+      "lastSeen": "active {when}",
+      "revoke": "Sign out",
+      "revoked": "Session signed out",
+      "revokeOthers": "Sign out other sessions",
+      "revokeOthersTitle": "Sign out {n} other session? | Sign out {n} other session? | Sign out {n} other sessions?",
+      "revokeOthersText": "Those devices will have to sign in again.",
+      "revokedOthers": "Other sessions signed out"
+    },
+    "delegations": {
+      "givenTitle": "Delegations I gave",
+      "givenText": "While one is active, new approvals assigned to you go to your delegate.",
+      "givenEmpty": "You have not delegated your approvals.",
+      "receivedTitle": "Delegations to me",
+      "receivedText": "Approvals that colleagues send to you while they are away.",
+      "receivedEmpty": "No one has delegated approvals to you.",
+      "new": "New delegation",
+      "scope": "Record type",
+      "allTypes": "All record types",
+      "starts": "Starts",
+      "startsHint": "Empty starts now",
+      "ends": "Ends",
+      "reason": "Reason",
+      "reasonPlaceholder": "e.g. Annual leave",
+      "active": "Active",
+      "scheduled": "Scheduled",
+      "revoke": "Revoke",
+      "revokeTitle": "Revoke this delegation?",
+      "revokeText": "New approvals come to you again. Requests already handed over stay with {name}.",
+      "create": "Create delegation",
+      "created": "Delegation created",
+      "revoked": "Delegation revoked",
+      "pickDelegate": "Choose who receives your approvals.",
+      "endsRequired": "Choose when the delegation ends.",
+      "endsAfterStart": "Must be after the start.",
+      "maxYear": "A delegation lasts at most one year.",
+      "endsFuture": "Must be in the future.",
+      "edit": "Edit delegation",
+      "editOne": "Edit the delegation to {name}",
+      "updated": "Delegation updated"
+    }
+  },
+  "errors": {
+    "auth_invalid_credentials": "That email and password don't match. Check them and try again.",
+    "auth_invalid_token": "This link is invalid or has expired.",
+    "auth_password_expired": "This temporary password has expired. Ask an administrator for a new one.",
+    "auth_password_change_required": "Choose a new password first.",
+    "password_unchanged": "Choose a password different from the temporary one.",
+    "auth_wrong_password": "That password is incorrect.",
+    "auth_password_required": "Enter your password.",
+    "mfa_invalid_code": "That code is not valid. Try again.",
+    "mfa_email_unverified": "Verify your email address before using email codes.",
+    "email_unchanged": "This is already your email.",
+    "password_too_short": "Use at least 12 characters.",
+    "password_too_long": "Use at most 128 characters.",
+    "password_common": "This password is too common.",
+    "password_matches_identity": "Don't use your email or name as your password.",
+    "rate_limited": "Too many attempts. Wait a moment and try again."
+  }
+}

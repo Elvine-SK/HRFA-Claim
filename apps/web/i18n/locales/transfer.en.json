@@ -1,0 +1,53 @@
+{
+  "transfer": {
+    "status": {
+      "queued": "Waiting to start…",
+      "running": "Working…",
+      "succeeded": "Done",
+      "dead": "Failed"
+    },
+    "export": {
+      "allHint": "Download every record as CSV",
+      "filteredHint": "Download the records matching the current filters as CSV",
+      "running": "Exporting…",
+      "done": "Exported {n} row | Exported {n} rows",
+      "truncated": "The export hit the row limit; narrow the filters to get the rest.",
+      "failed": "The export failed"
+    },
+    "import": {
+      "title": "Import {entities}",
+      "subtitle": "Upload a CSV file. It is checked first; nothing is saved until you confirm.",
+      "progress": "Import progress",
+      "steps": { "upload": "Upload", "check": "Check", "done": "Import" },
+      "template": "Download template",
+      "templateHint": "Start from the template so the columns match.",
+      "required": "required",
+      "drop": "Drop a CSV file here or click to choose",
+      "dropHint": "Up to 5 MB, UTF-8",
+      "replace": "Choose another file",
+      "notCsv": "Choose a .csv file.",
+      "tooBig": "The file is larger than {mb} MB.",
+      "check": "Check file",
+      "checking": "Checking rows…",
+      "importing": "Importing rows…",
+      "checkOk": "Every row is valid",
+      "checkIssues": "{n} row has problems | {n} rows have problems",
+      "checkSummary": "{ok} of {total} rows can be imported.",
+      "ignored": "These columns are not used and will be ignored:",
+      "total": "Rows",
+      "valid": "Valid",
+      "imported": "Imported",
+      "withErrors": "With problems",
+      "errorsCaption": "Rows with problems",
+      "row": "Row",
+      "field": "Column",
+      "problem": "Problem",
+      "run": "Import",
+      "runValid": "Import {n} valid row | Import {n} valid rows",
+      "doneTitle": "Imported {n} row | Imported {n} rows",
+      "doneSkipped": "{n} row with problems was skipped. | {n} rows with problems were skipped.",
+      "doneToast": "Imported {n} row | Imported {n} rows",
+      "failed": "The import failed"
+    }
+  }
+}

@@ -1,0 +1,177 @@
+{
+  "approval": {
+    "nav": "Approvals",
+    "title": "Approvals",
+    "subtitle": "Requests waiting for you, and the ones you sent.",
+    "entities": "requests",
+    "round": "Round {n}",
+    "views": {
+      "label": "View",
+      "inbox": "Inbox",
+      "mine": "My requests",
+      "all": "All requests"
+    },
+    "columns": {
+      "record": "Record",
+      "status": "Status",
+      "submittedBy": "Submitted by",
+      "round": "Round",
+      "submitted": "Submitted",
+      "completed": "Completed"
+    },
+    "inbox": {
+      "count": "{n} waiting for you | {n} waiting for you",
+      "emptyTitle": "You're all caught up",
+      "emptyText": "Nothing is waiting for your decision.",
+      "pickTitle": "Pick a request to review",
+      "selectItem": "Select request from {name}",
+      "delegatedFrom": "Delegated by {name}"
+    },
+    "bulk": {
+      "label": "Bulk actions",
+      "approve": "Approve selected",
+      "title": {
+        "approve": "Approve {n} request | Approve {n} requests",
+        "reject": "Reject {n} request | Reject {n} requests",
+        "return": "Return {n} request | Return {n} requests"
+      },
+      "done": {
+        "approve": "Approved {n} request | Approved {n} requests",
+        "reject": "Rejected {n} request | Rejected {n} requests",
+        "return": "Returned {n} request | Returned {n} requests"
+      },
+      "failed": "{n} request could not be processed: {reason} | {n} requests could not be processed: {reason}"
+    },
+    "due": {
+      "overdue": "Overdue by {n} day | Overdue by {n} days",
+      "today": "Due today",
+      "soon": "Due in {n} day | Due in {n} days",
+      "later": "Due in {n} day | Due in {n} days"
+    },
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "returned": "Returned",
+      "cancelled": "Cancelled"
+    },
+    "assignment": {
+      "pending": "Waiting",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "returned": "Returned",
+      "superseded": "No longer needed"
+    },
+    "completion": {
+      "any": "any one approver",
+      "all": "all approvers"
+    },
+    "flow": {
+      "label": "Approval progress",
+      "skippedStep": "Skipped",
+      "state": {
+        "done": "Done",
+        "current": "In progress",
+        "rejected": "Rejected",
+        "returned": "Returned",
+        "skipped": "Skipped",
+        "waiting": "Waiting"
+      }
+    },
+    "events": {
+      "system": "System",
+      "submitted": "{actor} submitted the request",
+      "stage_started": "Stage {stage} started",
+      "step_skipped": "A step in {stage} was skipped",
+      "step_completed": "A step in {stage} was completed",
+      "approved": "{actor} approved",
+      "rejected": "{actor} rejected",
+      "returned": "{actor} returned it for changes",
+      "resubmitted": "{actor} resubmitted the request",
+      "commented": "{actor} commented",
+      "cancelled": "{actor} cancelled the request",
+      "completed": "Finished: {status}",
+      "delegated": "{actor} delegated the decision",
+      "escalated": "Escalated in {stage}"
+    },
+    "decide": {
+      "comment": "Comment",
+      "placeholder": "Add a comment (required to reject or return)",
+      "placeholderComment": "Write a comment",
+      "commentRequired": "A comment is required for this decision.",
+      "commentEmpty": "Write a comment first.",
+      "commentOnly": "Comment",
+      "approve": "Approve",
+      "reject": "Reject",
+      "return": "Return",
+      "resubmit": "Resubmit",
+      "cancel": "Cancel request",
+      "cancelTitle": "Cancel this request?",
+      "cancelText": "Approvers will no longer see it. You can submit the record again later.",
+      "approveTitle": "Approve this request?",
+      "approveText": "It moves on to the next step, or is approved if this was the last one. You can't change your decision afterwards.",
+      "rejectTitle": "Reject this request?",
+      "rejectText": "The submitter is notified. You can't change your decision afterwards.",
+      "returnTitle": "Return for changes?",
+      "returnText": "The submitter is notified and can edit the record and resubmit it.",
+      "resubmitTitle": "Resubmit this request?",
+      "resubmitText": "The approvers are asked to review it again.",
+      "commentTitle": "Post this comment?",
+      "commentText": "It is added to the request activity, where everyone on the request can see it.",
+      "move": "Move"
+    },
+    "toast": {
+      "approve": "Request approved",
+      "reject": "Request rejected",
+      "return": "Request returned for changes",
+      "resubmit": "Request resubmitted",
+      "cancel": "Request cancelled",
+      "comment": "Comment added",
+      "delegate": "Request delegated to {name}"
+    },
+    "detail": {
+      "title": "Approval request",
+      "unavailable": "This request can't be shown",
+      "submittedBy": "Submitted by {name} {when}",
+      "openRecord": "Open {entity}",
+      "stage": "Current stage",
+      "round": "Round",
+      "submitted": "Submitted",
+      "completed": "Completed",
+      "progress": "Progress",
+      "facts": "Details",
+      "activity": "Activity",
+      "workflow": "Workflow"
+    },
+    "record": {
+      "title": "Approval",
+      "none": "Not submitted for approval yet.",
+      "since": "since {when}",
+      "open": "Open request",
+      "submit": "Submit for approval",
+      "submitAgain": "Submit again",
+      "submitTitle": "Submit for approval?",
+      "submitText": "The approvers are notified and asked to review it. You can't submit it again while the request is open.",
+      "submitted": "Submitted for approval",
+      "chooseTitle": "Choose a workflow",
+      "chooseText": "Pick how this record is approved.",
+      "submitWith": "It will go through {name}.",
+      "noWorkflow": "No workflow is available to you"
+    },
+    "delegate": {
+      "button": "Delegate",
+      "title": "Delegate this request",
+      "text": "Hand your decision on this request to a colleague. They are notified, and the request leaves your inbox.",
+      "to": "Delegate to",
+      "pick": "Choose a person",
+      "search": "Type at least 2 letters",
+      "none": "No one matches"
+    },
+    "away": {
+      "one": "Your approvals go to {name} until {until}",
+      "many": "You have {n} delegations running",
+      "text": "New approvals assigned to you are sent to your delegate. What is listed here still waits for you.",
+      "manage": "Manage delegations"
+    }
+  }
+}

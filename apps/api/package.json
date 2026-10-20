@@ -1,0 +1,35 @@
+{
+  "name": "hr-fam-api",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --env-file-if-exists=.env src/main.ts",
+    "start": "tsx --env-file-if-exists=.env src/main.ts",
+    "platform": "tsx --env-file-if-exists=.env src/cli.ts",
+    "migrate": "tsx --env-file-if-exists=.env src/cli.ts migrate",
+    "openapi": "tsx --env-file-if-exists=.env src/cli.ts openapi openapi.json",
+    "openapi:verify": "tsx --env-file-if-exists=.env src/cli.ts openapi openapi.json --check",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@elvine-sk/platform-approval": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/approval",
+    "@elvine-sk/platform-audit": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/audit",
+    "@elvine-sk/platform-auth": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/auth",
+    "@elvine-sk/platform-authorization": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/authorization",
+    "@elvine-sk/platform-core": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/core",
+    "@elvine-sk/platform-dashboard": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/dashboard",
+    "@elvine-sk/platform-db": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/db",
+    "@elvine-sk/platform-files": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/files",
+    "@elvine-sk/platform-jobs": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/jobs",
+    "@elvine-sk/platform-notifications": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/notifications",
+    "@elvine-sk/platform-server": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/server",
+    "@elvine-sk/platform-transfer": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/transfer"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsx": "^4.23.15",
+    "typescript": "5.9.3",
+    "vitest": "^5.0.3"
+  }
+}

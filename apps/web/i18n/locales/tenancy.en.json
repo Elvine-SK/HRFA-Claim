@@ -1,0 +1,48 @@
+{
+  "tenancy": {
+    "nav": {
+      "workspaces": "Workspaces"
+    },
+    "choose": {
+      "title": "Choose a workspace",
+      "subtitle": "You belong to several. Pick the one to work in; you can switch at any time from the top of the menu."
+    },
+    "switcher": {
+      "label": "Your workspaces",
+      "open": "Workspace: {name}. Switch workspace",
+      "switched": "Now working in {name}",
+      "manage": "Manage workspaces"
+    },
+    "admin": {
+      "subtitle": "Separate areas of work. Records like products belong to one workspace and only its members see them.",
+      "new": "New workspace",
+      "newText": "Add members after creating it; only members can work in it.",
+      "entities": "workspaces",
+      "details": "Details",
+      "memberCount": "No members | {n} member | {n} members"
+    },
+    "fields": {
+      "name": "Name",
+      "key": "Key",
+      "keyHint": "Lowercase letters, digits, - and _; it cannot be changed later",
+      "keyInvalid": "Start with a letter; use 2 to 64 lowercase letters, digits, - or _",
+      "keyFixed": "Set when the workspace was created",
+      "status": "Status",
+      "members": "Members",
+      "created": "Created"
+    },
+    "status": {
+      "active": "Active",
+      "suspended": "Suspended"
+    },
+    "suspend": {
+      "title": "Suspend {name}?",
+      "text": "Its members can no longer work in it, and it disappears from their workspace menu. Its records are kept; reactivate it to bring them back.",
+      "confirm": "Suspend",
+      "done": "Workspace suspended"
+    },
+    "reactivate": "Reactivate",
+    "reactivated": "Workspace reactivated",
+    "suspendedHint": "Suspended: its members cannot work in it until it is reactivated."
+  }
+}

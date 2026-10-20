@@ -1,0 +1,45 @@
+{
+  "name": "hr-fam-web",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@elvine-sk/platform-core": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/core",
+    "@elvine-sk/platform-nuxt": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/nuxt",
+    "@iconify-json/lucide": "^1.2.140",
+    "@nuxt/ui": "^4.11.3",
+    "@nuxtjs/i18n": "^10.6.0",
+    "@tanstack/vue-query": "^5.104.1",
+    "@vue-flow/core": "^1.48.2",
+    "@vueuse/core": "^14.4.0",
+    "dayjs": "^1.11.23",
+    "nuxt": "^4.6.0",
+    "tailwindcss": "^4.3.3",
+    "uqr": "^0.1.3",
+    "vue": "^3.5.43",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@elvine-sk/platform-approval": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/approval",
+    "@elvine-sk/platform-audit": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/audit",
+    "@elvine-sk/platform-auth": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/auth",
+    "@elvine-sk/platform-auth-oidc": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/auth-oidc",
+    "@elvine-sk/platform-authorization": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/authorization",
+    "@elvine-sk/platform-dashboard": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/dashboard",
+    "@elvine-sk/platform-files": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/files",
+    "@elvine-sk/platform-jobs": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/jobs",
+    "@elvine-sk/platform-notifications": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/notifications",
+    "@elvine-sk/platform-tenancy": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/tenancy",
+    "@elvine-sk/platform-views": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/views",
+    "@elvine-sk/platform-webhooks": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/webhooks",
+    "openapi-typescript": "^7.13.0",
+    "typescript": "5.9.3",
+    "vue-tsc": "^3.3.12"
+  },
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "postinstall": "nuxt prepare",
+    "typecheck": "nuxt typecheck",
+    "api:types": "openapi-typescript ../api/openapi.json -o app/types/api.d.ts"
+  }
+}

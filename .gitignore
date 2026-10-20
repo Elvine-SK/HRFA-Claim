@@ -1,3 +1,14 @@
+node_modules/
+.nuxt/
+.output/
+dist/
+.data/
+.env
+*.log
+mail-out/
+storage/
+coverage/
+
 docs-and-facts-of-project/
 docs-and-facts-of-project.zip
 *.stackdump

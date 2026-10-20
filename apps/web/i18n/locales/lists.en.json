@@ -1,0 +1,64 @@
+{
+  "lists": {
+    "filter": {
+      "add": "Add filter",
+      "edit": "Edit filter",
+      "where": "Filter where",
+      "field": "Field",
+      "operator": "Condition",
+      "value": "Value",
+      "from": "From",
+      "to": "To",
+      "apply": "Apply filter",
+      "remove": "Remove filter {label}",
+      "clearAll": "Clear all",
+      "limit": "A list takes at most {n} filters",
+      "yes": "Yes",
+      "no": "No",
+      "and": "and",
+      "someone": "User {id}"
+    },
+    "ops": {
+      "eq": "is",
+      "ne": "is not",
+      "gt": "is more than",
+      "gte": "is at least",
+      "lt": "is less than",
+      "lte": "is at most",
+      "in": "is any of",
+      "nin": "is none of",
+      "between": "is between",
+      "contains": "contains",
+      "startsWith": "starts with",
+      "isNull": "is empty"
+    },
+    "dateOps": {
+      "gt": "is after",
+      "gte": "is on or after",
+      "lt": "is before",
+      "lte": "is on or before"
+    },
+    "views": {
+      "label": "Views",
+      "all": "All",
+      "save": "Save view",
+      "saveTitle": "Save this view",
+      "saveText": "Keeps the search, filters and sort order under a name. Only you see it.",
+      "saveAsNew": "Save as new view",
+      "name": "Name",
+      "rename": "Rename",
+      "renameTitle": "Rename view",
+      "update": "Update view",
+      "delete": "Delete",
+      "deleteTitle": "Delete the view “{name}”?",
+      "deleteText": "The records stay as they are; only the view is removed.",
+      "saved": "View saved",
+      "updated": "View updated",
+      "deleted": "View deleted",
+      "modified": "Changed since it was saved",
+      "invalid": "This view uses a filter that no longer exists. Delete it and save a new one.",
+      "menu": "Actions for {name}",
+      "loadFailed": "Views could not be loaded"
+    }
+  }
+}

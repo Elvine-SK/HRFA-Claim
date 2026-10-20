@@ -1,0 +1,9 @@
+packages:
+  - apps/*
+
+onlyBuiltDependencies:
+  - '@node-rs/argon2'
+  - '@parcel/watcher'
+  - esbuild
+  - vue-demi
+  - unrs-resolver

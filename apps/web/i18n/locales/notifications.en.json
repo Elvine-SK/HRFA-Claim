@@ -1,0 +1,33 @@
+{
+  "notifications": {
+    "menu": {
+      "title": "Notifications",
+      "unread": "Unread",
+      "all": "All",
+      "markAllRead": "Mark all read",
+      "loadMore": "Load more",
+      "emptyUnread": "You're all caught up",
+      "emptyAll": "No notifications yet",
+      "emptyText": "New notifications show up here.",
+      "error": "Couldn't load notifications",
+      "badge": "{n} unread"
+    },
+    "groups": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "earlier": "Earlier"
+    },
+    "peek": {
+      "waitingOn": "Waiting on",
+      "due": "Due"
+    },
+    "prefs": {
+      "title": "Notifications",
+      "text": "Choose where you hear about each kind of event.",
+      "type": "Event",
+      "inApp": "In-app",
+      "email": "Email",
+      "saved": "Preference saved"
+    }
+  }
+}

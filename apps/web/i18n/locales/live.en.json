@@ -1,0 +1,8 @@
+{
+  "live": {
+    "changedElsewhere": "Changed by someone else just now",
+    "changedElsewhereHint": "Reload to see their version. Your unsaved changes here will be lost; saving without reloading will be refused.",
+    "reload": "Reload",
+    "keepEditing": "Keep editing"
+  }
+}

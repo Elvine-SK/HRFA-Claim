@@ -1,0 +1,314 @@
+/*
+ * Platform design tokens (UI spec §2) and their mapping onto Nuxt UI (§3.1).
+ * Presets set every token; runtime overrides (brand, gradient stops, radius, primary shades)
+ * are written inline on <html> by the theme plugin and win over these rules.
+ */
+
+/* ----------------------------------------------------------------- shared */
+:root {
+  --app-mono: 'Geist Mono', 'Noto Sans Lao', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --app-font: 'Noto Sans Lao', 'Plus Jakarta Sans', system-ui, sans-serif;
+
+  --app-radius: 14px;
+  --app-r-sm: calc(var(--app-radius) * 0.7);
+  --app-r-md: var(--app-radius);
+  --app-r-lg: calc(var(--app-radius) * 1.35);
+  --app-r-pill: 999px;
+
+  --app-grad: linear-gradient(135deg, var(--app-grad-from), var(--app-grad-to));
+  --app-grad-fg: #ffffff;
+
+  --app-gap: 16px;
+  --app-pad: 22px;
+  --app-row-h: 58px;
+
+  --app-side-w: 264px;
+  --app-side-w-rail: 76px;
+  --app-side-w-mobile: 280px;
+  --app-topbar-h: 64px;
+  --app-content-max: 1480px;
+
+  --app-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --app-dur-fast: 120ms;
+  --app-dur-base: 150ms;
+  --app-dur-moderate: 250ms;
+  --app-dur-page: 300ms;
+
+  --app-z-sticky: 30;
+  --app-z-sidebar: 40;
+  --app-z-drawer: 70;
+  --app-z-palette: 90;
+  --app-z-toast: 100;
+
+  --app-texture-size: auto;
+  --app-tip-bg: var(--app-text);
+  --app-tip-fg: var(--app-surface);
+
+  color-scheme: light;
+}
+
+:root.dark {
+  color-scheme: dark;
+}
+
+/* ---------------------------------------------------------------- aurora */
+html:not([data-preset]),
+html[data-preset='aurora'] {
+  --app-bg: #f4f5fb;
+  --app-surface: #ffffff;
+  --app-surface-2: #f4f5fa;
+  --app-border: #e7e8f1;
+  --app-hover: #f6f6fc;
+  --app-text: #11132a;
+  --app-muted: #6b6f88;
+  --app-primary: #5b4cf5;
+  --app-primary-fg: #ffffff;
+  --app-accent: var(--app-primary);
+  --app-chart-2: #b44cf0;
+  --app-chart-3: #14b8d4;
+  --app-chart-4: #f2559a;
+  --app-chart-5: #f5a524;
+  --app-chart-6: #16c784;
+  --app-ok: #12b76a;
+  --app-warn: #f5a524;
+  --app-bad: #f04438;
+  --app-info: #2e90fa;
+  --app-grad-from: var(--app-primary);
+  --app-grad-to: #f2559a;
+  --app-shadow-sm: 0 1px 2px rgb(16 18 50 / 0.06);
+  --app-shadow: 0 1px 2px rgb(16 18 50 / 0.04), 0 4px 16px -4px rgb(16 18 50 / 0.06);
+  --app-shadow-lg: 0 12px 40px -8px rgb(16 18 50 / 0.18);
+  --app-texture:
+    radial-gradient(
+      800px 360px at 10% -10%,
+      color-mix(in oklab, var(--app-grad-from) 7%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      700px 360px at 100% 0%,
+      color-mix(in oklab, var(--app-grad-to) 6%, transparent),
+      transparent 70%
+    );
+  --app-radius: 14px;
+  --app-font: 'Noto Sans Lao', 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+html:not([data-preset]).dark,
+html[data-preset='aurora'].dark {
+  --app-bg: #0a0b16;
+  --app-surface: #12132a;
+  --app-surface-2: #181a35;
+  --app-border: #24264a;
+  --app-hover: #1a1c3a;
+  --app-text: #ecedfa;
+  --app-muted: #8d90b3;
+  --app-primary: #7c6dff;
+  --app-chart-2: #c77dff;
+  --app-chart-3: #22d3ee;
+  --app-chart-4: #ff6bae;
+  --app-chart-5: #ffb547;
+  --app-chart-6: #2ee6a0;
+  --app-ok: #2ed38b;
+  --app-warn: #ffb547;
+  --app-bad: #ff6a5f;
+  --app-info: #5aa8ff;
+  --app-grad-to: #ff6bae;
+  --app-shadow: 0 1px 0 rgb(255 255 255 / 0.03) inset, 0 8px 24px -8px rgb(0 0 0 / 0.5);
+  --app-shadow-lg: 0 16px 48px -8px rgb(0 0 0 / 0.6);
+  --app-texture:
+    radial-gradient(
+      900px 420px at 10% -10%,
+      color-mix(in oklab, var(--app-grad-from) 22%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      800px 420px at 100% 0%,
+      color-mix(in oklab, var(--app-grad-to) 14%, transparent),
+      transparent 70%
+    );
+}
+
+/* ------------------------------------------------------------- nightfall */
+html[data-preset='nightfall'] {
+  --app-bg: #fafafa;
+  --app-surface: #ffffff;
+  --app-surface-2: #f4f4f5;
+  --app-border: #e4e4e7;
+  --app-hover: #f4f4f5;
+  --app-text: #09090b;
+  --app-muted: #71717a;
+  --app-primary: #18181b;
+  --app-primary-fg: #fafafa;
+  --app-accent: #65a30d;
+  --app-chart-2: #7c3aed;
+  --app-chart-3: #0891b2;
+  --app-chart-4: #e11d74;
+  --app-chart-5: #d97706;
+  --app-chart-6: #059669;
+  --app-ok: #16a34a;
+  --app-warn: #d97706;
+  --app-bad: #dc2626;
+  --app-info: #0284c7;
+  --app-grad-from: #65a30d;
+  --app-grad-to: #0891b2;
+  --app-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.06);
+  --app-shadow: none;
+  --app-shadow-lg: 0 16px 40px -12px rgb(0 0 0 / 0.25);
+  --app-texture:
+    linear-gradient(color-mix(in oklab, var(--app-border) 60%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklab, var(--app-border) 60%, transparent) 1px, transparent 1px);
+  --app-texture-size: 48px 48px;
+  --app-radius: 10px;
+  --app-font: 'Noto Sans Lao', 'Geist', system-ui, sans-serif;
+}
+
+html[data-preset='nightfall'].dark {
+  --app-bg: #08080a;
+  --app-surface: #0f0f12;
+  --app-surface-2: #17171b;
+  --app-border: #232329;
+  --app-hover: #18181d;
+  --app-text: #f4f4f5;
+  --app-muted: #8b8b95;
+  --app-primary: #c6f432;
+  --app-primary-fg: #0a0a0a;
+  --app-accent: #c6f432;
+  --app-chart-2: #8b6cff;
+  --app-chart-3: #2bd4f5;
+  --app-chart-4: #ff5c93;
+  --app-chart-5: #ffb224;
+  --app-chart-6: #3ddc97;
+  --app-ok: #3ddc97;
+  --app-warn: #ffb224;
+  --app-bad: #ff5c5c;
+  --app-info: #2bd4f5;
+  --app-grad-from: #c6f432;
+  --app-grad-to: #2bd4f5;
+  --app-grad-fg: #0a0a0a;
+  --app-shadow-lg: 0 20px 50px -12px rgb(0 0 0 / 0.8);
+  --app-tip-bg: #1f1f25;
+  --app-tip-fg: #f4f4f5;
+  --app-texture:
+    radial-gradient(
+      900px 380px at 30% -120px,
+      color-mix(in oklab, var(--app-grad-from) 12%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(color-mix(in oklab, var(--app-border) 55%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklab, var(--app-border) 55%, transparent) 1px, transparent 1px);
+  --app-texture-size: auto, 48px 48px, 48px 48px;
+}
+
+/* -------------------------------------------------------------- graphite */
+html[data-preset='graphite'] {
+  --app-bg: #f7f8fa;
+  --app-surface: #ffffff;
+  --app-surface-2: #f2f4f7;
+  --app-border: #e4e7ec;
+  --app-hover: #f5f6f8;
+  --app-text: #101828;
+  --app-muted: #667085;
+  --app-primary: #2563eb;
+  --app-primary-fg: #ffffff;
+  --app-accent: var(--app-primary);
+  --app-chart-2: #7c3aed;
+  --app-chart-3: #0891b2;
+  --app-chart-4: #db2777;
+  --app-chart-5: #d97706;
+  --app-chart-6: #059669;
+  --app-ok: #12b76a;
+  --app-warn: #f79009;
+  --app-bad: #f04438;
+  --app-info: #2e90fa;
+  --app-grad-from: var(--app-primary);
+  --app-grad-to: #06b6d4;
+  --app-shadow-sm: 0 1px 2px rgb(16 24 40 / 0.05);
+  --app-shadow: 0 1px 3px rgb(16 24 40 / 0.06);
+  --app-shadow-lg: 0 12px 32px -8px rgb(16 24 40 / 0.18);
+  --app-texture: none;
+  --app-radius: 10px;
+  --app-font: 'Noto Sans Lao', 'Inter', system-ui, sans-serif;
+}
+
+html[data-preset='graphite'].dark {
+  --app-bg: #0c111d;
+  --app-surface: #131a2a;
+  --app-surface-2: #1a2234;
+  --app-border: #263045;
+  --app-hover: #1a2234;
+  --app-text: #f0f2f5;
+  --app-muted: #94a3b8;
+  --app-primary: #3b82f6;
+  --app-chart-2: #a78bfa;
+  --app-chart-3: #22d3ee;
+  --app-chart-4: #f472b6;
+  --app-chart-5: #fbbf24;
+  --app-chart-6: #34d399;
+  --app-ok: #34d399;
+  --app-warn: #fbbf24;
+  --app-bad: #f87171;
+  --app-info: #60a5fa;
+  --app-grad-to: #22d3ee;
+  --app-shadow: 0 8px 24px -10px rgb(0 0 0 / 0.6);
+  --app-shadow-lg: 0 16px 48px -8px rgb(0 0 0 / 0.6);
+}
+
+/* ------------------------------------------- user/workspace choices (after presets) */
+html[data-font='jakarta'] {
+  --app-font: 'Noto Sans Lao', 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+html[data-font='inter'] {
+  --app-font: 'Noto Sans Lao', 'Inter', system-ui, sans-serif;
+}
+html[data-font='geist'] {
+  --app-font: 'Noto Sans Lao', 'Geist', system-ui, sans-serif;
+}
+
+html[data-density='compact'] {
+  --app-gap: 12px;
+  --app-pad: 16px;
+  --app-row-h: 38px;
+}
+html[data-density='spacious'] {
+  --app-gap: 20px;
+  --app-pad: 26px;
+  --app-row-h: 58px;
+}
+
+html[data-grad='off'],
+html[data-grad='off'].dark {
+  --app-grad: var(--app-primary);
+  --app-grad-fg: var(--app-primary-fg);
+}
+
+/* ------------------------------------------------------ Nuxt UI mapping (§3.1) */
+:root {
+  --ui-bg: var(--app-surface);
+  --ui-bg-muted: var(--app-surface-2);
+  --ui-bg-elevated: var(--app-hover);
+  --ui-bg-accented: var(--app-border);
+  --ui-bg-inverted: var(--app-text);
+
+  --ui-border: var(--app-border);
+  --ui-border-muted: color-mix(in oklab, var(--app-border) 40%, transparent);
+  --ui-border-accented: color-mix(in oklab, var(--app-border) 75%, var(--app-text));
+  --ui-border-inverted: var(--app-text);
+
+  --ui-text: var(--app-text);
+  --ui-text-highlighted: var(--app-text);
+  --ui-text-toned: color-mix(in oklab, var(--app-text) 80%, var(--app-muted));
+  --ui-text-muted: var(--app-muted);
+  --ui-text-dimmed: color-mix(in oklab, var(--app-muted) 70%, transparent);
+  --ui-text-inverted: var(--app-surface);
+
+  --ui-primary: var(--app-primary);
+  --ui-secondary: var(--app-accent);
+  --ui-success: var(--app-ok);
+  --ui-warning: var(--app-warn);
+  --ui-error: var(--app-bad);
+  --ui-info: var(--app-info);
+
+  /* Nuxt UI controls use rounded-md = 1.5 × --ui-radius; this makes them r-sm. */
+  --ui-radius: calc(var(--app-r-sm) / 1.5);
+  --ui-header-height: var(--app-topbar-h);
+}

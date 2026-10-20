@@ -1,0 +1,17 @@
+{
+  "records": {
+    "history": {
+      "empty": "No changes recorded yet.",
+      "create": "Created",
+      "update": "Changed {fields}",
+      "delete": "Deleted",
+      "restore": "Restored",
+      "by": "by {who}",
+      "someone": "Someone",
+      "system": "System",
+      "to": "changed to",
+      "yes": "Yes",
+      "no": "No"
+    }
+  }
+}

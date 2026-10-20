@@ -1,0 +1,21 @@
+{
+  "name": "hr-fam",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "dev:api": "cd apps/api && pnpm run dev",
+    "dev:web": "cd apps/web && pnpm run dev",
+    "migrate": "cd apps/api && pnpm run migrate",
+    "openapi": "cd apps/api && pnpm run openapi",
+    "typecheck": "cd apps/api && pnpm run typecheck && cd ../web && pnpm run typecheck",
+    "test": "cd apps/api && pnpm run test"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "5.9.3"
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "shell": {
+    "appName": "Nelvine",
+    "workspace": "Workspace",
+    "home": "Home",
+    "mainNav": "Main navigation",
+    "collapse": "Collapse sidebar",
+    "expand": "Expand sidebar",
+    "openMenu": "Open menu",
+    "searchTrigger": "Search or jump to…",
+    "appearance": "Appearance",
+    "toggleDark": "Toggle dark mode",
+    "notifications": "Notifications",
+    "account": "Account",
+    "profile": "Profile",
+    "security": "Security",
+    "preferences": "Preferences",
+    "sessions": "Sessions",
+    "language": "Language",
+    "signOut": "Sign out",
+    "guest": "Guest user",
+    "guestRole": "No sign-in yet",
+    "skipToContent": "Skip to content"
+  },
+  "palette": {
+    "placeholder": "Search pages and actions…",
+    "pages": "Pages",
+    "actions": "Actions",
+    "toggleTheme": "Toggle light / dark",
+    "openAppearance": "Open appearance settings",
+    "hints": "↑↓ navigate · Enter open · Esc close"
+  },
+  "appearance": {
+    "title": "Appearance",
+    "personalNote": "Only you see these changes. They follow your account.",
+    "workspaceNote": "Everyone starts from this look. Lock a setting so people can't change it for themselves.",
+    "personal": "Personal",
+    "workspace": "Workspace",
+    "admin": "Admin",
+    "workspaceDefault": "Workspace default",
+    "lock": "Lock",
+    "lockedForAll": "Locked for everyone",
+    "lockHint": "A locked setting is the same for everyone.",
+    "saveWorkspace": "Save for workspace",
+    "workspaceSaved": "Workspace appearance saved",
+    "discard": "Discard",
+    "from": "From",
+    "to": "To",
+    "gradientFrom": "Gradient start colour",
+    "gradientTo": "Gradient end colour",
+    "preset": "Preset",
+    "mode": "Mode",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "brand": "Brand colour",
+    "presetDefault": "Preset default",
+    "custom": "Custom colour",
+    "gradient": "Gradient accents",
+    "gradientOn": "Use gradient accents",
+    "radius": "Corner radius",
+    "density": "Density",
+    "compact": "Compact",
+    "comfortable": "Comfortable",
+    "spacious": "Spacious",
+    "font": "Font",
+    "locked": "Locked by your workspace",
+    "reset": "Reset to workspace",
+    "presets": {
+      "aurora": "Light, airy, gradient accents",
+      "nightfall": "Dense, mono numerals, grid",
+      "graphite": "Neutral enterprise blue"
+    }
+  },
+  "states": {
+    "401": {
+      "title": "Your session has ended",
+      "text": "Sign in again to continue where you left off."
+    },
+    "403": {
+      "title": "You don't have access",
+      "text": "Ask an administrator for access to this page."
+    },
+    "404": {
+      "title": "Page not found",
+      "text": "The page you're looking for doesn't exist or was moved."
+    },
+    "500": {
+      "title": "Something went wrong",
+      "text": "An unexpected error happened. Try again; if it keeps happening, share the request ID with support."
+    },
+    "goHome": "Go to dashboard",
+    "search": "Search",
+    "requestAccess": "Request access",
+    "signIn": "Sign in again"
+  },
+  "system": {
+    "title": "Component gallery",
+    "eyebrow": "System",
+    "subtitle": "Platform building blocks rendered with the current theme."
+  },
+  "nav": {
+    "overview": "Overview",
+    "dashboard": "Dashboard",
+    "workspace": "Workspace"
+  },
+  "home": {
+    "title": "Welcome, {name}",
+    "subtitle": "Pick up where you left off.",
+    "emptyTitle": "Nothing to show yet",
+    "emptyText": "Ask an administrator for access to the sections you need."
+  }
+}

@@ -1,0 +1,141 @@
+{
+  "webhooks": {
+    "title": "Webhooks",
+    "subtitle": "Send events to other systems, and receive theirs.",
+    "tabs": {
+      "outgoing": "Outgoing",
+      "incoming": "Incoming"
+    },
+    "columns": {
+      "name": "Name",
+      "host": "Host",
+      "events": "Events",
+      "status": "Status",
+      "lastDelivery": "Last delivery"
+    },
+    "status": {
+      "healthy": "Healthy",
+      "failing": "Failing",
+      "disabled": "Turned off"
+    },
+    "new": "New webhook",
+    "newText": "Choose the events to send and where to send them. The signing secret is shown once, after saving.",
+    "entities": "webhooks",
+    "details": "Details",
+    "fields": {
+      "name": "Name",
+      "url": "URL",
+      "events": "Events",
+      "payload": "Payload",
+      "active": "Active"
+    },
+    "events": {
+      "test": "Webhook test event"
+    },
+    "eventsPlaceholder": "Choose events",
+    "allWorkspaces": "Every workspace",
+    "allWorkspacesHint": "Send events from all workspaces, not only the current one.",
+    "payload": {
+      "minimal": "Minimal: event, record type and id",
+      "full": "Full: includes the record"
+    },
+    "payloadHint": "Minimal is safer: the receiver asks the API for details with its own permissions.",
+    "fullUnavailable": "Some of the chosen events can't carry the full record.",
+    "failingSince": "Deliveries have been failing since {when}.",
+    "secret": {
+      "title": "Signing secret",
+      "once": "Copy it now. It is shown only once.",
+      "copy": "Copy",
+      "rotate": "Rotate secret",
+      "rotateConfirm": "The old secret keeps working for 24 hours."
+    },
+    "test": "Send test event",
+    "testSent": "Test event queued",
+    "delete": "Delete webhook",
+    "deleteTitle": "Delete {name}?",
+    "deleteText": "Deliveries not sent yet are given up. This can't be undone.",
+    "deleteWord": "Delete",
+    "deliveries": {
+      "title": "Deliveries",
+      "event": "Event",
+      "code": "Code",
+      "duration": "Duration",
+      "attempts": "Attempts",
+      "time": "Time",
+      "empty": "Nothing sent yet.",
+      "resend": "Send again",
+      "resent": "Queued again"
+    },
+    "deliveryStatus": {
+      "pending": "Pending",
+      "succeeded": "Delivered",
+      "failed": "Failed, will retry",
+      "dead": "Given up"
+    },
+    "errors": {
+      "nameRequired": "Give the webhook a name.",
+      "urlRequired": "Enter the address to send to.",
+      "eventsRequired": "Pick at least one event.",
+      "url_refused": "This address can't be called. Internal addresses need an entry in WEBHOOKS_ALLOWED_HOSTS.",
+      "scheme": "Only http and https addresses can be called.",
+      "unresolvable": "This host can't be found. Check the address.",
+      "blocked_address": "This is an internal address. Add it to WEBHOOKS_ALLOWED_HOSTS to allow it.",
+      "https_required": "Use https."
+    },
+    "incoming": {
+      "new": "New source",
+      "newText": "Pick what to do with what arrives and how to check it comes from the sender. The secret is shown once, after saving.",
+      "entities": "sources",
+      "handler": "Handler",
+      "handlerPlaceholder": "Choose a handler",
+      "url": "Receive URL",
+      "urlHint": "Give this address to the sender. It accepts POST requests checked with the secret.",
+      "copyUrl": "Copy the receive URL",
+      "verify": "Check",
+      "verifyMethods": {
+        "platform": "Platform signature",
+        "hmac-sha256": "HMAC-SHA256 header",
+        "token": "Shared token"
+      },
+      "headerPrefix": "Sender header prefix",
+      "headerPrefixHint": "The sender signs with X-{prefix}-Signature (its WEBHOOKS_HEADER_PREFIX).",
+      "signatureHeader": "Signature header",
+      "encoding": "Encoding",
+      "signaturePrefix": "Signature prefix",
+      "signaturePrefixHint": "Text before the digest, if any.",
+      "timestampHeader": "Timestamp header",
+      "timestampHeaderHint": "When set, the digest covers the timestamp, a dot and the body, and the timestamp must be under 5 minutes old.",
+      "deliveryHeader": "Delivery id header",
+      "deliveryHeaderHint": "Names each delivery, so a repeat is refused. Without one, a repeated body is.",
+      "tokenHeader": "Token header",
+      "tokenHeaderHint": "The header that carries the secret. Empty: X-Webhook-Token.",
+      "allowedIps": "Allowed IP ranges",
+      "allowedIpsHint": "One address or CIDR per line. Empty: any address.",
+      "secretInput": "Sender's secret",
+      "secretInputHint": "Paste the sender's secret, or leave empty to generate one",
+      "secretText": "Give it to the sender, unless you pasted theirs.",
+      "allWorkspacesHint": "Not tied to a workspace: its handler runs outside any workspace.",
+      "on": "On",
+      "lastReceived": "Last received",
+      "failures24h": "Failed in 24 h",
+      "log": "Received",
+      "empty": "Nothing received yet.",
+      "deliveryId": "Delivery id",
+      "error": "Error",
+      "received": "Received",
+      "processed": "Processed",
+      "failed": "Failed",
+      "rerun": "Run again",
+      "rerunQueued": "Queued to run again",
+      "rotateConfirm": "The old secret keeps working for 24 hours. Give the new one to the sender.",
+      "delete": "Delete source",
+      "deleteText": "Its URL stops accepting requests at once. This can't be undone.",
+      "errors": {
+        "handlerRequired": "Choose a handler.",
+        "unknownHandler": "This handler is no longer installed. Choose another.",
+        "signatureHeaderRequired": "Name the header that carries the signature.",
+        "allowedIps": "Each line must be an IP address or a CIDR range."
+      }
+    }
+  }
+}

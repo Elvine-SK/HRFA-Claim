@@ -1,0 +1,141 @@
+{
+  "dashboard": {
+    "subtitle": "Your work at a glance. Customize it to keep what matters to you.",
+    "greeting": {
+      "morning": "Good morning, {name}",
+      "afternoon": "Good afternoon, {name}",
+      "evening": "Good evening, {name}"
+    },
+    "summary": "{count} waiting on you",
+    "approvalCount": "{n} approval | {n} approvals",
+    "customize": "Customize",
+    "addWidget": "Add widget",
+    "reset": "Reset layout",
+    "resetTitle": "Reset your dashboard?",
+    "resetText": "Your layout goes back to the default, and widgets you removed come back.",
+    "resetDone": "Dashboard reset",
+    "done": "Done",
+    "editHint": "Drag a card by its handle or use the arrows to reorder. Pick S / M / L / XL to resize. Saved to your account.",
+    "saveFailed": "Couldn't save your dashboard",
+    "loadFailed": "Couldn't load your dashboard.",
+    "added": "{title} added",
+    "removed": "{title} removed · add it back from the catalog",
+    "toolbar": "Arrange {title}",
+    "size": "Size",
+    "sizeTo": "Make it {size}",
+    "sizes": {
+      "s": "small",
+      "m": "medium",
+      "l": "large",
+      "xl": "full width"
+    },
+    "moveBack": "Move {title} back",
+    "moveForward": "Move {title} forward",
+    "remove": "Remove {title}",
+    "widgetFailed": "This widget couldn't load.",
+    "ago": {
+      "now": "now",
+      "minutes": "{n}m",
+      "hours": "{n}h",
+      "days": "{n}d"
+    },
+    "emptyTitle": "Your dashboard is empty",
+    "emptyText": "Add widgets from the catalog.",
+    "emptyNone": "Nothing to show yet",
+    "emptyNoneText": "Ask an administrator for access to the sections you need.",
+    "catalog": {
+      "title": "Widget catalog",
+      "text": "Widgets you may use. Locked ones need extra access.",
+      "add": "Add",
+      "placed": "On your dashboard",
+      "needs": "Needs {permission}",
+      "needsRole": "Ask an administrator to turn this widget on for your role"
+    },
+    "stats": {
+      "none": "No numbers to show.",
+      "failed": "Couldn't load this number"
+    },
+    "widgets": {
+      "stats": {
+        "title": "Key numbers",
+        "description": "Counts from the sections you use"
+      },
+      "approvals": {
+        "title": "My approvals",
+        "subtitle": "Waiting on you, oldest first",
+        "description": "Approve or reject requests without leaving the dashboard",
+        "empty": "Nothing is waiting on you.",
+        "approve": "Approve",
+        "reject": "Reject",
+        "comment": "Reason",
+        "commentPlaceholder": "Why are you rejecting it?",
+        "approved": "Request approved",
+        "rejected": "Request rejected",
+        "viewAll": "View all ({n})",
+        "overdue": "Overdue {n}d",
+        "dueToday": "Due today",
+        "dueOn": "Due {date}",
+        "caughtUp": "All caught up",
+        "open": "Open {name}'s request"
+      },
+      "activity": {
+        "title": "Recent activity",
+        "subtitle": "Across the workspace",
+        "description": "The latest events from the audit log",
+        "empty": "No activity yet.",
+        "viewAll": "Open the audit log",
+        "events": {
+          "auth": {
+            "login": {
+              "succeeded": "{actor} signed in",
+              "failed": "{actor} failed to sign in"
+            },
+            "logout": "{actor} signed out",
+            "password": {
+              "changed": "{actor} changed their password",
+              "reset": "{actor} reset their password"
+            },
+            "mfa": {
+              "enrolled": "{actor} turned on two-step verification"
+            },
+            "invite": {
+              "sent": "{actor} sent an invitation",
+              "accepted": "{actor} accepted an invitation"
+            }
+          },
+          "admin": {
+            "user": {
+              "updated": "{actor} updated a user"
+            },
+            "appearance": {
+              "updated": "{actor} changed the workspace look"
+            }
+          },
+          "approval": {
+            "workflow": {
+              "created": "{actor} created a workflow",
+              "updated": "{actor} updated a workflow"
+            },
+            "delegation": {
+              "created": "{actor} delegated their approvals"
+            }
+          },
+          "transfer": {
+            "imported": "{actor} imported records",
+            "exported": "{actor} exported records"
+          },
+          "files": {
+            "uploaded": "{actor} uploaded a file",
+            "deleted": "{actor} deleted a file"
+          }
+        }
+      },
+      "quick": {
+        "title": "Quick actions",
+        "description": "Shortcuts to the pages you use",
+        "empty": "No shortcuts yet.",
+        "subtitle": "Your frequent tasks"
+      }
+    }
+  }
+}
