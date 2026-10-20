@@ -1,4 +1,6 @@
-import { defineModule } from '@elvine-sk/platform-server'
+import { AUTH } from '@elvine-sk/platform-auth'
+import { defineModule, type ModuleContext } from '@elvine-sk/platform-server'
+import { SYNC_JOB, syncHrmSessions } from './logout-sync.ts'
 import { authHrmMigrations } from './migrations.ts'
 import { authHrmRoutes } from './routes.ts'
 
@@ -23,6 +25,8 @@ const messages = {
   },
 }
 
+let moduleCtx: ModuleContext | undefined
+
 /**
  * Sign-in handed over from the HRM portal (spec §6): a one-time code from HRM's `tb_app_handoff`, spent in this
  * app's database, opens a platform session for the linked (or new) user. App-local for now; shaped like the
@@ -30,10 +34,25 @@ const messages = {
  */
 export const authHrmModule = defineModule({
   name: 'auth-hrm',
-  dependsOn: ['auth', 'authorization', 'audit', 'hrm'],
+  dependsOn: ['auth', 'authorization', 'audit', 'jobs', 'hrm'],
   migrations: authHrmMigrations,
   auditActions: ['auth.hrm.login', 'auth.hrm.failed', 'auth.hrm.user_created'],
   publicRoutes: ['GET /auth/hrm'],
   messages,
+  jobs: [
+    {
+      name: SYNC_JOB,
+      maxAttempts: 1,
+      handler: async () => {
+        if (!moduleCtx) throw new Error('auth-hrm module is not set up')
+        return { revoked: await syncHrmSessions(moduleCtx.services.get(AUTH).sessions) }
+      },
+    },
+  ],
+  // Every minute: an HRM logout ends the app session within a minute (spec §6).
+  recurringJobs: [{ name: SYNC_JOB, job: SYNC_JOB, every: '1m' }],
+  setup(c) {
+    moduleCtx = c
+  },
   routes: (api, c) => authHrmRoutes(api, c),
 })

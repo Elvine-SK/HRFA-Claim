@@ -3,6 +3,8 @@ import { dbTestsEnabled } from '@elvine-sk/platform-db/testing'
 import type { PlatformApp } from '@elvine-sk/platform-server'
 import { TEST_ORIGIN, TestClient } from '@elvine-sk/platform-server/testing'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { AUTH } from '@elvine-sk/platform-auth'
+import { syncHrmSessions } from '../src/modules/auth-hrm/logout-sync.ts'
 import { API, bootApp, DOWN_URL } from './helpers.ts'
 
 const HRM_LOGIN_URL = 'https://hrm.test/login'
@@ -111,6 +113,30 @@ describe.skipIf(!dbTestsEnabled)('auth-hrm sign-in', () => {
   })
 })
 
+describe.skipIf(!dbTestsEnabled)('auth-hrm logout sync', () => {
+  let platform: PlatformApp
+
+  beforeAll(async () => {
+    platform = await bootApp({ config })
+  })
+  afterAll(async () => {
+    await platform?.ctx.db.destroy()
+  })
+
+  it('ends the sessions of users who logged out of HRM, and only theirs', async () => {
+    // 10001 has a tb_current_login row; 10002 has none (logged out of HRM).
+    const stays = new TestClient(platform)
+    const leaves = new TestClient(platform)
+    expect((await stays.get(`${API}/auth/hrm?code=sync-10001`)).headers.get('location')).toBe(`${TEST_ORIGIN}/`)
+    expect((await leaves.get(`${API}/auth/hrm?code=valid-10002`)).headers.get('location')).toBe(`${TEST_ORIGIN}/`)
+    const sessions = platform.ctx.services.get(AUTH).sessions
+    expect(await runWithContext(SYSTEM_CONTEXT, () => syncHrmSessions(sessions))).toBe(1)
+    expect((await stays.get(`${API}/auth/session`)).body.data.authenticated).toBe(true)
+    expect((await leaves.get(`${API}/auth/session`)).body.data.authenticated).toBe(false)
+    expect(await runWithContext(SYSTEM_CONTEXT, () => syncHrmSessions(sessions))).toBe(0)
+  })
+})
+
 describe.skipIf(!dbTestsEnabled)('auth-hrm sign-in with HRM down', () => {
   let platform: PlatformApp
 
@@ -125,5 +151,10 @@ describe.skipIf(!dbTestsEnabled)('auth-hrm sign-in with HRM down', () => {
     const res = await new TestClient(platform).get(`${API}/auth/hrm?code=valid-10002`)
     expect(res.status).toBe(302)
     expect(res.headers.get('location')).toBe(errorAt('unavailable'))
+  })
+
+  it('logout sync revokes nothing while HRM is unreachable', async () => {
+    const sessions = platform.ctx.services.get(AUTH).sessions
+    expect(await runWithContext(SYSTEM_CONTEXT, () => syncHrmSessions(sessions))).toBe(0)
   })
 })
