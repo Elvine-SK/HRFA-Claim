@@ -37,7 +37,9 @@ INSERT INTO hrm_employee_account_currency (eid, ccy, account_no, account_name, i
   ('10002', 'LAK', '0201-LAK', 'BOUNMY SISAVATH', 0, '2025-02-01 09:00:00');
 
 INSERT INTO tb_current_login (eid, session_token, start_time, last_act) VALUES
-  ('10001', 'fixture-session-10001', NOW(), NOW());
+  ('10001', 'fixture-session-10001', NOW(), NOW()),
+  -- 10003 is deleted in HRM but still has an HRM session.
+  ('10003', 'fixture-session-10003', NOW(), NOW());
 
 INSERT INTO tb_holiday (holiday_date, holiday_desc, status) VALUES
   ('2026-12-02', 'National Day', 'Y');
@@ -48,6 +50,10 @@ INSERT INTO tb_app_handoff (code_hash, eid, created_at, expires_at) VALUES
   (SHA2('replay-10001', 256), '10001', NOW(), '2099-01-01 00:00:00'),
   (SHA2('valid-10002', 256), '10002', NOW(), '2099-01-01 00:00:00'),
   (SHA2('sync-10001', 256), '10001', NOW(), '2099-01-01 00:00:00'),
+  (SHA2('again-10001', 256), '10001', NOW(), '2099-01-01 00:00:00'),
+  (SHA2('swap-10001', 256), '10001', NOW(), '2099-01-01 00:00:00'),
+  (SHA2('origin-ok-10001', 256), '10001', NOW(), '2099-01-01 00:00:00'),
+  (SHA2('origin-bad-10001', 256), '10001', NOW(), '2099-01-01 00:00:00'),
   (SHA2('valid-10003', 256), '10003', NOW(), '2099-01-01 00:00:00'),
   (SHA2('expired-10001', 256), '10001', '2000-01-01 00:00:00', '2000-01-01 00:01:00'),
   (SHA2('soon-10001', 256), '10001', NOW(), NOW() + INTERVAL 5 MINUTE),

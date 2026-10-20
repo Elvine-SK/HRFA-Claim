@@ -111,6 +111,48 @@ describe.skipIf(!dbTestsEnabled)('auth-hrm sign-in', () => {
   it('/hrm/me needs a session', async () => {
     expect((await fresh().get(`${API}/hrm/me`)).status).toBe(401)
   })
+
+  it('a new sign-in ends the session the browser had before', async () => {
+    const client = fresh()
+    expect((await signIn(client, 'again-10001')).headers.get('location')).toBe(`${TEST_ORIGIN}/`)
+    const before = new TestClient(platform)
+    before.cookies = new Map(client.cookies)
+    expect((await signIn(client, 'swap-10001')).headers.get('location')).toBe(`${TEST_ORIGIN}/`)
+    expect((await client.get(`${API}/auth/session`)).body.data.authenticated).toBe(true)
+    expect((await before.get(`${API}/auth/session`)).body.data.authenticated).toBe(false)
+  })
+
+  it('does not rate-limit a busy office behind one address', async () => {
+    const results = []
+    for (let i = 0; i < 40; i++) results.push((await signIn(fresh(), `junk-${i}`)).headers.get('location'))
+    expect(new Set(results)).toEqual(new Set([errorAt('code_invalid')]))
+  })
+})
+
+describe.skipIf(!dbTestsEnabled)('auth-hrm sign-in with HRM_ORIGIN set', () => {
+  let platform: PlatformApp
+  const signIn = (code: string, headers: Record<string, string> = {}) =>
+    new TestClient(platform).get(`${API}/auth/hrm?code=${code}`, headers)
+
+  beforeAll(async () => {
+    platform = await bootApp({ config: { ...config, HRM_ORIGIN: 'https://hrm.test' } })
+  })
+  afterAll(async () => {
+    await platform?.ctx.db.destroy()
+  })
+
+  it('refuses a handoff that did not come from HRM, without spending the code', async () => {
+    expect((await signIn('origin-bad-10001', { referer: 'https://evil.test/page' })).headers.get('location')).toBe(
+      errorAt('bad_origin'),
+    )
+    expect((await signIn('origin-bad-10001')).headers.get('location')).toBe(errorAt('bad_origin'))
+  })
+
+  it('accepts a handoff from an HRM page', async () => {
+    expect((await signIn('origin-ok-10001', { referer: 'https://hrm.test/portal/home' })).headers.get('location')).toBe(
+      `${TEST_ORIGIN}/`,
+    )
+  })
 })
 
 describe.skipIf(!dbTestsEnabled)('auth-hrm logout sync', () => {
@@ -134,6 +176,34 @@ describe.skipIf(!dbTestsEnabled)('auth-hrm logout sync', () => {
     expect((await stays.get(`${API}/auth/session`)).body.data.authenticated).toBe(true)
     expect((await leaves.get(`${API}/auth/session`)).body.data.authenticated).toBe(false)
     expect(await runWithContext(SYSTEM_CONTEXT, () => syncHrmSessions(sessions))).toBe(0)
+  })
+
+  /** An extra active session for the user linked to `eid`, as if they had signed in. */
+  async function sessionFor(eid: string) {
+    const auth = platform.ctx.services.get(AUTH)
+    return runWithContext(SYSTEM_CONTEXT, async () => {
+      const { ensureHrmUser } = await import('../src/modules/auth-hrm/users.ts')
+      const { userId } = await ensureHrmUser({ eid, nameLao: 'x', snameLao: 'y' })
+      return (await auth.sessions.create((await auth.findUserById(userId))!, 'active', false)).id
+    })
+  }
+
+  it('refuses to revoke when too many signed-in users look logged out at once', async () => {
+    const sessions = platform.ctx.services.get(AUTH).sessions
+    const id = await sessionFor('10002') // missing from tb_current_login; 10001 is present
+    await expect(
+      runWithContext(SYSTEM_CONTEXT, () => syncHrmSessions(sessions, { guard: { minUsers: 1, maxMissingShare: 0.3 } })),
+    ).rejects.toThrow(/refusing/i)
+    expect(await runWithContext(SYSTEM_CONTEXT, () => sessions.isActive(id))).toBe(true)
+    expect(await runWithContext(SYSTEM_CONTEXT, () => syncHrmSessions(sessions))).toBe(1)
+  })
+
+  it('ends the sessions of users who are no longer selectable in HRM', async () => {
+    // 10003 is deleted in HRM but still has a tb_current_login row.
+    const sessions = platform.ctx.services.get(AUTH).sessions
+    const id = await sessionFor('10003')
+    expect(await runWithContext(SYSTEM_CONTEXT, () => syncHrmSessions(sessions))).toBe(1)
+    expect(await runWithContext(SYSTEM_CONTEXT, () => sessions.isActive(id))).toBe(false)
   })
 })
 

@@ -63,7 +63,7 @@ describe.skipIf(!dbTestsEnabled)('hrm read layer', () => {
   })
 
   it('lists logged-in EIDs', async () => {
-    expect(await loggedInEids(['10001', '10002'])).toEqual(new Set(['10001']))
+    expect(await loggedInEids(['10001', '10002', '10003'])).toEqual(new Set(['10001', '10003']))
     expect(await loggedInEids([])).toEqual(new Set())
   })
 

@@ -15,6 +15,9 @@ employee over to HR-FAM with a one-time code (decision ຂ5, option 1). HR-FAM o
 3. A daily clean-up: `DELETE FROM tb_app_handoff WHERE expires_at < NOW() - INTERVAL 1 DAY`.
 4. A `tb_module` row for the tile, `md_url` pointing at the script in step 2.
 
+HR-FAM can be set to accept a handoff only when the browser's `Referer` is an HRM page (`HRM_ORIGIN`). Browsers
+send it by default; do not set `Referrer-Policy: no-referrer` on the portal pages or the script.
+
 Only the hash is stored, so the table never holds a usable code. HR-FAM records every code it accepts and refuses
 the same code a second time, so HRM does not need to mark codes used.
 
@@ -53,7 +56,10 @@ No `INSERT`, `UPDATE`, `DELETE`, `EXECUTE` or schema rights: HR-FAM's own checks
 ## Logout
 
 HR-FAM checks `tb_current_login` every minute and ends the HR-FAM session of anyone who no longer has a row there,
-so logging out of HRM, or HRM's 4-hour idle timeout, also signs the user out of HR-FAM.
+so logging out of HRM, or HRM's 4-hour idle timeout, also signs the user out of HR-FAM. The same check ends the
+session of an employee who is deleted, unapproved, not working or moved to a subsidiary in HRM. If more than half of
+the signed-in users (10 or more) look logged out at once, HR-FAM signs nobody out and reports the job as failed:
+clearing `tb_current_login` (for example during maintenance) must not end everyone's session.
 
 ## What the user sees when something fails
 
@@ -67,6 +73,7 @@ HR-FAM sends the browser back to the HRM login page with `?error=<code>`:
 | `auth_hrm.account_inactive` | The employee's HR-FAM account was disabled by an HR-FAM administrator  |
 | `auth_hrm.unavailable`    | HR-FAM could not reach HRM's database                                    |
 | `auth_hrm.rate_limited`   | Too many attempts from one address                                       |
+| `auth_hrm.bad_origin`     | `HRM_ORIGIN` is set and the request did not come from an HRM page        |
 | `auth_hrm.failed`         | Anything else; HR-FAM's log has the details                              |
 
 HRM may show a message for these, or ignore the parameter.

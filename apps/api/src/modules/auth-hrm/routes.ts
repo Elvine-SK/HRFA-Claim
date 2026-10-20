@@ -18,8 +18,11 @@ import { hrmError, lookupHandoff, spendHandoff } from './handoff.ts'
 import { ensureHrmUser, linkedEid } from './users.ts'
 
 const tags = ['HRM sign-in']
-/** Per IP, like the OIDC callback: enough for a busy office behind one address, not for guessing codes. */
-const RATE = { limit: 30, windowSeconds: 600 }
+/**
+ * Per IP. Generous: a branch's whole office signs in from one address at 8:00, and a 256-bit code cannot be
+ * guessed, so this only stops floods. Behind a proxy, set TRUSTED_PROXIES so the client address is used.
+ */
+const RATE = { limit: 600, windowSeconds: 600 }
 
 const redirectDoc = { description: 'Redirect to the app, or to the HRM login page with `?error=<code>`' }
 
@@ -32,8 +35,24 @@ export function authHrmRoutes(api: ApiRouter, ctx: ModuleContext) {
     return url.toString()
   }
 
-  /** Spends the code, provisions the user and opens a session, all or nothing. */
-  async function signIn(code: string | undefined) {
+  /** With HRM_ORIGIN set, only a navigation from an HRM page (its Referer) may hand a code over. */
+  function checkOrigin(referer: string | undefined) {
+    const expected = ctx.config.HRM_ORIGIN ? new URL(String(ctx.config.HRM_ORIGIN)).origin : null
+    if (!expected) return
+    let origin: string | null = null
+    try {
+      origin = referer ? new URL(referer).origin : null
+    } catch {
+      origin = null
+    }
+    if (origin !== expected) throw hrmError('bad_origin', 'Open this system from the HRM portal')
+  }
+
+  /**
+   * Spends the code, provisions the user and opens a session, all or nothing. The browser's previous session, if
+   * any, is revoked, as the platform's own sign-in does.
+   */
+  async function signIn(code: string | undefined, previousSessionId: string | undefined) {
     const { eid, hash } = await lookupHandoff(code)
     const employee = await findEmployee(eid)
     if (!employee) throw hrmError('not_selectable', 'Your HRM record does not allow access to this system')
@@ -42,6 +61,7 @@ export function authHrmRoutes(api: ApiRouter, ctx: ModuleContext) {
       const { userId, created } = await ensureHrmUser(employee)
       const user = await auth().findUserById(userId)
       if (!user || user.status !== 'active') throw hrmError('account_inactive', 'This account is not active')
+      if (previousSessionId) await auth().sessions.revoke(previousSessionId, 'replaced')
       const session = await auth().sessions.create(user, 'active', false)
       await currentDb().updateTable('users').set({ lastLoginAt: now() }).where('id', '=', uuidBin(userId)).execute()
       await currentDb().updateTable('hrmUserLinks').set({ lastLoginAt: now() }).where('eid', '=', eid).execute()
@@ -76,7 +96,11 @@ export function authHrmRoutes(api: ApiRouter, ctx: ModuleContext) {
     async (c) => {
       try {
         await ctx.rateLimiter.enforce([{ bucket: `hrm-signin:ip:${getContext().ip ?? 'unknown'}`, rule: RATE }])
-        const session = await signIn(c.req.valid('query').code)
+        checkOrigin(c.req.header('referer'))
+        const previous = c.var.auth?.kind === 'session' ? c.var.auth.sessionId : undefined
+        const session = await signIn(c.req.valid('query').code, previous)
+        // The URL carried the code: keep the answer out of caches.
+        c.header('Cache-Control', 'no-store')
         // Same attributes as the platform's sign-in and OIDC callback: a session cookie, host-only.
         c.header('Set-Cookie', `${auth().settings.cookieName}=${session.token}; Path=/; HttpOnly; Secure; SameSite=Lax`)
         return c.redirect(`${String(ctx.config.APP_ORIGIN)}/`, 302)
