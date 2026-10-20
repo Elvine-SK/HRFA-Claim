@@ -16,6 +16,7 @@ export default defineNuxtPlugin(() => {
     order: 0,
     items: [
       { id: 'dashboard', label: 'nav.dashboard', to: '/', icon: 'i-lucide-layout-dashboard', exact: true },
+      { id: 'hrm-me', label: 'hrm.nav.me', to: '/me', icon: 'i-lucide-id-card' },
     ],
   })
 

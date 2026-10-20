@@ -1,1 +1,18 @@
-{}
+{
+  "hrm": {
+    "nav": { "me": "My HRM profile" },
+    "me": {
+      "title": "My HRM profile",
+      "subtitle": "Your record in HRM, as this system uses it",
+      "eid": "Employee ID",
+      "nameLao": "Name (Lao)",
+      "nameEng": "Name (English)",
+      "position": "Position",
+      "department": "Department",
+      "section": "Section",
+      "unit": "Unit",
+      "branch": "Branch",
+      "notLinked": "Your account is not linked to an HRM employee. Open this system from the HRM portal."
+    }
+  }
+}
