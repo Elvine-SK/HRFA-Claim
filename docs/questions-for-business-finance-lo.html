@@ -1,0 +1,645 @@
+<!doctype html>
+<html lang="lo">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ຄຳຖາມເພື່ອຢືນຢັນ — ລະບົບເບີກຈ່າຍການເດີນທາງ</title>
+<style>
+  :root {
+    --bg: #f4f5f7; --card: #ffffff; --ink: #1c2330; --muted: #5d6778; --line: #dfe3ea;
+    --brand: #b3141c; --brand-soft: #fbeced; --note: #fff8e6; --note-line: #ecd9a0; --ok: #1a7f4b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: "Noto Sans Lao", "Phetsarath OT", "Saysettha OT", "Lao UI", "Segoe UI", sans-serif;
+    font-size: 16px; line-height: 1.75;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 24px 16px 80px; }
+  header.top { border-top: 5px solid var(--brand); background: var(--card); border-radius: 0 0 10px 10px; padding: 22px 24px; }
+  h1 { margin: 0 0 6px; font-size: 1.5rem; line-height: 1.4; }
+  .sub { color: var(--muted); margin: 0; }
+  .meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 18px; }
+  .meta label { display: block; font-size: .85rem; color: var(--muted); }
+  .meta input { width: 100%; padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; font: inherit; }
+  .how { background: var(--card); border-radius: 10px; padding: 16px 24px; margin-top: 16px; }
+  .how h2 { font-size: 1.05rem; margin: 0 0 6px; }
+  .how ul { margin: 0; padding-left: 22px; }
+  .bar { position: sticky; top: 0; z-index: 5; background: var(--bg); padding: 10px 0; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .bar .count { margin-right: auto; color: var(--muted); font-size: .92rem; }
+  button { font: inherit; padding: 7px 14px; border-radius: 6px; border: 1px solid var(--line); background: var(--card); cursor: pointer; }
+  button.primary { background: var(--brand); border-color: var(--brand); color: #fff; }
+  h2.section { margin: 30px 0 4px; font-size: 1.25rem; border-left: 5px solid var(--brand); padding-left: 12px; }
+  p.section-note { margin: 0 0 12px; color: var(--muted); padding-left: 17px; }
+  h3.group { margin: 22px 0 8px; font-size: 1rem; color: var(--brand); }
+  .q { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; break-inside: avoid; }
+  .q.done { border-left: 4px solid var(--ok); }
+  .q-head { display: flex; gap: 10px; align-items: baseline; }
+  .q-id { flex: none; background: var(--brand-soft); color: var(--brand); font-weight: 700; border-radius: 5px; padding: 0 8px; font-size: .9rem; }
+  .q-title { font-weight: 700; margin: 0; font-size: 1.05rem; }
+  .q-ref { color: var(--muted); font-size: .86rem; margin: 4px 0 8px; }
+  .q-text { margin: 0 0 8px; white-space: pre-line; }
+  .q-assume { background: var(--note); border: 1px solid var(--note-line); border-radius: 6px; padding: 8px 12px; margin: 0 0 10px; font-size: .94rem; }
+  .q-assume b { display: block; font-size: .84rem; }
+  .opts { margin: 0 0 8px; padding: 0; list-style: none; }
+  .opts label { display: flex; gap: 8px; align-items: flex-start; padding: 2px 0; cursor: pointer; }
+  .opts input { margin-top: 8px; flex: none; }
+  textarea { width: 100%; min-height: 70px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; font: inherit; resize: vertical; }
+  .ans-label { font-size: .84rem; color: var(--muted); display: block; margin-bottom: 2px; }
+  table.fill { border-collapse: collapse; margin: 0 0 10px; width: 100%; font-size: .94rem; }
+  table.fill th, table.fill td { border: 1px solid var(--line); padding: 4px 8px; text-align: left; }
+  table.fill th { background: #f0f2f6; }
+  code { background: #eef0f4; border-radius: 4px; padding: 1px 5px; font-family: Consolas, monospace; font-size: .9em; }
+  pre { background: #1c2330; color: #e8ecf3; border-radius: 6px; padding: 10px 12px; overflow-x: auto; font-size: .85rem; line-height: 1.5; }
+  footer { color: var(--muted); font-size: .88rem; margin-top: 30px; }
+  @media print {
+    body { background: #fff; font-size: 12.5px; }
+    .bar, .how { display: none; }
+    .q, header.top { border: 1px solid #999; }
+    textarea { min-height: 90px; border: 1px solid #999; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>ຄຳຖາມເພື່ອຢືນຢັນ — ລະບົບເບີກຈ່າຍອັດຕາກິນ, ຄ່າພັກເຊົາ ແລະ ເງິນແຮເດີນທາງ</h1>
+  <p class="sub">ເອກະສານນີ້ລວບລວມຈຸດທີ່ຍັງບໍ່ຈະແຈ້ງ ຫຼັງຈາກທີມພັດທະນາໄດ້ສຶກສາເອກະສານ “FINAL to IT”, ລະບຽບນະໂຍບາຍ (ສະບັບປັບປຸງ 2026) ແລະ ໂຄງສ້າງຖານຂໍ້ມູນ HRM V3. ກະລຸນາຕອບ ຫຼື ຢືນຢັນແຕ່ລະຂໍ້ ເພື່ອໃຫ້ການພັດທະນາຖືກຕ້ອງຕາມຄວາມຕ້ອງການ.</p>
+  <div class="meta">
+    <div><label for="m-name">ຜູ້ຕອບ (ຊື່ ແລະ ນາມສະກຸນ)</label><input id="m-name" data-meta="name"></div>
+    <div><label for="m-unit">ພະແນກ / ຂະແໜງ</label><input id="m-unit" data-meta="unit"></div>
+    <div><label for="m-date">ວັນທີ</label><input id="m-date" type="date" data-meta="date"></div>
+  </div>
+</header>
+
+<div class="how">
+  <h2>ວິທີນຳໃຊ້</h2>
+  <ul>
+    <li>ຂໍ້ທີ່ມີກ່ອງສີເຫຼືອງ “ທີມພັດທະນາເຂົ້າໃຈວ່າ” — ຖ້າຖືກຕ້ອງແລ້ວ ໃຫ້ເລືອກ “ຖືກຕ້ອງ”; ຖ້າບໍ່ຖືກ ກະລຸນາອະທິບາຍໃນຊ່ອງຄຳຕອບ.</li>
+    <li>ຄຳຕອບຈະຖືກບັນທຶກໄວ້ໃນ browser ເຄື່ອງນີ້ໂດຍອັດຕະໂນມັດ (ປິດແລ້ວເປີດຄືນຍັງຢູ່).</li>
+    <li>ເມື່ອຕອບແລ້ວ ກົດ “ບັນທຶກຄຳຕອບເປັນໄຟລ໌ (.json)” ແລ້ວສົ່ງໄຟລ໌ນັ້ນກັບຄືນໃຫ້ທີມພັດທະນາ ຫຼື ກົດ “ພິມ” ເພື່ອພິມ / ບັນທຶກເປັນ PDF.</li>
+    <li>ກົດ “ໂຫລດຄຳຕອບຈາກໄຟລ໌” ເພື່ອນຳຄຳຕອບຈາກໄຟລ໌ .json ເຂົ້າມາຕໍ່. ຂໍ້ທີ່ມີຄຳຕອບໃນໄຟລ໌ຈະຖືກແທນທີ່; ຂໍ້ທີ່ໄຟລ໌ບໍ່ມີຄຳຕອບ ຈະຮັກສາຄຳຕອບເດີມໄວ້ (ລວມຄຳຕອບຈາກຫຼາຍຄົນໄດ້).</li>
+    <li>ພາກ ກ ສຳລັບ ພະແນກບັນຊີສັງລວມ / ຫ້ອງການ-ການເງິນ / ຈັດຕັ້ງ-ພະນັກງານ. ພາກ ຂ ສຳລັບທີມ HRM ແລະ ໄອທີ.</li>
+  </ul>
+</div>
+
+<div class="bar">
+  <span class="count" id="count"></span>
+  <button type="button" id="btn-print">ພິມ</button>
+  <button type="button" id="btn-clear">ລຶບຄຳຕອບທັງໝົດ</button>
+  <button type="button" id="btn-import">ໂຫລດຄຳຕອບຈາກໄຟລ໌</button>
+  <input type="file" id="file-import" accept=".json,application/json" hidden>
+  <button type="button" id="btn-export-txt">ບັນທຶກແບບອ່ານ (.txt)</button>
+  <button type="button" class="primary" id="btn-export">ບັນທຶກຄຳຕອບເປັນໄຟລ໌ (.json)</button>
+</div>
+
+<main id="main"></main>
+
+<footer>
+  ສະບັບ: 13/10/2026 · ອ້າງອີງ: 1.Workflow.xlsx, 2. ກຳນົດ code and data.xlsx, 3. Format form HRM.xlsx, 4. Format form FA-M.xlsx, ລະບຽບວ່າດ້ວຍການປະຕິບັດນະໂຍບາຍໃຫ້ພະນັກງານ ທຄຕລ (ສະບັບປັບປຸງ 2026), ໂຄງສ້າງຖານຂໍ້ມູນ HRM V3.
+</footer>
+</div>
+
+<script>
+const OK = 'ຖືກຕ້ອງຕາມທີ່ທີມພັດທະນາເຂົ້າໃຈ';
+const NO = 'ບໍ່ຖືກຕ້ອງ (ກະລຸນາອະທິບາຍຂ້າງລຸ່ມ)';
+
+const SECTIONS = [
+  {
+    title: 'ພາກ ກ — ທຸລະກິດ / ການເງິນ',
+    note: 'ສຳລັບ ພະແນກບັນຊີສັງລວມ, ພະແນກຫ້ອງການບໍລິຫານ-ການເງິນ ແລະ ພະແນກຈັດຕັ້ງ-ພະນັກງານ',
+    groups: [
+      {
+        title: '1. ການຄິດໄລ່ນະໂຍບາຍ',
+        items: [
+          {
+            id: 'ກ1', title: 'ຟອມ (2) ຕ່າງເມືອງພາຍໃນແຂວງ — ໃຊ້ອັດຕາໃດ?',
+            ref: '3. Format form HRM.xlsx (sheet “2.ເມືອງ”), ລະບຽບ ຂໍ້ 3.1.6',
+            q: 'ຟອມ (2) ມີຕົວເລືອກ “ຄ້າງຄືນ / ບໍ່ຄ້າງຄືນ” ແຕ່ໃນໄຟລ໌ກຳນົດ code ບໍ່ມີຕາຕະລາງອັດຕາສຳລັບຟອມນີ້.\n• ກໍລະນີຄ້າງຄືນ: ໃຊ້ອັດຕາກິນ ແລະ ຄ່າພັກເຊົາ ຕາມຂໍ້ 3.1.1 (ຄືກັບຟອມ 1) ແມ່ນບໍ?\n• ກໍລະນີບໍ່ຄ້າງຄືນ ແລະ ໄລຍະທາງ 50 ກມ ຂຶ້ນໄປ: ອັດຕາກິນ 150,000 ກີບ/ຄົນ/ວັນ ຕາມຂໍ້ 3.1.6 ແມ່ນບໍ?\n• ກໍລະນີໄລຍະທາງຕ່ຳກວ່າ 50 ກມ: ໄດ້ຮັບນະໂຍບາຍຫຍັງ? ລະບົບຕ້ອງໃຫ້ຄີໄລຍະທາງ (ກມ) ຫຼື ບໍ່?',
+            assume: 'ຄ້າງຄືນ = ອັດຕາຂໍ້ 3.1.1; ບໍ່ຄ້າງຄືນ = 150,000 ກີບ/ຄົນ/ວັນ ໂດຍບໍ່ມີຄ່າພັກເຊົາ.',
+            opts: [OK, NO]
+          },
+          {
+            id: 'ກ2', title: 'ການນັບຈຳນວນວັນ ແລະ ຈຳນວນຄືນ',
+            ref: '4. Format form FA-M.xlsx (sheet “Checking file”)',
+            q: 'ຕົວຢ່າງ: ເດີນທາງ 01/11 ຫາ 05/11.\n• ຈຳນວນວັນ = 5 ວັນ (ນັບທັງມື້ໄປ ແລະ ມື້ກັບ) ແມ່ນບໍ?\n• ຈຳນວນຄືນ = ຈຳນວນວັນ − 1 = 4 ຄືນ ແມ່ນບໍ?\n• ໄປ-ກັບ ພາຍໃນມື້ດຽວ: 1 ວັນ, 0 ຄືນ ແມ່ນບໍ?',
+            assume: 'ນັບທັງມື້ໄປ ແລະ ມື້ກັບ; ຈຳນວນຄືນ = ຈຳນວນວັນ − 1 ສຳລັບທຸກຟອມ.',
+            opts: [OK, NO]
+          },
+          {
+            id: 'ກ3', title: 'ວັນທີເດີນທາງແຍກຕາມແຕ່ລະບຸກຄົນ',
+            ref: '3. Format form HRM.xlsx (sheet “1.ພາຍໃນ update”, “2.ເມືອງ update”)',
+            q: 'ໃນ sheet “update” ມີການເພີ່ມຖັນ ວັນທີເດີນທາງໄປ / ວັນທີເດີນທາງກັບ / ຈຳນວນວັນ ຂອງແຕ່ລະຄົນ.\n• ສະບັບ “update” ແມ່ນສະບັບສຸດທ້າຍທີ່ຕ້ອງພັດທະນາ ແມ່ນບໍ?\n• ຟອມ (3) ຕ່າງປະເທດ ແລະ ຟອມ (4) ຊາຍແດນ ຕ້ອງມີຖັນດັ່ງກ່າວຄືກັນ ຫຼື ບໍ່?\n• ເງິນແຮຄະນະ (ຄິດຕາມຈຳນວນວັນ) ໃຫ້ອີງວັນທີຂອງຂໍ້ຕົກລົງ ຫຼື ອີງຄົນທີ່ເດີນທາງດົນທີ່ສຸດ?',
+            assume: 'ໃຊ້ສະບັບ update ກັບທຸກຟອມ; ເງິນແຮຄະນະອີງວັນທີ ຈາກ-ຫາ ຂອງຂໍ້ຕົກລົງ.',
+            opts: [OK, NO]
+          },
+          {
+            id: 'ກ4', title: 'ເງິນແຮຄະນະພາຍໃນ — ກໍລະນີ 10 ວັນພໍດີ',
+            ref: 'ລະບຽບ ຂໍ້ 3.2.1; 2. ກຳນົດ code and data.xlsx (sheet “ມາດຕາ 3”)',
+            q: 'ລະບຽບກຳນົດ “6-10 ວັນ = 5,000,000 ກີບ” ແລະ “10 ວັນຂຶ້ນໄປ = 7,000,000 ກີບ”. ຖ້າເດີນທາງ 10 ວັນພໍດີ ຈະໄດ້ຮັບເທົ່າໃດ?',
+            assume: '10 ວັນ = 5,000,000 ກີບ; 11 ວັນຂຶ້ນໄປ = 7,000,000 ກີບ.',
+            opts: ['10 ວັນ = 5,000,000 ກີບ (11 ວັນຂຶ້ນໄປ = 7,000,000)', '10 ວັນ = 7,000,000 ກີບ']
+          },
+          {
+            id: 'ກ5', title: 'ຕົວເລືອກ “ຂໍ້ມູນນະໂຍບາຍ” ມີຜົນຕໍ່ການຄິດໄລ່ແນວໃດ?',
+            ref: '3. Format form HRM.xlsx (Policy Details dropdown), ລະບຽບ ຂໍ້ 3.1.4 ແລະ 4.6',
+            q: 'ກະລຸນາຢືນຢັນວ່າແຕ່ລະຕົວເລືອກ ທຄຕລ ຈ່າຍຫຍັງແດ່ (ຕື່ມ “ຈ່າຍ” ຫຼື “ບໍ່ຈ່າຍ” ຖ້າບໍ່ກົງກັບຕາຕະລາງ):',
+            table: {
+              head: ['ຕົວເລືອກ', 'ອັດຕາກິນ', 'ຄ່າພັກເຊົາ', 'ເງິນແຮບຸກຄົນ (ຕ່າງປະເທດ)', 'ເງິນແຮຄະນະ'],
+              rows: [
+                ['ທຄຕລ ຮັບຜິດຊອບທັງໝົດ', 'ຈ່າຍ', 'ຈ່າຍ', 'ຈ່າຍ', 'ຈ່າຍ'],
+                ['ເຈົ້າພາບຮັບຜິດຊອບຄ່າເດີນທາງ', 'ຈ່າຍ', 'ຈ່າຍ', 'ຈ່າຍ', 'ຈ່າຍ'],
+                ['ເຈົ້າພາບຮັບຜິດຊອບຄ່າພັກເຊົາ', 'ຈ່າຍ', 'ບໍ່ຈ່າຍ', 'ຈ່າຍ', 'ຈ່າຍ'],
+                ['ເຈົ້າພາບຮັບຜິດຊອບຄ່າກິນຢູ່', 'ບໍ່ຈ່າຍ', 'ຈ່າຍ', 'ຈ່າຍ', 'ຈ່າຍ'],
+                ['ເຈົ້າພາບຮັບຜິດຊອບຄ່າກິນຢູ່ພັກເຊົາ', 'ບໍ່ຈ່າຍ', 'ບໍ່ຈ່າຍ', 'ຈ່າຍ', 'ຈ່າຍ']
+              ]
+            },
+            assume: 'ຕາມຕາຕະລາງຂ້າງເທິງ.',
+            opts: [OK, NO]
+          },
+          {
+            id: 'ກ6', title: 'ຟອມ (2) ແລະ ຟອມ (4) — ມີຕົວເລືອກໃດ?',
+            ref: '3. Format form HRM.xlsx (sheet “agreement key” ທຽບກັບ sheet “2.ເມືອງ” ແລະ “4.ຊາຍແດນ”)',
+            q: 'sheet “agreement key” ລະບຸວ່າ ຟອມ 2 ມີ “ຂໍ້ມູນນະໂຍບາຍ” ແລະ ຟອມ 4 ມີ “ຂໍ້ມູນການພັກເຊົາ”. ແຕ່ຕົວຟອມສະແດງກົງກັນຂ້າມ: ຟອມ 2 ມີ “ຂໍ້ມູນການພັກເຊົາ (ຄ້າງຄືນ / ບໍ່ຄ້າງຄືນ)” ແລະ ຟອມ 4 ບໍ່ມີທັງສອງ. ອັນໃດຖືກຕ້ອງ?',
+            table: {
+              head: ['ຟອມ', 'ຂໍ້ມູນນະໂຍບາຍ (ໃຜຮັບຜິດຊອບ)', 'ຂໍ້ມູນການພັກເຊົາ (ຄ້າງຄືນ / ບໍ່ຄ້າງຄືນ)'],
+              rows: [['ຟອມ 1 ພາຍໃນ', 'ມີ', 'ບໍ່ມີ'], ['ຟອມ 2 ເມືອງ', '?', '?'], ['ຟອມ 3 ຕ່າງປະເທດ', 'ມີ', 'ບໍ່ມີ'], ['ຟອມ 4 ຊາຍແດນ', '?', '?']]
+            }
+          },
+          {
+            id: 'ກ7', title: 'ເຂດຊາຍແດນ (ຟອມ 4)',
+            ref: 'ລະບຽບ ຂໍ້ 4.1 (ວັກສຸດທ້າຍ); 2. ກຳນົດ code and data.xlsx (OB1)',
+            q: 'ລະບຽບລະບຸວ່າ ເຂດຊາຍແດນໃຊ້ອັດຕາກິນ-ຄ່າພັກເຊົາຄືກັບພາຍໃນ (ຂໍ້ 3.1.1) ສ່ວນເງິນແຮເດີນທາງ ປະຕິບັດຕາມອັດຕາການໄປຕ່າງປະເທດ.\n• ເງິນແຮຄະນະຂອງຟອມ 4 ຄິດຕາມຈຳນວນຄົນ (1,000 – 2,500 ໂດລາ) ແມ່ນບໍ? ຈ່າຍເປັນສະກຸນເງິນໃດ?\n• ເງິນແຮບຸກຄົນ: ຟອມ 4 ບໍ່ມີ ແມ່ນບໍ?\n• ລາຍຊື່ເຂດຊາຍແດນ (ເຊັ່ນ: ນະຄອນຫຼວງ-ໜອງຄາຍ-ອຸດອນ, ຫົວພັນ-ແທ່ງຫົວ, ສະຫວັນນະເຂດ-ມຸກດາຫານ, ຫຼວງນ້ຳທາ-ບໍ່ຫານ): ຂໍລາຍຊື່ຄົບຖ້ວນ.',
+            assume: 'ອັດຕາກິນ-ຄ່າພັກເຊົາ ເປັນກີບ ຕາມ OB1; ເງິນແຮຄະນະຕາມຈຳນວນຄົນ ເປັນໂດລາ; ບໍ່ມີເງິນແຮບຸກຄົນ.',
+            opts: [OK, NO]
+          },
+          {
+            id: 'ກ8', title: 'ການເດີນທາງຫຼາຍປະເທດໃນຂໍ້ຕົກລົງດຽວ',
+            ref: 'ລະບຽບ ຂໍ້ 4.5 ແລະ 4.8',
+            q: 'ເງິນແຮບຸກຄົນ ແລະ ເງິນແຮຄະນະ ຄິດ “ຕໍ່ປະເທດ”.\n• ຂໍ້ຕົກລົງສະບັບດຽວ ສາມາດມີຫຼາຍປະເທດໄດ້ບໍ? ຖ້າໄດ້ ລະບົບຕ້ອງໃຫ້ເລືອກຫຼາຍປະເທດ ພ້ອມວັນທີຂອງແຕ່ລະປະເທດ ແມ່ນບໍ?\n• ກົດ 2 ປະເທດຕາມຂໍ້ 4.8 ຕ້ອງຄິດໄລ່ອັດຕະໂນມັດ ຫຼື ໃຫ້ການເງິນປັບດ້ວຍມື?',
+            opts: ['ຟອມລະ 1 ປະເທດເທົ່ານັ້ນ (ໄລຍະທຳອິດ)', 'ຕ້ອງຮອງຮັບຫຼາຍປະເທດຕັ້ງແຕ່ໄລຍະທຳອິດ']
+          },
+          {
+            id: 'ກ9', title: 'ກົດລະບຽບເພີ່ມເຕີມ — ຕ້ອງມີໃນໄລຍະທຳອິດ ຫຼື ບໍ່?',
+            ref: 'ລະບຽບ ຂໍ້ 3.1.5, 3.1.6, 4.6, 4.7, 4.8',
+            q: 'ກົດລະບຽບຕໍ່ໄປນີ້ມີໃນລະບຽບ ແຕ່ບໍ່ມີໃນຟອມ ຫຼື ສູດຄິດໄລ່ທີ່ສົ່ງໃຫ້ໄອທີ. ກະລຸນາລະບຸແຕ່ລະຂໍ້ວ່າ: (ກ) ລະບົບຄິດໄລ່ອັດຕະໂນມັດ, (ຂ) ການເງິນປັບດ້ວຍມືພ້ອມເຫດຜົນ, ຫຼື (ຄ) ເຮັດໃນໄລຍະຕໍ່ໄປ.\n1) ຂໍ້ 3.1.5 — ຕ່າງແຂວງເກີນ 7 ວັນ: ແຕ່ວັນທີ 8 ຈ່າຍຄ່າພັກຕາມໃບບິນຕົວຈິງ ບໍ່ເກີນອັດຕາ.\n2) ຂໍ້ 4.6 — ເຈົ້າພາບຮັບຜິດຊອບອາຫານບາງຄາບ: ເອົາອັດຕາກິນຫານ 3 ຄາບ ແລ້ວປັດຂຶ້ນ.\n3) ຂໍ້ 4.7 — ພະນັກງານສາຂາຕ່າງແຂວງ ທີ່ຕ້ອງມາກຽມເດີນທາງຢູ່ນະຄອນຫຼວງ.\n4) ຂໍ້ 4.8 — ເດີນທາງ 2 ປະເທດຕິດຕໍ່ກັນ.\n5) ຂໍ້ 3.1.3 / 3.1.6 — ນ້ຳມັນລົດ 7 ກມ/ລິດ ກໍລະນີໃຊ້ລົດສ່ວນຕົວ.'
+          },
+          {
+            id: 'ກ10', title: 'ການປັບຕົວເລກໂດຍການເງິນ',
+            ref: '1.Workflow.xlsx (FA-M flow: ກວດສອບຂໍ້ມູນທັງໝົດ)',
+            q: 'ໃນຕາຕະລາງກວດຂໍ້ມູນ ຖ້າຕົວເລກທີ່ລະບົບຄິດໄລ່ບໍ່ກົງກັບຄວາມເປັນຈິງ ພະນັກງານການເງິນສາມາດແກ້ໄຂຈຳນວນເງິນໄດ້ບໍ?',
+            assume: 'ແກ້ໄຂໄດ້ ແຕ່ຕ້ອງໃສ່ເຫດຜົນ; ລະບົບເກັບທັງຕົວເລກທີ່ຄິດໄລ່ ແລະ ຕົວເລກທີ່ແກ້ໄຂ.',
+            opts: [OK, 'ບໍ່ອະນຸຍາດໃຫ້ແກ້ໄຂ — ຕ້ອງສົ່ງກັບຄືນໃຫ້ຈັດຕັ້ງແກ້ຂໍ້ຕົກລົງ', NO]
+          },
+          {
+            id: 'ກ11', title: 'ລະຫັດ OA2 ແລະ ເຂດອາເມລິກາ-ອາຟຣິກາ',
+            ref: '2. ກຳນົດ code and data.xlsx (sheet “ມາດຕາ 4”); ລະບຽບ ຂໍ້ 4.3',
+            q: '• ຕາຕະລາງ “ກຸ່ມທີ 2” ຂອງອາຊີ-ປາຊີຟິກ ໃຊ້ລະຫັດ OA1P1…OA1P9 — ໜ້າຈະພິມຜິດ, ຄວນເປັນ OA2P1…OA2P9 ແມ່ນບໍ?\n• ເຂດອາເມລິກາເໜືອ, ອາເມລິກາໃຕ້ ແລະ ອາຟຣິກາ ໃຊ້ອັດຕາເທົ່າກັບ ເອີຣົບ ກຸ່ມທີ 1 (ຂໍ້ 4.3). ໃນລະບົບຈະສະແດງເປັນ “ເອີຣົບ ກຸ່ມທີ 1 (OE1)” ຫຼື ຕ້ອງການຊື່ເຂດ ແລະ ລະຫັດແຍກຕ່າງຫາກ?',
+            assume: 'ໃຊ້ OA2P*; ອາເມລິກາ-ອາຟຣິກາ ຈັດຢູ່ໃນ OE1.',
+            opts: [OK, NO]
+          }
+        ]
+      },
+      {
+        title: '2. ຂໍ້ຕົກລົງ ແລະ ຄະນະເດີນທາງ',
+        items: [
+          {
+            id: 'ກ12', title: 'ເລກທີເອກະສານ (Doc.no)',
+            ref: '3. Format form HRM.xlsx (ເລກທີ 0001.XXXX.2026)',
+            q: 'ຮູບແບບທີ່ເຂົ້າໃຈ: “0001.BCEL.2026” (ພາສາລາວ “0001.ທຄຕລ.2026”).\n• ເລກທີນີ້ ຈັດຕັ້ງ ຄີຕາມເລກຂອງຂໍ້ຕົກລົງສະບັບແທ້ ຫຼື ໃຫ້ລະບົບອອກເລກລຳດັບຖັດໄປໃຫ້ເອງ?\n• ສ່ວນກາງ (XXXX) ເປັນ “BCEL / ທຄຕລ” ສະເໝີ ຫຼື ສາມາດເປັນຕົວຫຍໍ້ອື່ນ (ເຊັ່ນ: ພະແນກ, ສາຂາ)?\n• ຂໍ້ຕົກລົງ ແລະ ແຈ້ງການ ໃຊ້ເລກລຳດັບຊຸດດຽວກັນ ແມ່ນບໍ? ເລກເລີ່ມນັບໃໝ່ທຸກປີ ແມ່ນບໍ?',
+            assume: 'ຈັດຕັ້ງຄີຕາມສະບັບແທ້; ລະບົບກວດຮູບແບບ ແລະ ບໍ່ໃຫ້ຊ້ຳກັນ.',
+            opts: [OK, NO]
+          },
+          {
+            id: 'ກ13', title: 'ຫົວໜ້າຄະນະ ແລະ ຜູ້ຖືເງິນແຮ (Advance Holder)',
+            ref: 'ບົດນຳສະເໜີ DG ໜ້າ 11 ແລະ 14; 3. Format form HRM.xlsx',
+            q: 'ຟອມໃນ Excel ມີແຕ່ຖັນ “Advance Holder”, ແຕ່ໃນບົດນຳສະເໜີມີ “Head Team” ນຳ ແລະ ສາຍອະນຸມັດການສົ່ງເງິນແຮຕ້ອງຜ່ານຫົວໜ້າຄະນະ.\n• ຕ້ອງເພີ່ມການເລືອກ “ຫົວໜ້າຄະນະ” ໃນຟອມຂໍ້ຕົກລົງ ແມ່ນບໍ?\n• ຫົວໜ້າຄະນະ ແລະ ຜູ້ຖືເງິນແຮ ເປັນຄົນດຽວກັນໄດ້ບໍ? ຖ້າເປັນຄົນດຽວກັນ ຂັ້ນຕອນອະນຸມັດຂອງຫົວໜ້າຄະນະຈະຂ້າມ ຫຼື ໃຫ້ໃຜອະນຸມັດແທນ?',
+            assume: 'ເພີ່ມຊ່ອງເລືອກຫົວໜ້າຄະນະ 1 ຄົນ ແລະ ຜູ້ຖືເງິນແຮ 1 ຄົນ; ເປັນຄົນດຽວກັນໄດ້.',
+            opts: [OK, NO]
+          },
+          {
+            id: 'ກ14', title: 'ກໍລະນີບໍ່ເອົາເງິນແຮ ແລະ ເວລາອອກເງິນແຮ',
+            ref: '3. Format form HRM.xlsx (sheet “Detail”: “ອອກກ່ອນໄປ ຫຼື ໄປກ່ອນອອກພາຍຫຼັງ”; “ກໍລະນີບໍ່ເອົາເງິນແຮ”)',
+            q: '• ຂໍ້ຕົກລົງສາມາດລະບຸ “ບໍ່ເອົາເງິນແຮຄະນະ” ໄດ້ ແມ່ນບໍ? ກໍລະນີນີ້ບໍ່ຕ້ອງມີຜູ້ຖືເງິນແຮ ແລະ ບໍ່ຕ້ອງສົ່ງຄືນ ແມ່ນບໍ?\n• “ອອກກ່ອນໄປ” ແລະ “ໄປກ່ອນອອກພາຍຫຼັງ” ຕ່າງກັນແນວໃດໃນການລົງບັນຊີ? ກໍລະນີໄປກ່ອນ ແລ້ວມາເບີກພາຍຫຼັງ ຍັງຕ້ອງຜ່ານຟອມສົ່ງຄືນເງິນແຮ ຫຼື ບໍ່?'
+          },
+          {
+            id: 'ກ15', title: 'ຂັ້ນຕຳແໜ່ງພິເສດ',
+            ref: 'ລະບຽບ ຂໍ້ 3.1.1 ແຖວທີ 3; ລະບຽບຕຳແໜ່ງງານ ມາດຕາ 5',
+            q: '“ສະມາຊິກສະພາບໍລິຫານທີ່ເປັນພະນັກງານຂອງ ທຄຕລ ແຕ່ບໍ່ແມ່ນຄະນະອຳນວຍການ” ໄດ້ຮັບອັດຕາຂັ້ນ P3. ຂໍ້ມູນຕຳແໜ່ງໃນ HRM ອາດບໍ່ສະແດງສະຖານະນີ້.\n• ອະນຸຍາດໃຫ້ຈັດຕັ້ງປ່ຽນ Code Rank ຂອງບຸກຄົນໃນຂໍ້ຕົກລົງ ພ້ອມໃສ່ເຫດຜົນ ໄດ້ບໍ?\n• ມີກໍລະນີພິເສດອື່ນອີກບໍ (ເຊັ່ນ: ຮັກສາການ, ທຽບເທົ່າ)?',
+            assume: 'ຈັດຕັ້ງປ່ຽນ Code Rank ໄດ້ ພ້ອມເຫດຜົນ ແລະ ການເງິນເຫັນການປ່ຽນແປງນັ້ນ.',
+            opts: [OK, NO]
+          },
+          {
+            id: 'ກ16', title: 'ການແກ້ໄຂ ຫຼື ຍົກເລີກຂໍ້ຕົກລົງ',
+            ref: '—',
+            q: '• ຫຼັງຂໍ້ຕົກລົງຖືກອະນຸມັດແລ້ວ ຖ້າມີການປ່ຽນແປງ (ເພີ່ມ-ຫຼຸດຄົນ, ປ່ຽນວັນທີ, ຍົກເລີກການເດີນທາງ) ຂັ້ນຕອນຄວນເປັນແນວໃດ?\n• ຖ້າການເງິນລົງບັນຊີຈ່າຍແລ້ວ ແຕ່ການເດີນທາງຖືກຍົກເລີກ ຫຼື ສັ້ນລົງ ຈະເກັບເງິນຄືນແນວໃດ?'
+          }
+        ]
+      },
+      {
+        title: '3. ສາຍອະນຸມັດ',
+        items: [
+          {
+            id: 'ກ17', title: 'ສາຍອະນຸມັດຂອງຂໍ້ຕົກລົງ (ຟອມ 1–4)',
+            ref: '3. Format form HRM.xlsx (ຜູ້ຄີຂໍ້ມູນ / ຜູ້ກວດສອບ / ຜູ້ອະນຸມັດ)',
+            q: 'ກະລຸນາລະບຸຕຳແໜ່ງ ຫຼື ພາກສ່ວນຂອງແຕ່ລະຂັ້ນ:\n• ຜູ້ຄີຂໍ້ມູນ (Prepared By): ?\n• ຜູ້ກວດສອບ (Checked By): ?\n• ຜູ້ອະນຸມັດ (Approved By): ?\nສາຂາຕ່າງແຂວງ ຄີ ແລະ ອະນຸມັດເອງຢູ່ສາຂາ ຫຼື ສົ່ງມາສຳນັກງານໃຫຍ່?'
+          },
+          {
+            id: 'ກ18', title: 'ສາຍອະນຸມັດຂອງຕາຕະລາງຄິດໄລ່ ແລະ ລົງບັນຊີ (FA-M)',
+            ref: '1.Workflow.xlsx (FA-M flow: ກວດສອບ → ອະນຸມັດ → submit)',
+            q: 'ຫຼັງລະບົບດຶງຂໍ້ມູນຕາມ Doc.no ແລະ ຄິດໄລ່ແລ້ວ ໃຜກວດ ແລະ ໃຜອະນຸມັດ ກ່ອນອອກໄຟລ໌ລົງບັນຊີ? (ລະບຸຕຳແໜ່ງແຕ່ລະຂັ້ນ)'
+          },
+          {
+            id: 'ກ19', title: 'ສາຍອະນຸມັດຂອງການສົ່ງຄືນເງິນແຮ (ຟອມ 5–6)',
+            ref: 'ບົດນຳສະເໜີ DG ໜ້າ 14',
+            q: 'ສາຍອະນຸມັດຕາມບົດນຳສະເໜີ:\n[1] ຜູ້ຖືເງິນແຮ ຕື່ມຟອມ → [2] ຫົວໜ້າຄະນະ → [3] ພະນັກງານຫ້ອງການ-ການເງິນ → [4] ຄະນະຂະແໜງຫ້ອງການ-ການເງິນ → [5] ຄະນະພະແນກຫ້ອງການບໍລິຫານ-ການເງິນ (ອະນຸມັດສຸດທ້າຍ).\n• ຖືກຕ້ອງ ແລະ ຄົບຖ້ວນ ແມ່ນບໍ?\n• ສຳລັບສາຂາ: ແມ່ນ “ຂະແໜງຫ້ອງການ-ບັນຊີ-ໄອທີ” ຂອງສາຂາ ເປັນຜູ້ກວດ ແລະ ຄະນະສາຂາອະນຸມັດ ແມ່ນບໍ?\n• ຖ້າຜູ້ອະນຸມັດບໍ່ຢູ່ ມີການມອບສິດແທນ ຫຼື ບໍ່?',
+            assume: 'ສຳນັກງານໃຫຍ່ໃຊ້ 5 ຂັ້ນຕາມຂ້າງເທິງ.',
+            opts: [OK, NO]
+          },
+          {
+            id: 'ກ20', title: 'ກຳນົດເວລາ 5 ວັນລັດຖະການ',
+            ref: 'ລະບຽບ ຂໍ້ 3.2.1 ແລະ 4.4',
+            q: 'ຕ້ອງສະຫຼຸບສົ່ງເງິນແຮພາຍໃນ 5 ວັນລັດຖະການ ຫຼັງກັບມາ.\n• ນັບຈາກມື້ຖັດຈາກວັນທີກັບ ແມ່ນບໍ?\n• ຖ້າເກີນກຳນົດ ລະບົບຄວນເຮັດຫຍັງ: ແຈ້ງເຕືອນເທົ່ານັ້ນ, ແຈ້ງຫົວໜ້າ, ຫຼື ຫ້າມອອກເງິນແຮໃໝ່ໃຫ້ຜູ້ນັ້ນ?',
+            assume: 'ແຈ້ງເຕືອນຜູ້ຖືເງິນແຮ ແລະ ສະແດງລາຍການເກີນກຳນົດໃຫ້ການເງິນ (ບໍ່ມີການຫ້າມ).',
+            opts: [OK, NO]
+          }
+        ]
+      },
+      {
+        title: '4. ການລົງບັນຊີ ແລະ ໄຟລ໌ອັບໂຫລດ',
+        items: [
+          {
+            id: 'ກ21', title: 'ການລົງບັນຊີສົ່ງຄືນເງິນແຮ',
+            ref: '4. Format form FA-M.xlsx (sheet “Checking file” ຕາຕະລາງທີ 4)',
+            q: 'ທີມພັດທະນາເຂົ້າໃຈຕາຕະລາງທີ 4 ດັ່ງນີ້ (ຕົວຢ່າງ: ເງິນແຮ 5,000,000; ໃຊ້ຈ່າຍ 3,800,000; ເຫຼືອ 1,200,000):\n• DR ບັນຊີຜູ້ຖືເງິນແຮ 1,200,000 (ສ່ວນທີ່ຕ້ອງສົ່ງຄືນ)\n• DR ບັນຊີລາຍຈ່າຍ 3,800,000 (ສ່ວນທີ່ໃຊ້ຈ່າຍ)\n• CR 1362220001 ເງິນແຮເດີນທາງ 5,000,000\nຖືກຕ້ອງບໍ? ຖ້າໃຊ້ຈ່າຍເກີນເງິນແຮ (ຂໍ້ 3.2.3) ລົງບັນຊີແນວໃດ?',
+            assume: 'ຕາມຕົວຢ່າງຂ້າງເທິງ; ກໍລະນີໃຊ້ເກີນ: CR ບັນຊີພະນັກງານ ສ່ວນທີ່ເກີນ.',
+            opts: [OK, NO]
+          },
+          {
+            id: 'ກ22', title: 'ບັນຊີ 2361800001 ແລະ 4405200001',
+            ref: '4. Format form FA-M.xlsx (ຕາຕະລາງທີ 4, ຖັນ I)',
+            q: 'ໃນຖັນເລກບັນຊີ ລະບຸ “2361800001 / 4405200001”. ກໍລະນີໃດໃຊ້ບັນຊີໃດ? ລະບົບຕັດສິນເອງໄດ້ຈາກເງື່ອນໄຂໃດ ຫຼື ໃຫ້ການເງິນເລືອກ? ລາຍການຄ່າໃຊ້ຈ່າຍແຕ່ລະແຖວ ຕ້ອງເລືອກປະເພດລາຍຈ່າຍ ຫຼື ບໍ່?'
+          },
+          {
+            id: 'ກ23', title: 'ສະກຸນເງິນຂອງການຈ່າຍຕ່າງປະເທດ',
+            ref: '2. ກຳນົດ code and data.xlsx (ອັດຕາເປັນ USD); 4. Format form FA-M.xlsx (ລວມເງິນທັງໝົດ (ກີບ))',
+            q: 'ອັດຕາຕ່າງປະເທດກຳນົດເປັນໂດລາ ແຕ່ຕາຕະລາງກວດຂໍ້ມູນທີ 3 ຂຽນ “ລວມເງິນທັງໝົດ (ກີບ)”.\n• ຈ່າຍເປັນ USD ເຂົ້າບັນຊີ USD ຂອງພະນັກງານ ຫຼື ແປງເປັນກີບ ແລ້ວຈ່າຍເຂົ້າບັນຊີກີບ?\n• ຖ້າແປງ: ໃຊ້ອັດຕາແລກປ່ຽນໃດ (ຊື້/ຂາຍ, ຂອງວັນໃດ) ແລະ ໃຜເປັນຜູ້ຄີ?\n• ຖ້າພະນັກງານບໍ່ມີບັນຊີ USD ຈະເຮັດແນວໃດ?\n• ມີການຈ່າຍເປັນ ບາດ (THB) ຫຼື ບໍ່?',
+            opts: ['ຈ່າຍເປັນ USD ເຂົ້າບັນຊີ USD', 'ແປງເປັນກີບ ແລ້ວຈ່າຍເຂົ້າບັນຊີກີບ', 'ອື່ນໆ (ອະທິບາຍ)']
+          },
+          {
+            id: 'ກ24', title: 'ຮູບແບບເລກບັນຊີ GL ໃນໄຟລ໌ອັບໂຫລດ',
+            ref: '4. Format form FA-M.xlsx (sheet “Upload file”)',
+            q: 'ຕົວຢ່າງ: 888010LAK44087200010001 = ສາຂາ (888010) + ສະກຸນ (LAK) + ເລກບັນຊີ (4408720001) + 0001.\n• ຮູບແບບນີ້ຖືກຕ້ອງບໍ? “0001” ທ້າຍສຸດໝາຍເຖິງຫຍັງ ແລະ ຄົງທີ່ ຫຼື ບໍ່?\n• ສຳລັບ USD: 888010USD… ແມ່ນບໍ?\n• ລະຫັດສາຂາ ເປັນ 888010 ສະເໝີ ຫຼື ໃຊ້ສາຂາຂອງພະນັກງານ / ສາຂາທີ່ຮັບຜິດຊອບລາຍຈ່າຍ?\n• ຖັນ BRANCH ຂອງແຖວບັນຊີພະນັກງານ ໃສ່ສາຂາໃດ?'
+          },
+          {
+            id: 'ກ25', title: 'ລາຍລະອຽດໄຟລ໌ອັບໂຫລດ',
+            ref: '4. Format form FA-M.xlsx (sheet “Upload file”)',
+            q: 'ຖັນ: ACCOUNT, BRANCH, NAME, CCY, CHEQUE_NO, AMT, RVS_NO, DR_CR, REMARK.\n• ໄຟລ໌ເປັນປະເພດໃດ: .xlsx, .xls ຫຼື .csv?\n• REMARK ຕ້ອງການຂໍ້ຄວາມແບບໃດ (ເຊັ່ນ: Doc.no + ຊື່ຄະນະ + ວັນທີ)? ມີຄວາມຍາວສູງສຸດ ຫຼື ຫ້າມໃຊ້ຕົວອັກສອນລາວ ຫຼື ບໍ່?\n• CHEQUE_NO ແລະ RVS_NO ປ່ອຍວ່າງສະເໝີ ແມ່ນບໍ?\n• AMT ມີຈຸດທົດສະນິຍົມ ແລະ ເຄື່ອງໝາຍຈຸດຂັ້ນຫຼັກພັນ ຫຼື ບໍ່?\n• ແຖວ DR ຂອງ GL ລວມເປັນແຖວດຽວຕໍ່ບັນຊີ (ຕາມຕົວຢ່າງ) ແມ່ນບໍ?\n• 1 ຂໍ້ຕົກລົງ = 1 ໄຟລ໌ ຫຼື ສາມາດລວມຫຼາຍຂໍ້ຕົກລົງໃນໄຟລ໌ດຽວ?',
+            assume: '1 ຂໍ້ຕົກລົງ ແລະ 1 ປະເພດທຸລະກຳ = 1 ໄຟລ໌; DR ລວມຕໍ່ບັນຊີ GL; CR ແຍກຕາມພະນັກງານ.',
+            opts: [OK, NO]
+          },
+          {
+            id: 'ກ26', title: 'ການຢືນຢັນຫຼັງລົງບັນຊີ',
+            ref: '1.Workflow.xlsx (CORE: ບັນທຶກການລົງບັນຊີ)',
+            q: 'ໄລຍະທຳອິດ ລະບົບຈະອອກໄຟລ໌ ແລ້ວການເງິນນຳໄປອັບໂຫລດເຂົ້າ CORE ເອງ (ການເຊື່ອມຕໍ່ໂດຍກົງຈະປຶກສາພາຍຫຼັງ).\n• ຫຼັງອັບໂຫລດສຳເລັດ ການເງິນຈະກົດ “ລົງບັນຊີແລ້ວ” ໃນລະບົບ ພ້ອມຄີເລກອ້າງອີງຈາກ CORE — ຍອມຮັບໄດ້ບໍ?\n• ເລກອ້າງອີງຈາກ CORE ມີຮູບແບບແນວໃດ? ຖ້າ CORE ປະຕິເສດບາງແຖວ ຂັ້ນຕອນແກ້ໄຂເປັນແນວໃດ?',
+            assume: 'ການເງິນຢືນຢັນດ້ວຍມື ພ້ອມເລກອ້າງອີງ.',
+            opts: [OK, NO]
+          }
+        ]
+      },
+      {
+        title: '5. ຟອມສົ່ງຄືນເງິນແຮ',
+        items: [
+          {
+            id: 'ກ27', title: 'ຟອມ (6) ເງິນແຮຕ່າງປະເທດ — Cross Rate',
+            ref: '3. Format form HRM.xlsx (sheet “6.ເງິນແຮຕ່າງປະເທດ”, “advance key”)',
+            q: 'ຟອມມີຖັນ ຈຳນວນເງິນ, Cross Rate, ຈຳນວນເງິນ (USD) ແລະ ກຳນົດວ່າ USD = ຈຳນວນເງິນ ÷ cross rate.\n• ພະນັກງານຄີ Cross Rate ເອງທຸກແຖວ ຫຼື ລະບົບຄວນມີອັດຕາໃຫ້?\n• ຕ້ອງເລືອກສະກຸນເງິນຂອງແຕ່ລະລາຍການ (ເຊັ່ນ: THB, CNY, JPY) ຫຼື ບໍ່?\n• ຕ້ອງມີຫຼັກຖານອັດຕາແລກປ່ຽນແນບ ຫຼື ບໍ່?'
+          },
+          {
+            id: 'ກ28', title: 'ໃບບິນ ແລະ ລາຍຈ່າຍທີ່ບໍ່ມີໃບບິນ',
+            ref: 'ລະບຽບ ຂໍ້ 3.2.4 ແລະ 4.4',
+            q: '• ທຸກລາຍການຄ່າໃຊ້ຈ່າຍ ຕ້ອງແນບໃບບິນ ແມ່ນບໍ? ປະເພດໄຟລ໌ ແລະ ຂະໜາດທີ່ຍອມຮັບ?\n• ລາຍຈ່າຍທີ່ບໍ່ມີໃບບິນ (ຂໍ້ 4.4) ຕ້ອງມີຂັ້ນຕອນອະນຸມັດພິເສດໃນລະບົບ ຫຼື ບໍ່?\n• ຕ້ອງມີລາຍການປະເພດຄ່າໃຊ້ຈ່າຍໃຫ້ເລືອກ (ຄ່າຜ່ານແດນ, ຄ່ານ້ຳມັນ, ຄ່າທາງດ່ວນ, …) ຫຼື ຄີເປັນຂໍ້ຄວາມອິດສະຫຼະ?'
+          },
+          {
+            id: 'ກ29', title: 'ຟອມ (5) ແລະ ຟອມ (6) — ຂໍ້ມູນທີ່ດຶງອັດຕະໂນມັດ',
+            ref: '3. Format form HRM.xlsx (sheet “advance key”)',
+            q: 'sheet “advance key” ກຳນົດ “ເງິນແຮທີ່ໄດ້ຮັບ” ເປັນ EP-IN (ພະນັກງານຄີດ້ວຍມື). ແຕ່ລະບົບຮູ້ຈຳນວນເງິນແຮຈາກການລົງບັນຊີຢູ່ແລ້ວ.\n• ໃຫ້ລະບົບດຶງຈຳນວນເງິນແຮມາໃສ່ໃຫ້ອັດຕະໂນມັດ ແລະ ບໍ່ໃຫ້ແກ້ໄຂ ໄດ້ບໍ?',
+            assume: 'ລະບົບດຶງຈຳນວນເງິນແຮອັດຕະໂນມັດຕາມ Doc.no.',
+            opts: [OK, NO]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    title: 'ພາກ ຂ — ເຕັກນິກ',
+    note: 'ສຳລັບທີມ HRM ແລະ ໄອທີ',
+    groups: [
+      {
+        title: '1. ຂໍ້ມູນຈາກ HRM',
+        items: [
+          {
+            id: 'ຂ1', title: 'ການຈັບຄູ່ PostType ກັບ Code Rank (P1–P9)',
+            ref: 'hrm_position.PostType; 2. ກຳນົດ code and data.xlsx (sheet “position code”)',
+            q: 'PostType ເປັນກຸ່ມຕຳແໜ່ງລະດັບດຽວກັນ (ຕົວຢ່າງ: 7 = ຫົວໜ້າພະແນກ, ຫົວໜ້າສູນ, ຫົວໜ້າສາຂາ = P3). ກະລຸນາຕື່ມ Code Rank ຂອງແຕ່ລະ PostType ຫຼື ແນບຜົນຂອງ query ນີ້:',
+            pre: "SELECT PostType,\n       GROUP_CONCAT(PostName ORDER BY PostOrderBy SEPARATOR ' | ') AS positions\nFROM hrm_position\nWHERE PostStatus = 'Y'\nGROUP BY PostType\nORDER BY PostType;",
+            table: {
+              head: ['PostType', 'ຕຳແໜ່ງ', 'Code Rank (P1–P9)'],
+              rows: [['1', '', ''], ['2', '', ''], ['3', '', ''], ['4', '', ''], ['5', '', ''], ['6', '', ''], ['7', 'ຫົວໜ້າພະແນກ, ຫົວໜ້າສູນ, ຫົວໜ້າສາຂາ', 'P3'], ['8', '', ''], ['9', '', '']]
+            }
+          },
+          {
+            id: 'ຂ2', title: 'ບັນຊີພະນັກງານຕາມສະກຸນເງິນ',
+            ref: 'hrm_employee_account_currency (personnel_account_FROM_HRM_V3.sql)',
+            q: '• ຕາຕະລາງໃໝ່ (eid, ccy, account_no, account_name, is_deleted) ນຳໃຊ້ແລ້ວຢູ່ Testing (10.0.7.110) ແລະ Production (10.0.2.116) ຫຼື ຍັງ?\n• ມີຂໍ້ມູນບັນຊີ USD / THB ແລ້ວ ຫຼື ຍັງ? ພະນັກງານເພີ່ມເອງຜ່ານເມນູ “ບັນຊີທະນາຄານຂອງຂ້ອຍ” ແມ່ນບໍ? ມີຂັ້ນຕອນອະນຸມັດ ຫຼື ບໍ່?\n• ຕາຕະລາງບໍ່ມີ unique key — ຢືນຢັນວ່າ 1 ພະນັກງານ ມີບັນຊີທີ່ໃຊ້ງານໄດ້ພຽງ 1 ບັນຊີຕໍ່ສະກຸນເງິນ ແມ່ນບໍ?'
+          },
+          {
+            id: 'ຂ3', title: 'ເງື່ອນໄຂພະນັກງານທີ່ເລືອກໄດ້',
+            ref: 'hrm_employee (WORK_STATUS, IS_DELETE, APPROVED_STATUS)',
+            q: 'ໃນການຄີ User ID ເຂົ້າຂໍ້ຕົກລົງ ລະບົບຈະດຶງສະເພາະພະນັກງານທີ່ IS_DELETE = \'N\' ແລະ APPROVED_STATUS = \'A\'.\n• ຄ່າ WORK_STATUS ໃດແດ່ທີ່ຖືວ່າ “ຍັງເຮັດວຽກຢູ່”?\n• User ID ທີ່ພະນັກງານຄີ ແມ່ນ EID 5 ຫຼັກ (ລະຫັດປ້ຳໂມງ) ແມ່ນບໍ?\n• ພະນັກງານບໍລິສັດໃນເຄືອ (COMPANY_CODE ບໍ່ແມ່ນ \'00\') ເຂົ້າຮ່ວມຄະນະເດີນທາງໄດ້ບໍ?'
+          },
+          {
+            id: 'ຂ4', title: 'ຂໍ້ມູນແຂວງ, ເມືອງ, ປະເທດ',
+            ref: 'hrm_province, hrm_district, hrm_country',
+            q: '• hrm_country ມີພຽງປະມານ 35 ປະເທດ ແລະ ບໍ່ມີລະຫັດເຂດ/ກຸ່ມ. ທີມພັດທະນາຈະສ້າງລາຍຊື່ປະເທດພ້ອມເຂດ ແລະ ກຸ່ມ ໄວ້ໃນລະບົບໃໝ່ເອງ — ເຫັນດີບໍ?\n• ແຂວງ ແລະ ເມືອງ ຈະອ່ານຈາກ HRM ໂດຍກົງ — ຂໍ້ມູນຄົບ ແລະ ເປັນປັດຈຸບັນ ແມ່ນບໍ?',
+            assume: 'ປະເທດ + ເຂດ + ກຸ່ມ ເກັບໄວ້ໃນລະບົບໃໝ່; ແຂວງ-ເມືອງ ອ່ານຈາກ HRM.',
+            opts: [OK, NO]
+          }
+        ]
+      },
+      {
+        title: '2. ການເຂົ້າສູ່ລະບົບ ແລະ ການເຊື່ອມຕໍ່',
+        items: [
+          {
+            id: 'ຂ5', title: 'ການສົ່ງຕໍ່ການເຂົ້າສູ່ລະບົບຈາກ HRM (Token handoff)',
+            ref: 'tb_current_login, tb_module',
+            q: 'ຜູ້ໃຊ້ກົດ tile ຂອງລະບົບໃໝ່ໃນໜ້າຫຼັກ HRM ແລ້ວເຂົ້າໃຊ້ໄດ້ເລີຍ ໂດຍບໍ່ຕ້ອງ login ຊ້ຳ. ເລືອກວິທີ:',
+            opts: [
+              'ວິທີ 1 (ແນະນຳ): HRM ສ້າງລະຫັດໃຊ້ຄັ້ງດຽວ (ໝົດອາຍຸ 60 ວິນາທີ) ເກັບໃນຕາຕະລາງໃໝ່ ແລ້ວ redirect ມາລະບົບໃໝ່ — ຕ້ອງແກ້ໄຂ HRM ເລັກນ້ອຍ',
+              'ວິທີ 2: HRM ສົ່ງ session_token ທີ່ມີຢູ່ແລ້ວ ດ້ວຍ form POST ແລ້ວລະບົບໃໝ່ກວດກັບ tb_current_login — ບໍ່ຕ້ອງສ້າງຕາຕະລາງໃໝ່'
+            ]
+          },
+          {
+            id: 'ຂ6', title: 'ອາຍຸ session ແລະ ການອອກຈາກລະບົບ',
+            ref: 'tb_current_login (last_act)',
+            q: '• session ຂອງ HRM ໝົດອາຍຸຫຼັງບໍ່ມີການເຄື່ອນໄຫວຈັກນາທີ?\n• ເມື່ອອອກຈາກ HRM ແຖວໃນ tb_current_login ຖືກລຶບ ແມ່ນບໍ? (ລະບົບໃໝ່ຈະກວດເປັນໄລຍະ ເພື່ອອອກຈາກລະບົບຕາມ)\n• 1 ພະນັກງານ ມີຫຼາຍ session ພ້ອມກັນໄດ້ບໍ?'
+          },
+          {
+            id: 'ຂ7', title: 'ຜູ້ໃຊ້ຖານຂໍ້ມູນສຳລັບລະບົບໃໝ່',
+            ref: 'bcel_hrm_v3 @ 10.0.7.110 (Testing)',
+            q: 'ຂໍ DB user ສຳລັບ Testing ທີ່ມີສິດ SELECT ສະເພາະຕາຕະລາງ: hrm_employee, hrm_employee_profile, hrm_employee_account_currency, hrm_position, hrm_branch, hrm_department, hrm_section, hrm_unit, hrm_province, hrm_district, hrm_country, hrm_currency, tb_holiday, tb_current_login, tb_users_common.\n(ຖ້າເລືອກວິທີ 1 ໃນຂໍ້ ຂ5: ເພີ່ມສິດ SELECT + UPDATE ໃນຕາຕະລາງ handoff.)\nມີຂໍ້ຈຳກັດດ້ານຄວາມປອດໄພ ຫຼື ຂັ້ນຕອນຂໍອະນຸມັດ ຫຼື ບໍ່?'
+          },
+          {
+            id: 'ຂ8', title: 'ສິດເລີ່ມຕົ້ນຂອງຜູ້ໃຊ້',
+            ref: '—',
+            q: 'ສິດ (Role) ຈະຕັ້ງຄ່າໃນລະບົບໃໝ່. ພະນັກງານທີ່ເຂົ້າມາຄັ້ງທຳອິດ ໂດຍຍັງບໍ່ໄດ້ຮັບການກຳນົດສິດ:',
+            opts: ['ໄດ້ສິດ “ພະນັກງານ” ອັດຕະໂນມັດ (ເຫັນ ແລະ ສົ່ງຄືນເງິນແຮຂອງຕົນເອງ)', 'ບໍ່ມີສິດໃດໆ ຈົນກວ່າຜູ້ດູແລລະບົບຈະກຳນົດໃຫ້']
+          }
+        ]
+      },
+      {
+        title: '3. ໂຄງສ້າງພື້ນຖານ',
+        items: [
+          {
+            id: 'ຂ9', title: 'ຊື່ລະບົບ ແລະ ທີ່ຢູ່ (URL)',
+            ref: 'tb_module (md_code, md_name_lao, md_name_eng, md_url, md_icon)',
+            q: '“HR-FAM” ເປັນຊື່ຊົ່ວຄາວ.\n• ຊື່ທາງການຂອງລະບົບ (ພາສາລາວ ແລະ ອັງກິດ) ທີ່ຈະສະແດງເທິງ tile?\n• URL / domain ສຳລັບ Testing ແລະ Production?'
+          },
+          {
+            id: 'ຂ10', title: 'Server ແລະ ການຕິດຕັ້ງ',
+            ref: '—',
+            q: '• ລະບົບໃໝ່ຕ້ອງການ Node.js 22.12 ຂຶ້ນໄປ ແລະ MariaDB 11.4 (ຖານຂໍ້ມູນຂອງຕົນເອງ ແຍກຈາກ bcel_hrm_v3). ຈະຕິດຕັ້ງຢູ່ server ໃດ? ໃຊ້ Docker / Podman ໄດ້ບໍ?\n• Server ອອກອິນເຕີເນັດໄດ້ບໍ (ສຳລັບດຶງ package ຈາກ GitHub Packages) ຫຼື ຕ້ອງ build ຈາກພາຍນອກແລ້ວນຳເຂົ້າ?'
+          },
+          {
+            id: 'ຂ11', title: 'ການເກັບໄຟລ໌ແນບ',
+            ref: '—',
+            q: 'ຂໍ້ຕົກລົງສະບັບແທ້ ແລະ ໃບບິນ ຈະຖືກອັບໂຫລດເຂົ້າລະບົບ.\n• ເກັບໄວ້ບ່ອນໃດ: disk ຂອງ server, shared folder, ຫຼື S3-compatible storage?\n• ຂະໜາດສູງສຸດຕໍ່ໄຟລ໌ ແລະ ປະເພດໄຟລ໌ທີ່ອະນຸຍາດ (PDF, JPG, PNG)?\n• ຕ້ອງເກັບຮັກສາຈັກປີ?'
+          },
+          {
+            id: 'ຂ12', title: 'ການແຈ້ງເຕືອນ',
+            ref: 'hrm_employee_profile.EMAIL',
+            q: '• ມີ SMTP server ພາຍໃນໃຫ້ລະບົບສົ່ງອີເມວແຈ້ງເຕືອນໄດ້ບໍ?\n• ຫຼື ໃຊ້ພຽງການແຈ້ງເຕືອນພາຍໃນລະບົບ (ໄລຍະທຳອິດ)?',
+            opts: ['ແຈ້ງເຕືອນພາຍໃນລະບົບເທົ່ານັ້ນ', 'ພາຍໃນລະບົບ + ອີເມວ']
+          },
+          {
+            id: 'ຂ13', title: 'ການເຊື່ອມຕໍ່ CORE (ປຶກສາພາຍຫຼັງ)',
+            ref: '1.Workflow.xlsx',
+            q: 'ໄລຍະທຳອິດບໍ່ມີການເຊື່ອມຕໍ່ໂດຍກົງ. ເພື່ອກະກຽມໄລຍະຕໍ່ໄປ:\n• ໃຜເປັນຜູ້ປະສານງານຝ່າຍ CORE?\n• CORE ຮອງຮັບການເຊື່ອມຕໍ່ແບບໃດ (API, file drop, message queue)?'
+          }
+        ]
+      }
+    ]
+  }
+];
+
+const KEY = 'travel-payment-questions-v1';
+let state = {};
+try { state = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { state = {}; }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
+
+const el = (tag, cls, text) => {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text !== undefined) n.textContent = text;
+  return n;
+};
+
+const allItems = [];
+const main = document.getElementById('main');
+
+function renderItem(item) {
+  allItems.push(item);
+  const st = state[item.id] || (state[item.id] = { choice: '', text: '', cells: {} });
+  if (!st.cells) st.cells = {};
+  const card = el('section', 'q');
+  card.id = 'q-' + item.id;
+
+  const head = el('div', 'q-head');
+  head.append(el('span', 'q-id', item.id), el('h4', 'q-title', item.title));
+  card.append(head, el('p', 'q-ref', 'ອ້າງອີງ: ' + item.ref), el('p', 'q-text', item.q));
+
+  if (item.pre) card.append(el('pre', '', item.pre));
+
+  if (item.table) {
+    const t = el('table', 'fill');
+    const hr = el('tr');
+    item.table.head.forEach((h) => hr.append(el('th', '', h)));
+    t.append(hr);
+    item.table.rows.forEach((row, r) => {
+      const tr = el('tr');
+      row.forEach((cell, c) => {
+        const td = el('td');
+        if (c === 0) { td.textContent = cell; } else {
+          const key = r + ':' + c;
+          td.contentEditable = 'true';
+          td.textContent = key in st.cells ? st.cells[key] : cell;
+          td.addEventListener('input', () => { st.cells[key] = td.textContent; save(); refresh(); });
+        }
+        tr.append(td);
+      });
+      t.append(tr);
+    });
+    card.append(t);
+  }
+
+  if (item.assume) {
+    const a = el('p', 'q-assume');
+    a.append(el('b', '', 'ທີມພັດທະນາເຂົ້າໃຈວ່າ:'), document.createTextNode(item.assume));
+    card.append(a);
+  }
+
+  if (item.opts) {
+    const ul = el('ul', 'opts');
+    item.opts.forEach((o) => {
+      const li = el('li');
+      const lab = el('label');
+      const inp = el('input');
+      inp.type = 'radio'; inp.name = 'opt-' + item.id; inp.value = o; inp.checked = st.choice === o;
+      inp.addEventListener('change', () => { st.choice = o; save(); refresh(); });
+      lab.append(inp, el('span', '', o));
+      li.append(lab);
+      ul.append(li);
+    });
+    card.append(ul);
+  }
+
+  const lab = el('label', 'ans-label', 'ຄຳຕອບ / ຄຳອະທິບາຍ');
+  const ta = el('textarea');
+  ta.id = 'ans-' + item.id; lab.htmlFor = ta.id;
+  ta.value = st.text || '';
+  ta.addEventListener('input', () => { st.text = ta.value; save(); refresh(); });
+  card.append(lab, ta);
+  return card;
+}
+
+function renderAll() {
+  allItems.length = 0;
+  main.replaceChildren();
+  SECTIONS.forEach((sec) => {
+    main.append(el('h2', 'section', sec.title), el('p', 'section-note', sec.note));
+    sec.groups.forEach((g) => {
+      main.append(el('h3', 'group', g.title));
+      g.items.forEach((item) => main.append(renderItem(item)));
+    });
+  });
+  document.querySelectorAll('[data-meta]').forEach((inp) => { inp.value = state['_' + inp.dataset.meta] || ''; });
+  refresh();
+}
+
+const answered = (id) => {
+  const s = state[id] || {};
+  return Boolean(s.choice || (s.text && s.text.trim()) || (s.cells && Object.keys(s.cells).length));
+};
+
+function refresh() {
+  let n = 0;
+  allItems.forEach((it) => {
+    const done = answered(it.id);
+    if (done) n += 1;
+    document.getElementById('q-' + it.id).classList.toggle('done', done);
+  });
+  document.getElementById('count').textContent = 'ຕອບແລ້ວ ' + n + ' / ' + allItems.length + ' ຂໍ້';
+}
+
+document.querySelectorAll('[data-meta]').forEach((inp) => {
+  const k = '_' + inp.dataset.meta;
+  inp.addEventListener('input', () => { state[k] = inp.value; save(); });
+});
+
+function download(name, text, type) {
+  const blob = new Blob([text], { type });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.append(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+document.getElementById('btn-export').addEventListener('click', () => {
+  const answers = {};
+  allItems.forEach((it) => { if (answered(it.id)) answers[it.id] = state[it.id]; });
+  const out = {
+    format: KEY,
+    exportedAt: new Date().toISOString(),
+    meta: { name: state._name || '', unit: state._unit || '', date: state._date || '' },
+    answers
+  };
+  const who = (state._name || 'answers').trim().replace(/[\\/:*?"<>|\s]+/g, '-');
+  download('travel-payment-' + who + '.json', JSON.stringify(out, null, 2), 'application/json');
+});
+
+const fileInput = document.getElementById('file-import');
+document.getElementById('btn-import').addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', async () => {
+  const file = fileInput.files[0];
+  fileInput.value = '';
+  if (!file) return;
+  let data;
+  try { data = JSON.parse(await file.text()); } catch (e) {
+    alert('ອ່ານໄຟລ໌ບໍ່ໄດ້: ຕ້ອງເປັນໄຟລ໌ .json ທີ່ບັນທຶກຈາກໜ້ານີ້.');
+    return;
+  }
+  if (!data || data.format !== KEY || typeof data.answers !== 'object') {
+    alert('ໄຟລ໌ນີ້ບໍ່ແມ່ນໄຟລ໌ຄຳຕອບຂອງແບບຟອມນີ້.');
+    return;
+  }
+  const known = new Set(allItems.map((it) => it.id));
+  let loaded = 0;
+  let skipped = 0;
+  Object.entries(data.answers).forEach(([id, a]) => {
+    if (!known.has(id) || !a || typeof a !== 'object') { skipped += 1; return; }
+    const cur = state[id] || { choice: '', text: '', cells: {} };
+    state[id] = {
+      choice: typeof a.choice === 'string' && a.choice ? a.choice : cur.choice,
+      text: typeof a.text === 'string' && a.text.trim() ? a.text : cur.text,
+      cells: Object.assign({}, cur.cells, a.cells && typeof a.cells === 'object' ? a.cells : {})
+    };
+    loaded += 1;
+  });
+  const m = data.meta || {};
+  ['name', 'unit', 'date'].forEach((k) => { if (typeof m[k] === 'string' && m[k] && !state['_' + k]) state['_' + k] = m[k]; });
+  save();
+  renderAll();
+  alert('ໂຫລດຄຳຕອບແລ້ວ ' + loaded + ' ຂໍ້' + (skipped ? ' (ຂ້າມ ' + skipped + ' ຂໍ້ທີ່ບໍ່ຮູ້ຈັກ)' : '') + '.');
+});
+
+document.getElementById('btn-print').addEventListener('click', () => window.print());
+
+document.getElementById('btn-clear').addEventListener('click', () => {
+  if (!confirm('ລຶບຄຳຕອບທັງໝົດແທ້ບໍ?')) return;
+  try { localStorage.removeItem(KEY); } catch (e) {}
+  location.reload();
+});
+
+document.getElementById('btn-export-txt').addEventListener('click', () => {
+  const lines = [
+    'ຄຳຕອບ — ລະບົບເບີກຈ່າຍການເດີນທາງ',
+    'ຜູ້ຕອບ: ' + (state._name || ''),
+    'ພະແນກ / ຂະແໜງ: ' + (state._unit || ''),
+    'ວັນທີ: ' + (state._date || ''),
+    ''
+  ];
+  allItems.forEach((it) => {
+    const s = state[it.id] || {};
+    lines.push('[' + it.id + '] ' + it.title);
+    if (s.choice) lines.push('  ເລືອກ: ' + s.choice);
+    if (it.table) {
+      it.table.rows.forEach((row, r) => {
+        const vals = row.map((cell, c) => (c > 0 && s.cells && (r + ':' + c) in s.cells ? s.cells[r + ':' + c] : cell));
+        lines.push('  | ' + vals.join(' | ') + ' |');
+      });
+    }
+    if (s.text && s.text.trim()) lines.push('  ຄຳຕອບ: ' + s.text.trim().replace(/\n/g, '\n          '));
+    if (!answered(it.id)) lines.push('  (ຍັງບໍ່ໄດ້ຕອບ)');
+    lines.push('');
+  });
+  download('travel-payment-answers.txt', '﻿' + lines.join('\r\n'), 'text/plain;charset=utf-8');
+});
+
+renderAll();
+</script>
+</body>
+</html>
