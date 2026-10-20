@@ -33,7 +33,10 @@ export function selectableEmployees() {
     .leftJoin('hrmBranch', 'hrmBranch.branchId', 'hrmEmployee.branchCode')
     .leftJoin('hrmDepartment', 'hrmDepartment.deptId', 'hrmEmployee.departmentCode')
     .leftJoin('hrmSection', 'hrmSection.sectId', 'hrmEmployee.sectionCode')
-    .leftJoin('hrmUnit', 'hrmUnit.unitId', 'hrmEmployee.unitCode')
+    // Unit ids repeat across branches; `hrm_unit` is keyed by (BRANCH_ID, UNIT_ID).
+    .leftJoin('hrmUnit', (j) =>
+      j.onRef('hrmUnit.unitId', '=', 'hrmEmployee.unitCode').onRef('hrmUnit.branchId', '=', 'hrmEmployee.branchCode'),
+    )
     .where('hrmEmployee.isDelete', '=', 'N')
     .where('hrmEmployee.approvedStatus', '=', 'A')
     .where('hrmEmployee.workStatus', '=', 1)

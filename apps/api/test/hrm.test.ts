@@ -85,6 +85,13 @@ describe.skipIf(!dbTestsEnabled)('hrm read layer', () => {
     expect(res.body.meta.pageSize).toBe(20)
   })
 
+  it("joins the unit of the employee's own branch, once", async () => {
+    expect((await findEmployee('10001'))!.unitName).toBe('ໜ່ວຍງານບັນຊີ')
+    const res = await reader.get(`${API}/hrm/employees?q=10001`)
+    expect(res.body.data.map((e: { eid: string }) => e.eid)).toEqual(['10001'])
+    expect(res.body.meta.total).toBe(1)
+  })
+
   it('picker searches Lao names', async () => {
     const res = await reader.get(`${API}/hrm/employees?q=${encodeURIComponent('ບຸນມີ')}`)
     expect(res.body.data.map((e: { eid: string }) => e.eid)).toEqual(['10002'])

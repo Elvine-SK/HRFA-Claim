@@ -13,7 +13,9 @@ INSERT INTO hrm_section (DEPT_ID, SECT_ID, NAME_LA, NAME_EN, IS_DELETE) VALUES
   ('0101', '0201', 'ຂະແໜງການເງິນ', 'Finance Section', 'N');
 
 INSERT INTO hrm_unit (BRANCH_ID, UNIT_ID, FULL_NAME_LA, FULL_NAME_EN) VALUES
-  ('888010', '030101', 'ໜ່ວຍງານບັນຊີ', 'Accounting Unit');
+  ('888010', '030101', 'ໜ່ວຍງານບັນຊີ', 'Accounting Unit'),
+  -- Unit ids repeat across branches in HRM: the key is (BRANCH_ID, UNIT_ID).
+  ('888020', '030101', 'ໜ່ວຍບໍລິການສາຂາ', 'Branch Service Unit');
 
 INSERT INTO hrm_position (PostID, PostName, PostNameEng, PostType, PostStatus, PostOrderBy) VALUES
   (12, 'ຫົວໜ້າພະແນກ', 'Head of Department', 7, 'Y', 1),

@@ -52,6 +52,7 @@ export interface HrmSectionTable {
 }
 
 export interface HrmUnitTable {
+  branchId: string | null
   unitId: string | null
   fullNameLa: string | null
   fullNameEn: string | null
