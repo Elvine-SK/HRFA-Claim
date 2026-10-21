@@ -136,6 +136,20 @@ Plan 3 is next. Write each plan when the previous one is done, so it can use the
   bundle stores it in `apps/web/hrm-login-url.txt` and `ecosystem.config.cjs` passes it on.
 - `/me` says "not linked" for any error, also when HRM is down.
 
+Carry into plans 3–4 (from the plan 2 final review):
+
+- `currentDb()` has no Kysely types for the `travel_*` tables: add a `declare module '@elvine-sk/platform-db'`
+  table interface before plan 3 or 4 queries them, so a wrong column name fails typecheck.
+- Country zones and the rank map are not effective-dated: plan 3 must snapshot the zone (as it does the rank)
+  when an agreement is submitted.
+- Plan 3 models the "Other" border route (no seed row): a nullable route id plus free text.
+- Move `todayHrm()` out of `travel-master/sets.ts` into a shared helper; plan 3 deadlines need the same
+  `+07:00` today.
+- Plan 4: fuel = distance ÷ `km_per_litre` (an Amount, `"7.00"`) needs a helper that divides by an Amount and a
+  rounding rule the spec does not give yet; validate totals fit 13 digits before writing; test the money
+  guards. `flatRateOn('fuel_price')` is `null` until a price is entered: treat it as "cannot calculate".
+- The seed migration imports `RANK_CODES` from `lookups.ts`; keep that constant unchanged (the seed is frozen).
+
 ## Blockers and open items
 
 - App name and URLs (ຂ9); the working name `hr-fam` is used until then.
