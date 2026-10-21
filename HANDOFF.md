@@ -1,7 +1,7 @@
 # Handoff — hr-fam (2026-10-20)
 
 Travel payment app for BCEL on nelvine-platform. Working name "HR-FAM" until the business names it (ຂ9).
-**Plan 1 is built** on branch `plan-1-foundation` (local git only, not merged into `main`): the app scaffold, the
+**Plan 1 is built** and merged into `main` (local git only): the app scaffold, the
 HRM read layer and sign-in from HRM. Next: plan 2.
 
 ## Start here
@@ -128,4 +128,3 @@ Write each plan when the previous one is done, so it can use the real code.
   ກ19, plan 5). The full list is spec v2 §17.
 - Deployment (PM2 on the testing server, build off-server, spec v2 §15) is in no plan yet; add it to plan 2 or a
   small plan.
-- Branch `plan-1-foundation` is not merged into `main` yet.
