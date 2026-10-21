@@ -41,25 +41,18 @@ rm -rf apps/web/.output
 
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
-STAGE="$TMP/stage"
 OUT="$TMP/hr-fam-$SHA"
-mkdir -p "$STAGE" "$OUT/apps/web" "$OUT/docs"
+mkdir -p "$OUT/apps/web" "$OUT/docs"
 
-echo "== deploy api (production dependencies)"
-# pnpm 10 refuses a plain deploy from a workspace without injected packages: use the legacy mode
-pnpm --filter ./apps/api deploy --prod --legacy "$STAGE/api"
-
-echo "== assemble (links dereferenced)"
-cp -rL "$STAGE/api" "$OUT/apps/api"
-rm -rf "$OUT/apps/api/test" "$OUT/apps/api/.env"
+# `pnpm deploy --prod` cannot be used: it does not copy packages linked from ../nelvine-platform. The
+# script walks the production dependencies of the API from the workspace install instead.
+echo "== assemble api (production dependencies, tsx, real copies)"
+node "$ROOT/tooling/deploy/assemble-api.mjs" "$ROOT/apps/api" "$OUT/apps/api"
+echo "== assemble web"
 cp -rL apps/web/.output "$OUT/apps/web/.output"
 cp ecosystem.config.cjs "$OUT/"
 cp docs/deploy-testing.md "$OUT/docs/"
 
-# tsx is a dev dependency, so --prod leaves it out; the start command needs it. Copy it and its
-# dependencies from the workspace install (real directories, no package.json edit).
-echo "== add tsx"
-node "$ROOT/tooling/deploy/copy-tsx.mjs" "$ROOT/apps/api" "$OUT/apps/api/node_modules"
 
 echo "== checks"
 LINKS="$(find "$OUT" -type l)"
