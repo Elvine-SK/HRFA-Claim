@@ -81,6 +81,8 @@ describe.skipIf(!dbTestsEnabled)('travel-master reference data', () => {
       })
       expect(await countryByIso2('FR')).toEqual({ iso2: 'FR', nameLo: 'ຝຣັ່ງ', nameEn: 'France', zoneCode: 'OE1' })
       expect(await countryByIso2('LA')).toBeNull()
+      expect(await countryByIso2('TW')).toMatchObject({ zoneCode: 'OA2', nameEn: 'Taiwan', nameLo: 'ໄຕ້ຫວັນ' })
+      expect((await countryByIso2('CN'))?.nameLo).toBe('ຈີນ')
       const perZone = await currentDb()
         .selectFrom('travelCountries')
         .select(['zoneCode', (eb) => eb.fn.countAll<number>().as('n')])
@@ -89,7 +91,7 @@ describe.skipIf(!dbTestsEnabled)('travel-master reference data', () => {
         .execute()
       expect(perZone.map((r) => [r.zoneCode, Number(r.n)])).toEqual([
         ['OA1', 15],
-        ['OA2', 47],
+        ['OA2', 48],
         ['OE1', 98],
         ['OE2', 36],
       ])

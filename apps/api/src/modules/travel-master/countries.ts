@@ -1,11 +1,12 @@
 /**
- * Country seed list: the UN member states, the Holy See, Palestine, Hong Kong and Macao, without Laos (a trip
+ * Country seed list: the UN member states, the Holy See, Palestine, Taiwan, Hong Kong and Macao, without Laos (a trip
  * inside Laos is a domestic or border form). Zones per regulation article 4 (spec §7): the countries the
  * regulation names in its groups, then every other country by region: Asia, the Middle East and Oceania `OA2`,
  * Europe `OE2`, the Americas and Africa `OE1` (4.3).
  *
  * Lao names: the regulation's spelling for the countries it names (from the code file's text of article 4, with
- * the code file's typos corrected to the regulation: ໂຮນລັງ, ໂອສຕຣິດ), the usual Lao names for the others.
+ * the code file's typos corrected to the regulation: ໂຮນລັງ, ໂອສຕຣິດ), the usual Lao names for the others. Names
+ * use the common short form without a state-form prefix (ຈີນ, not ສປ ຈີນ), so a search by first letters finds them.
  * Read only by the seed migration; an administrator corrects names in the app.
  */
 
@@ -19,7 +20,7 @@ const OA1: Row[] = [
   ['KW', 'Kuwait', 'ກູເວດ'],
   ['LB', 'Lebanon', 'ລີບັງ'],
   ['JP', 'Japan', 'ຍີ່ປຸ່ນ'],
-  ['KR', 'South Korea', 'ສ.ເກົາຫຼີ'],
+  ['KR', 'South Korea', 'ເກົາຫຼີໃຕ້'],
   ['SG', 'Singapore', 'ສິງກະໂປ'],
   ['AU', 'Australia', 'ອົດສະຕຣາລີ'],
   ['QA', 'Qatar', 'ກາຕາ'],
@@ -39,17 +40,17 @@ const OA2: Row[] = [
   ['LK', 'Sri Lanka', 'ສີລັງກາ'],
   ['TL', 'Timor-Leste', 'ຕີມໍແລັດສະເຕ'],
   ['TR', 'Türkiye', 'ຕວັກກີ'],
-  ['CN', 'China', 'ສປ ຈີນ'],
+  ['CN', 'China', 'ຈີນ'],
   ['ID', 'Indonesia', 'ອິນໂດເນເຊຍ'],
   ['MY', 'Malaysia', 'ມາເລເຊຍ'],
   ['PH', 'Philippines', 'ຟີລິບປິນ'],
   ['MN', 'Mongolia', 'ມົງໂກລີ'],
   ['IN', 'India', 'ອິນເດຍ'],
-  ['KP', 'North Korea', 'ສປປ ເກົາຫຼີ'],
+  ['KP', 'North Korea', 'ເກົາຫຼີເໜືອ'],
   ['KH', 'Cambodia', 'ກຳປູເຈຍ'],
   ['TH', 'Thailand', 'ໄທ'],
   ['MM', 'Myanmar', 'ມຽນມາ'],
-  ['VN', 'Vietnam', 'ສສ ຫວຽດນາມ'],
+  ['VN', 'Vietnam', 'ຫວຽດນາມ'],
   // Other countries of Asia and the Middle East.
   ['AF', 'Afghanistan', 'ອາຟການິສະຖານ'],
   ['AM', 'Armenia', 'ອາກເມນີ'],
@@ -65,6 +66,7 @@ const OA2: Row[] = [
   ['PS', 'Palestine', 'ປາແລັດສະຕິນ'],
   ['SY', 'Syria', 'ຊີເຣຍ'],
   ['TJ', 'Tajikistan', 'ທາຈິກິສະຖານ'],
+  ['TW', 'Taiwan', 'ໄຕ້ຫວັນ'],
   ['TM', 'Turkmenistan', 'ເຕີກເມນິສະຖານ'],
   ['UZ', 'Uzbekistan', 'ອຸສເບກິສະຖານ'],
   ['YE', 'Yemen', 'ເຢເມນ'],
@@ -87,7 +89,7 @@ const OE1: Row[] = [
   // Europe group 1. The regulation's "ອຽກລັງ" is read as England until the business says otherwise (spec §7).
   ['BE', 'Belgium', 'ແບນຊິກ'],
   ['FR', 'France', 'ຝຣັ່ງ'],
-  ['RU', 'Russia', 'ສະຫະພັນລັດເຊຍ'],
+  ['RU', 'Russia', 'ລັດເຊຍ'],
   ['CH', 'Switzerland', 'ສະວິດສະ'],
   ['GB', 'United Kingdom', 'ອັງກິດ'],
   ['NL', 'Netherlands', 'ໂຮນລັງ'],
@@ -139,11 +141,11 @@ const OE1: Row[] = [
   ['BI', 'Burundi', 'ບູຣຸນດີ'],
   ['CV', 'Cabo Verde', 'ເຄບເວີດ'],
   ['CM', 'Cameroon', 'ກາເມຣູນ'],
-  ['CF', 'Central African Republic', 'ສາທາລະນະລັດອາຟຣິກາກາງ'],
+  ['CF', 'Central African Republic', 'ອາຟຣິກາກາງ'],
   ['TD', 'Chad', 'ຊາດ'],
   ['KM', 'Comoros', 'ໂກໂມ'],
   ['CG', 'Congo', 'ກົງໂກ'],
-  ['CD', 'DR Congo', 'ສາທາລະນະລັດປະຊາທິປະໄຕກົງໂກ'],
+  ['CD', 'DR Congo', 'ກົງໂກ (ກິນຊາຊາ)'],
   ['CI', "Côte d'Ivoire", 'ໂກດີວົວ'],
   ['DJ', 'Djibouti', 'ຈີບູຕີ'],
   ['EG', 'Egypt', 'ອີຢິບ'],
@@ -225,7 +227,7 @@ const OE2: Row[] = [
   ['MK', 'North Macedonia', 'ມາເຊໂດນີເໜືອ'],
   ['SM', 'San Marino', 'ຊານມາຣີໂນ'],
   ['RS', 'Serbia', 'ເຊີເບຍ'],
-  ['VA', 'Holy See', 'ນະຄອນວາຕິກັນ'],
+  ['VA', 'Holy See', 'ວາຕິກັນ'],
 ]
 
 export interface SeedCountry {
