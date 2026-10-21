@@ -218,8 +218,11 @@ granted). The kit for the HRM team is [`docs/hrm-handoff.md`](../hrm-handoff.md)
   corrections do not need code.
 
 Values are seeded from `2. ກຳນົດ code and data.xlsx` (2026-10-16) and `4. Format form FA-M.xlsx` (2026-10-20).
-Defects of the code file the seed works around, to be confirmed by the business: Romania is listed in both `OE1`
-("ໂຣມານີ") and `OE2` ("ຣູມານີ"); England is listed twice in `OE1` ("ອັງກິດ", "ອັງກະລັງ").
+Where the code file and the regulation differ, the seed follows the regulation (article 4, page 4): Europe group 1
+there is Belgium, France, Russia, Switzerland, England, **Netherlands** ("ໂຮນລັງ"), Spain, "ອຽກລັງ", Greece and
+Norway. The code file's "ໂຣມານີ" in `OE1` is a typo for "ໂຮນລັງ"; Romania ("ຣູມານີ") is `OE2`, as both lists say.
+The word "ອຽກລັງ" (code file "ອັງກະລັງ") names no country clearly; until the business says which, the seed reads it
+as a second spelling of England and leaves Italy, which neither list names, in `OE2` as "other European".
 
 ## 8. Agreement (forms 1–4)
 
@@ -507,7 +510,8 @@ Assumptions the build follows unless corrected:
 Needed from the business:
 
 1. Doc.no branch part: three digits (`0001.BCEL.010.2026`) or six (`0001.BCEL.888010.2026`) (ກ12)?
-2. Code file: is Romania `OE1` or `OE2`? Is Brazil `OE1`?
+2. Regulation 4.2, Europe group 1: which country is "ອຽກລັງ" (code file "ອັງກະລັງ")? If it is Italy, Italy moves
+   from `OE2` to `OE1`. Is Brazil, which the 4.3 list does not name, `OE1` like the rest of the Americas?
 3. FA-M `ສາຍເດີນ`, section 1: is the second debit 4408730001 (accommodation)?
 4. Overseas entries debit the GL in LAK and credit CASA in USD: does CORE convert, at which rate (buying or selling,
    of which date), and who provides it?
@@ -542,7 +546,7 @@ Needed from HRM and IT:
 
 1. App scaffold, HRM read layer, sign-in handoff. **Done** (plan 1).
 2. Master data with seed, and the deployment to the testing server. Needs ຂ1 (rank map); business question 2
-   (Romania) for the seed; the posting entries can be seeded and corrected later.
+   changes one country's zone at most. The posting entries come with step 4, which is the first to use them.
 3. Agreements with REF, Doc.no and approval. Needs business question 1 (Doc.no branch part) before the parser is
    final.
 4. Payment calculation, checking table, upload file. Needs business questions 3, 4, 6, 7, 9 and 14.
