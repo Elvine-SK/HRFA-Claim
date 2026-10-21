@@ -6,13 +6,13 @@ HRM read layer and sign-in from HRM. Next: plan 2.
 
 ## Start here
 
-- **Spec:** [`docs/specs/2026-10-20-travel-payment-design-v2.md`](docs/specs/2026-10-20-travel-payment-design-v2.md).
-  v1 (`2026-10-13`) is kept for history only.
+- **Spec:** [`docs/specs/2026-10-21-travel-payment-design-v3.md`](docs/specs/2026-10-21-travel-payment-design-v3.md).
+  v2 (`2026-10-20`) and v1 (`2026-10-13`) are kept for history only.
 - **Business answers:** [`docs/travel-payment-answers.json`](docs/travel-payment-answers.json) (export of
-  2026-10-20T08:16), questions in [`docs/questions-for-business-finance-lo.html`](docs/questions-for-business-finance-lo.html).
-  Corrections given in chat on 2026-10-20 are already in spec v2: ກ2 days are subtracted by hand (an input),
-  Doc.no carries the full six-digit branch code (`0001.BCEL.888010.2026`), host-meal rounding is ÷ 3 rounded up
-  to a whole unit of the currency (100 USD → 34 USD).
+  2026-10-21T02:44), questions in [`docs/questions-for-business-finance-lo.html`](docs/questions-for-business-finance-lo.html),
+  plus the updated `2. ກຳນົດ code and data.xlsx` (2026-10-16) and `4. Format form FA-M.xlsx` (2026-10-20, new
+  sheets `GL` and `ສາຍເດີນ`). All are in spec v3; its §17 lists what is still open. The Doc.no branch part
+  (3 digits per ກ12, 6 digits per the chat of 2026-10-20) is undecided.
 - **Done:** [plan 1](docs/superpowers/plans/2026-10-20-plan-1-foundation.md). **Next:** write plan 2 (master data).
 - **HRM team kit:** [`docs/hrm-handoff.md`](docs/hrm-handoff.md) (handoff table, redirect script, grants, errors).
 
@@ -123,8 +123,7 @@ Write each plan when the previous one is done, so it can use the real code.
 - App name and URLs (ຂ9); the working name `hr-fam` is used until then.
 - Testing database user (ຂ7) and the HRM team adding `tb_app_handoff` and the redirect (ຂ5, kit in
   `docs/hrm-handoff.md`). Only the real sign-in from HRM waits on this.
-- Later plans: the `PostType` → `P1`–`P9` map (ຂ1, plan 2), the border routes (ກ7, plan 2), forms 2 and 4 options
-  (ກ6, plan 3), GL string and upload file details (ກ24, ກ25, plan 4), settlement accounts and branch chain (ກ22,
-  ກ19, plan 5). The full list is spec v2 §17.
-- Deployment (PM2 on the testing server, build off-server, spec v2 §15) is in no plan yet; add it to plan 2 or a
-  small plan.
+- Later plans: the `PostType` → `P1`–`P9` map (ຂ1) and Romania's zone (plan 2), the Doc.no branch part (plan 3),
+  the overseas LAK/USD entries, fuel and border entries, `REMARK` (plan 4), the holding-account timing and `RVS_NO`
+  (plan 5). The full list, with the build step each blocks, is spec v3 §17–18.
+- Deployment (PM2 on the testing server, build off-server, spec v3 §15) goes into plan 2.
