@@ -1,6 +1,8 @@
 {
   "hrm": {
-    "nav": { "me": "My HRM profile" },
+    "nav": {
+      "me": "My HRM profile"
+    },
     "me": {
       "title": "My HRM profile",
       "subtitle": "Your record in HRM, as this system uses it",
@@ -13,6 +15,120 @@
       "unit": "Unit",
       "branch": "Branch",
       "notLinked": "Your account is not linked to an HRM employee. Open this system from the HRM portal."
+    }
+  },
+  "master": {
+    "nav": {
+      "title": "Travel master data"
+    },
+    "index": {
+      "subtitle": "Reference data for travel payments: ranks, zones, rates and bands"
+    },
+    "nameEn": "Name (English)",
+    "nameLo": "Name (Lao)",
+    "required": "Required",
+    "saved": "Saved",
+    "published": "Published",
+    "deleted": "{name} deleted",
+    "futureOnlyText": "Only a set that has not started yet can be deleted. This can't be undone.",
+    "future": "Future",
+    "inEffect": "In effect",
+    "noSets": "No sets yet",
+    "dateInvalid": "Pick a valid start date",
+    "amountInvalid": "Enter every amount as a number with at most two decimals, for example 150000 or 12.50",
+    "newSet": "New set from date",
+    "newValue": "New value from date",
+    "futureValues": "Later values",
+    "setFrom": "Set from {date}",
+    "setDates": "Start dates",
+    "seeDate": "See the set in effect on this date",
+    "todayButton": "Today",
+    "effectiveFrom": "Starts on",
+    "futureHint": "A date after today",
+    "amountsIn": "Amounts in {currency}",
+    "amount": "Amount",
+    "publish": "Publish",
+    "rankMap": {
+      "title": "Rank map",
+      "line": "Which rank each HRM PostType belongs to",
+      "hint": "Each HRM PostType must belong to one rank P1 to P9 before travel rates can be found for its staff.",
+      "unmapped": "{n} PostType has no rank yet | {n} PostTypes have no rank yet",
+      "postType": "PostType",
+      "positions": "Sample positions",
+      "rank": "Rank",
+      "notMapped": "Not mapped",
+      "pick": "Pick a rank"
+    },
+    "countries": {
+      "title": "Countries",
+      "line": "Countries, their names and travel zone",
+      "entities": "countries",
+      "iso2": "ISO code",
+      "iso2Invalid": "Two letters",
+      "zone": "Zone",
+      "add": "Add country",
+      "edit": "Edit country"
+    },
+    "borderRoutes": {
+      "title": "Border routes",
+      "line": "Border crossings used for border trips",
+      "status": "Status",
+      "active": "Active",
+      "inactive": "Inactive",
+      "add": "Add border route",
+      "edit": "Edit border route",
+      "activate": "Activate",
+      "deactivate": "Deactivate"
+    },
+    "rates": {
+      "title": "Rates",
+      "line": "Daily, accommodation and personal rates per rank and zone, by start date",
+      "onDate": "Set in effect on {date}",
+      "today": "Set in effect today",
+      "none": "No set in effect on this date",
+      "rank": "Rank",
+      "daily": "Daily",
+      "accommodation": "Accommodation",
+      "personal": "Personal",
+      "newTitle": "New rate set for zone {zone}"
+    },
+    "flatRates": {
+      "title": "Flat rates",
+      "line": "Same-day rate, fuel price and kilometres per litre",
+      "none": "No value yet",
+      "newTitle": "New value: {name}",
+      "keys": {
+        "same_day": "Same-day rate",
+        "fuel_price": "Fuel price per litre",
+        "km_per_litre": "Kilometres per litre"
+      }
+    },
+    "advanceBands": {
+      "title": "Advance bands",
+      "line": "Advance amounts by number of days (domestic) or group size (group)",
+      "none": "No bands in effect",
+      "open": "No limit",
+      "addBand": "Add band",
+      "rowInvalid": "Each band needs a first and a last number (or none for the last) and an amount",
+      "newTitle": "New bands: {name}",
+      "kinds": {
+        "domestic_days": "Domestic, by number of days",
+        "group_size": "Group, by number of people"
+      },
+      "min": {
+        "domestic_days": "From day",
+        "group_size": "From people"
+      },
+      "max": {
+        "domestic_days": "To day",
+        "group_size": "To people"
+      }
+    },
+    "glAccounts": {
+      "title": "GL accounts",
+      "line": "General ledger accounts used for posting (read only)",
+      "gl": "GL",
+      "seq": "SEQ"
     }
   }
 }
