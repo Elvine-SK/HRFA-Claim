@@ -3,20 +3,38 @@
 #   tooling/deploy/bundle.sh --hrm-login-url https://hrm.example/login
 # The bundle holds real copies of everything it runs (platform packages are linked from ../nelvine-platform
 # in development). Native packages (argon2, esbuild) are built for the OS of the machine that runs this
-# script: build on the same OS and CPU as the server (Linux x64), or the API will not start there.
+# script: build on the same OS and CPU as the server (Linux x64), or the API will not start there. The script
+# refuses to run elsewhere unless --allow-non-linux is given (the result is then not installable).
 set -euo pipefail
 
 HRM_LOGIN_URL=""
+ALLOW_NON_LINUX=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --hrm-login-url) HRM_LOGIN_URL="${2:-}"; shift 2 ;;
     --hrm-login-url=*) HRM_LOGIN_URL="${1#*=}"; shift ;;
+    --allow-non-linux) ALLOW_NON_LINUX=1; shift ;;
     *) echo "unknown argument: $1" >&2; exit 2 ;;
   esac
 done
 if [ -z "$HRM_LOGIN_URL" ]; then
-  echo "usage: bundle.sh --hrm-login-url <URL of the HRM login page>" >&2
+  echo "usage: bundle.sh --hrm-login-url <URL of the HRM login page> [--allow-non-linux]" >&2
   exit 2
+fi
+
+OS_NAME="$(uname -s)"
+CPU_NAME="$(uname -m)"
+if [ "$OS_NAME" != "Linux" ] || [ "$CPU_NAME" != "x86_64" ]; then
+  if [ "$ALLOW_NON_LINUX" = "1" ]; then
+    echo "WARNING: building on $OS_NAME $CPU_NAME, not Linux x86_64." >&2
+    echo "WARNING: native packages (argon2, esbuild) in this bundle will NOT run on the server." >&2
+    echo "WARNING: use this bundle only to inspect its contents, never to install it." >&2
+  else
+    echo "refusing to build: this is $OS_NAME $CPU_NAME, the server runs Linux x86_64." >&2
+    echo "Native packages (argon2, esbuild) are built for the machine that runs this script, so the API would not start on the server." >&2
+    echo "Run it on Linux x86_64 (WSL2 or CI), or pass --allow-non-linux to build anyway (not installable)." >&2
+    exit 2
+  fi
 fi
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"

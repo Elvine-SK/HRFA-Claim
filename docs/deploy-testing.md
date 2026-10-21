@@ -8,6 +8,8 @@ The bundle is built on a developer machine with `tooling/deploy/bundle.sh --hrm-
 URL given to it is stored in `apps/web/hrm-login-url.txt`, which `ecosystem.config.cjs` hands to the web process
 (`NUXT_PUBLIC_HRM_LOGIN_URL`); to change it, edit that file and run `pm2 reload ecosystem.config.cjs --update-env`. Native packages inside it (argon2,
 esbuild) are built for the OS that made the bundle: it must be built on Linux x64 to run on the server.
+`bundle.sh` refuses to run on any other OS or CPU. `--allow-non-linux` overrides this with a loud warning; a bundle
+built that way is for inspection only and must not be installed.
 
 ## Prerequisites
 

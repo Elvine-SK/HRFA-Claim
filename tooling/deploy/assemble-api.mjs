@@ -1,7 +1,9 @@
 // Usage: node assemble-api.mjs <apps/api dir> <destination apps/api dir>
 //
 // Builds the API folder of the bundle from the workspace install, with real copies only:
-//  - the API's own files (not node_modules, tests, .env),
+//  - the API's own files, by allowlist (API_FILES below): `.env`, `.env.*` other than the example, `storage/`,
+//    logs and uploads can never be shipped,
+//  - tsconfig.base.json from the repo root (tsx reads `extends ../../tsconfig.base.json`),
 //  - a package.json whose link: dependencies carry the copied version instead (the file in the repo is
 //    generated and stays as it is),
 //  - production node_modules: every dependency of the API, and of each dependency in turn, found by Node's
@@ -15,20 +17,24 @@ import { basename, dirname, join, relative, resolve } from 'node:path'
 const [apiDir, destApi] = process.argv.slice(2)
 if (!apiDir || !destApi) throw new Error('usage: assemble-api.mjs <api dir> <destination api dir>')
 
-const SKIP_IN_API = new Set(['node_modules', 'test', '.env', 'vitest.config.ts', 'Dockerfile'])
+// Everything the API needs at runtime (PM2 runs src/main.ts and src/cli.ts through tsx). package.json is
+// rewritten below; tsconfig.json extends the root tsconfig.base.json, copied to the same relative place.
+const API_FILES = ['src', 'package.json', 'tsconfig.json', '.env.example', 'openapi.json']
 const SKIP_IN_PACKAGE = new Set(['node_modules', '.turbo', '.vite-temp', 'test', 'coverage', '.git'])
 
 const readJson = (file) => JSON.parse(readFileSync(file, 'utf8'))
 
 mkdirSync(destApi, { recursive: true })
-cpSync(apiDir, destApi, {
-  recursive: true,
-  dereference: true,
-  filter: (src) => {
-    const rel = relative(resolve(apiDir), src)
-    return !(SKIP_IN_API.has(rel) || rel.endsWith('.stackdump'))
-  },
-})
+for (const name of API_FILES) {
+  const from = join(apiDir, name)
+  if (!existsSync(from)) throw new Error(`${name} is missing from ${apiDir}`)
+  cpSync(from, join(destApi, name), { recursive: true, dereference: true })
+}
+// tsconfig.json of the API extends ../../tsconfig.base.json: same place in the bundle (<bundle>/tsconfig.base.json).
+const base = join(resolve(apiDir, '..', '..'), 'tsconfig.base.json')
+const baseDest = join(resolve(destApi, '..', '..'), 'tsconfig.base.json')
+if (!existsSync(base)) throw new Error(`${base} is missing`)
+cpSync(base, baseDest)
 
 /** Real directory of a package as Node finds it from `fromDir` (a real directory). */
 function findPackageDir(fromDir, name) {
