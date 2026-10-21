@@ -50,6 +50,8 @@ echo "== assemble api (production dependencies, tsx, real copies)"
 node "$ROOT/tooling/deploy/assemble-api.mjs" "$ROOT/apps/api" "$OUT/apps/api"
 echo "== assemble web"
 cp -rL apps/web/.output "$OUT/apps/web/.output"
+printf '%s
+' "$HRM_LOGIN_URL" > "$OUT/apps/web/hrm-login-url.txt"
 cp ecosystem.config.cjs "$OUT/"
 cp docs/deploy-testing.md "$OUT/docs/"
 

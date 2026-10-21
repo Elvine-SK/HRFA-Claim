@@ -56,8 +56,8 @@ Reviews: a security review of the sign-in (0 Critical, 5 Important, all fixed) a
   routes under `/api/v1/travel-master`; effective-dated sets (a new set closes the previous one).
 - Web: master data pages under `/master`.
 - Deployment: `ecosystem.config.cjs` (PM2: `api`, `worker`, `web`, one instance each) and
-  `tooling/deploy/bundle.sh --hrm-login-url <URL>`, which typechecks, builds the web (the login URL is fixed
-  at build time), copies the API with real production `node_modules` (no links, `tsx` added) and writes
+  `tooling/deploy/bundle.sh --hrm-login-url <URL>`, which typechecks, builds the web (the login URL goes into
+  `apps/web/hrm-login-url.txt`), copies the API with real production `node_modules` (no links, `tsx` added) and writes
   `build/hr-fam-<sha>.tar.gz`. Build it on the server's OS (Linux x64): argon2 and esbuild are native.
   Install steps for `10.0.7.110`: [`docs/deploy-testing.md`](docs/deploy-testing.md).
 
@@ -130,7 +130,8 @@ Plan 3 is next. Write each plan when the previous one is done, so it can use the
 - Codes travel in the URL: strip `code` from reverse-proxy logs. `hrm_handoff_redemptions` is never cleaned.
 - HRM users have no MFA: do not give them administrator roles without a decision.
 - `findEmployee` shows a NULL `BRANCH_CODE` as `888010`; no fixtures for NULL organisation fields.
-- `NUXT_PUBLIC_HRM_LOGIN_URL` is fixed at web build time (static SPA): build per environment.
+- `NUXT_PUBLIC_HRM_LOGIN_URL` is read by the web server when it starts (the build does not bake it in); the PM2
+  bundle stores it in `apps/web/hrm-login-url.txt` and `ecosystem.config.cjs` passes it on.
 - `/me` says "not linked" for any error, also when HRM is down.
 
 ## Blockers and open items

@@ -5,7 +5,8 @@ The bundle `hr-fam-<sha>.tar.gz` holds everything the app runs: the API sources 
 `ecosystem.config.cjs` and this file. The server needs no internet access and no `pnpm install`.
 
 The bundle is built on a developer machine with `tooling/deploy/bundle.sh --hrm-login-url <URL>`. The HRM login
-URL is fixed in the web build, so a bundle belongs to one environment. Native packages inside it (argon2,
+URL given to it is stored in `apps/web/hrm-login-url.txt`, which `ecosystem.config.cjs` hands to the web process
+(`NUXT_PUBLIC_HRM_LOGIN_URL`); to change it, edit that file and run `pm2 reload ecosystem.config.cjs --update-env`. Native packages inside it (argon2,
 esbuild) are built for the OS that made the bundle: it must be built on Linux x64 to run on the server.
 
 ## Prerequisites
