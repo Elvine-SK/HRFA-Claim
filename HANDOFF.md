@@ -1,8 +1,8 @@
-# Handoff — hr-fam (2026-10-20)
+# Handoff — hr-fam (2026-10-21)
 
 Travel payment app for BCEL on nelvine-platform. Working name "HR-FAM" until the business names it (ຂ9).
-**Plan 1 is built** and merged into `main` (local git only): the app scaffold, the
-HRM read layer and sign-in from HRM. Next: plan 2.
+**Plans 1 and 2 are built** (local git only): plan 1 the app scaffold, the HRM read layer and sign-in from
+HRM; plan 2 the master data and the PM2 bundle. Next: plan 3 (agreements).
 
 ## Start here
 
@@ -13,7 +13,8 @@ HRM read layer and sign-in from HRM. Next: plan 2.
   plus the updated `2. ກຳນົດ code and data.xlsx` (2026-10-16) and `4. Format form FA-M.xlsx` (2026-10-20, new
   sheets `GL` and `ສາຍເດີນ`). All are in spec v3; its §17 lists what is still open. The Doc.no branch part
   (3 digits per ກ12, 6 digits per the chat of 2026-10-20) is undecided.
-- **Done:** [plan 1](docs/superpowers/plans/2026-10-20-plan-1-foundation.md). **Next:** write plan 2 (master data).
+- **Done:** [plan 1](docs/superpowers/plans/2026-10-20-plan-1-foundation.md), plan 2 (master data, deployment bundle).
+  **Next:** write plan 3 (agreements).
 - **HRM team kit:** [`docs/hrm-handoff.md`](docs/hrm-handoff.md) (handoff table, redirect script, grants, errors).
 
 ## Run it
@@ -24,6 +25,7 @@ pnpm install && pnpm migrate
 # local HRM copy (fixture employees), see docs/hrm-handoff.md "Local copy"
 pnpm dev:api                         # :3001
 pnpm dev:web                         # :3000
+tooling/deploy/bundle.sh --hrm-login-url <URL>   # build/hr-fam-<sha>.tar.gz for the testing server
 RUN_DB_TESTS=1 pnpm test             # 44 tests; the test DBs are built on :3308 by global-setup
 ```
 
@@ -45,6 +47,19 @@ local HRM copy. `/auth/sign-in?local=1` is the platform sign-in for the bootstra
 
 Reviews: a security review of the sign-in (0 Critical, 5 Important, all fixed) and a light whole-branch review
 (2 Important, fixed). Deferred minors are listed below.
+
+## What plan 2 built
+
+- `travel-master` module: reference tables (ranks, zones, countries, border routes, rank map, rates, flat
+  rates, advance bands, fuel, GL), seeded from the code file and the regulation; lookups `rankForPostType`,
+  `zoneOf`, `countryByIso2`, `rateOn`, `flatRateOn`, `advanceOn`; a money helper (decimals and rounding);
+  routes under `/api/v1/travel-master`; effective-dated sets (a new set closes the previous one).
+- Web: master data pages under `/master`.
+- Deployment: `ecosystem.config.cjs` (PM2: `api`, `worker`, `web`, one instance each) and
+  `tooling/deploy/bundle.sh --hrm-login-url <URL>`, which typechecks, builds the web (the login URL is fixed
+  at build time), copies the API with real production `node_modules` (no links, `tsx` added) and writes
+  `build/hr-fam-<sha>.tar.gz`. Build it on the server's OS (Linux x64): argon2 and esbuild are native.
+  Install steps for `10.0.7.110`: [`docs/deploy-testing.md`](docs/deploy-testing.md).
 
 ## Approach: app first, platform later
 
@@ -76,13 +91,13 @@ PascalCase upstream columns do not survive `CamelCasePlugin`.
 | Plan | Spec §18 step                                            | State        |
 | ---- | -------------------------------------------------------- | ------------ |
 | 1    | Scaffold, HRM read layer, sign-in handoff                | Done         |
-| 2    | Master data with seed (ranks, zones, rates, bands, fuel, GL) | To write |
+| 2    | Master data with seed (ranks, zones, rates, bands, fuel, GL), PM2 bundle | Done |
 | 3    | Agreements: forms 1–4, REF, Doc.no, approval             | To write     |
 | 4    | Payment calculation, checking table, upload file         | To write     |
 | 5    | Settlement, approval chain, posting batch                | To write     |
 | 6    | Dashboard, reminders, printable views, transit form      | To write     |
 
-Write each plan when the previous one is done, so it can use the real code.
+Plan 3 is next. Write each plan when the previous one is done, so it can use the real code.
 
 ## Decisions
 
@@ -123,7 +138,11 @@ Write each plan when the previous one is done, so it can use the real code.
 - App name and URLs (ຂ9); the working name `hr-fam` is used until then.
 - Testing database user (ຂ7) and the HRM team adding `tb_app_handoff` and the redirect (ຂ5, kit in
   `docs/hrm-handoff.md`). Only the real sign-in from HRM waits on this.
-- Later plans: the `PostType` → `P1`–`P9` map (ຂ1) and Romania's zone (plan 2), the Doc.no branch part (plan 3),
+- Open items in the plan 2 seed: spec v3 §17 business question 2 (the unclear Europe-group-1 word; Italy and
+  Brazil depend on it), the `PostType` → `P1`–`P9` map (ຂ1), the Lao spelling of AE to confirm, and the
+  Caucasus countries (AM, AZ, GE) seeded in zone group OA2. The visual browser checks of the `/master` pages
+  are still to do.
+- Later plans: the Doc.no branch part (plan 3),
   the overseas LAK/USD entries, fuel and border entries, `REMARK` (plan 4), the holding-account timing and `RVS_NO`
   (plan 5). The full list, with the build step each blocks, is spec v3 §17–18.
-- Deployment (PM2 on the testing server, build off-server, spec v3 §15) goes into plan 2.
+- Deployment: PM2 bundle built (see above); not yet installed on the testing server.
