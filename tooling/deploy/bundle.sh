@@ -46,9 +46,8 @@ OUT="$TMP/hr-fam-$SHA"
 mkdir -p "$STAGE" "$OUT/apps/web" "$OUT/docs"
 
 echo "== deploy api (production dependencies)"
-if ! pnpm --filter ./apps/api deploy --prod "$STAGE/api"; then
-  pnpm --filter ./apps/api deploy --prod --legacy "$STAGE/api"
-fi
+# pnpm 10 refuses a plain deploy from a workspace without injected packages: use the legacy mode
+pnpm --filter ./apps/api deploy --prod --legacy "$STAGE/api"
 
 echo "== assemble (links dereferenced)"
 cp -rL "$STAGE/api" "$OUT/apps/api"
