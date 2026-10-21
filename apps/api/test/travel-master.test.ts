@@ -1,9 +1,9 @@
-import { uuidv7 } from '@elvine-sk/platform-core'
+import { setClock, uuidv7 } from '@elvine-sk/platform-core'
 import { currentDb, runWithContext, SYSTEM_CONTEXT, uuidBin } from '@elvine-sk/platform-db'
 import { dbTestsEnabled } from '@elvine-sk/platform-db/testing'
 import type { PlatformApp } from '@elvine-sk/platform-server'
 import { TestClient } from '@elvine-sk/platform-server/testing'
-import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import {
   advanceOn,
   countryByIso2,
@@ -363,6 +363,250 @@ describe.skipIf(!dbTestsEnabled)('travel-master routes', () => {
     } finally {
       await manager.delete(url('/rank-map/8'))
     }
+  })
+})
+
+describe.skipIf(!dbTestsEnabled)('travel-master effective-dated sets', () => {
+  let platform: PlatformApp
+  let manager: TestClient
+  let someone: TestClient
+  const sys = <T>(fn: () => Promise<T>) => runWithContext(SYSTEM_CONTEXT, fn)
+  const url = (path: string) => `${API}/travel-master${path}`
+  const nine = (daily: string, personal: string | null = null) =>
+    ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'P9'].map((rankCode) => ({
+      rankCode,
+      daily,
+      accommodation: '500000',
+      personal,
+    }))
+
+  const today = () => new Date('2026-10-21T10:00:00+07:00')
+
+  beforeAll(async () => {
+    setClock(today) // sign in on the same clock the tests run on
+    platform = await bootApp()
+    const admin = await adminClient(platform)
+    const roleId = await role(admin, 'travel_master_sets_manager', ['travel_master.manage'])
+    manager = (await userWith(platform, admin, [roleId])).client
+    someone = (await userWith(platform, admin)).client
+    setClock(null)
+  })
+  beforeEach(() => setClock(today))
+  afterEach(() => setClock(null))
+  afterAll(async () => {
+    await platform?.ctx.db.destroy()
+  })
+
+  it('publishes a future rate set and uses it from its first day', async () => {
+    const set = { zoneCode: 'D', effectiveFrom: '2027-01-01', rows: nine('330000') }
+    expect((await manager.post(url('/rates'), set)).status).toBe(201)
+    expect((await someone.get(url('/rates?zone=D&on=2026-12-31'))).body.data.rows[0].daily).toBe('310000.00')
+    expect((await someone.get(url('/rates?zone=D&on=2027-01-01'))).body.data.rows[0].daily).toBe('330000.00')
+    await sys(async () => {
+      expect((await rateOn('D', 'P5', '2027-01-01'))?.daily).toBe('330000.00')
+    })
+  })
+
+  it('lists the sets of a zone, newest first, and defaults to today in HRM time', async () => {
+    const res = await someone.get(url('/rates?zone=D'))
+    expect(res.status).toBe(200)
+    expect(res.body.sets).toEqual(['2027-01-01', '2026-01-01'])
+    expect(res.body.data).toMatchObject({ zoneCode: 'D', currency: 'LAK', effectiveFrom: '2026-01-01' })
+    expect(res.body.data.rows.map((r: { rankCode: string }) => r.rankCode)).toEqual([
+      'P1',
+      'P2',
+      'P3',
+      'P4',
+      'P5',
+      'P6',
+      'P7',
+      'P8',
+      'P9',
+    ])
+    expect((await someone.get(url('/rates?zone=D&on=2025-12-31'))).body.data).toBeNull()
+    expect((await someone.get(url('/rates?zone=D&on=2026-02-30'))).status).toBe(422)
+    expect((await someone.get(url('/rates?zone=D&on=tomorrow'))).status).toBe(422)
+    expect((await someone.get(url('/rates?zone=ZZ'))).status).toBe(422)
+    expect((await new TestClient(platform).get(url('/rates?zone=D'))).status).toBe(401)
+  })
+
+  it('refuses to change or delete a set in effect, and leaves it unchanged', async () => {
+    const post = (effectiveFrom: string) =>
+      manager.post(url('/rates'), { zoneCode: 'D', effectiveFrom, rows: nine('1') })
+    expect((await post('2026-01-01')).status).toBe(409)
+    const today = await post('2026-10-21')
+    expect(today.status).toBe(409)
+    expect(today.body.error.code).toBe('travel_master.set_in_effect')
+    expect((await manager.delete(url('/rates/D/2026-01-01'))).status).toBe(409)
+    expect((await someone.get(url('/rates?zone=D&on=2026-10-21'))).body.data.rows[0].daily).toBe('310000.00')
+  })
+
+  it('replaces a future set of the same date whole', async () => {
+    const set = { zoneCode: 'D', effectiveFrom: '2027-01-01', rows: nine('340000') }
+    expect((await manager.post(url('/rates'), set)).status).toBe(201)
+    const res = await someone.get(url('/rates?zone=D&on=2027-01-01'))
+    expect(res.body.data.rows).toHaveLength(9)
+    expect(res.body.data.rows.every((r: { daily: string }) => r.daily === '340000.00')).toBe(true)
+  })
+
+  it('audits publishing a set', async () => {
+    const rows = await sys(() =>
+      currentDb()
+        .selectFrom('auditEvents')
+        .select(['action', 'details'])
+        .where('action', '=', 'travel_master.set_published')
+        .execute(),
+    )
+    expect(rows.length).toBeGreaterThan(0)
+    expect(JSON.stringify(rows.map((r) => r.details))).toContain('travel_rates')
+  })
+
+  it('deletes a future set, and answers 404 for one that is not there', async () => {
+    expect((await manager.delete(url('/rates/D/2027-01-01'))).status).toBe(204)
+    expect((await someone.get(url('/rates?zone=D'))).body.sets).toEqual(['2026-01-01'])
+    expect((await manager.delete(url('/rates/D/2027-01-01'))).status).toBe(404)
+  })
+
+  it('validates a rate set', async () => {
+    const post = (zoneCode: string, rows: unknown[]) =>
+      manager.post(url('/rates'), { zoneCode, effectiveFrom: '2027-02-01', rows })
+    expect((await post('D', nine('1').slice(1))).status).toBe(422)
+    expect((await post('D', [...nine('1').slice(1), ...nine('1').slice(1, 2)])).status).toBe(422)
+    expect((await post('OE1', nine('100'))).status).toBe(422) // personal missing
+    expect((await post('D', nine('1', '5'))).status).toBe(422) // personal on a LAK zone
+    expect((await post('D', nine('1.234'))).status).toBe(422)
+    expect((await post('ZZ', nine('1'))).status).toBe(422)
+    const badDate = { zoneCode: 'D', effectiveFrom: '2027-02-30', rows: nine('1') }
+    expect((await manager.post(url('/rates'), badDate)).status).toBe(422)
+    expect((await post('OE1', nine('100', '50'))).status).toBe(201)
+    expect((await manager.delete(url('/rates/OE1/2027-02-01'))).status).toBe(204)
+  })
+
+  it.each([
+    [
+      [
+        { minCount: 1, maxCount: 2, amount: '1' },
+        { minCount: 4, maxCount: null, amount: '2' },
+      ],
+    ],
+    [
+      [
+        { minCount: 1, maxCount: 3, amount: '1' },
+        { minCount: 3, maxCount: null, amount: '2' },
+      ],
+    ],
+    [
+      [
+        { minCount: 1, maxCount: 2, amount: '1' },
+        { minCount: 3, maxCount: 5, amount: '2' },
+      ],
+    ],
+    [[{ minCount: 2, maxCount: null, amount: '1' }]],
+    [
+      [
+        { minCount: 1, maxCount: null, amount: '1' },
+        { minCount: 2, maxCount: null, amount: '2' },
+      ],
+    ],
+  ])('refuses advance bands with a gap, overlap or no open end: %j', async (bands) => {
+    const res = await manager.post(url('/advance-bands'), { kind: 'group_size', effectiveFrom: '2027-01-01', bands })
+    expect(res.status).toBe(422)
+    expect(res.body.error.code).toBe('travel_master.bands_invalid')
+  })
+
+  it('publishes, reads and deletes advance bands', async () => {
+    const bands = [
+      { minCount: 1, maxCount: 3, amount: '100' },
+      { minCount: 4, maxCount: null, amount: '200' },
+    ]
+    const post = (effectiveFrom: string) =>
+      manager.post(url('/advance-bands'), { kind: 'group_size', effectiveFrom, bands })
+    expect((await post('2027-01-01')).status).toBe(201)
+    const current = await someone.get(url('/advance-bands?kind=group_size'))
+    expect(current.status).toBe(200)
+    expect(current.body.sets).toEqual(['2027-01-01', '2026-01-01'])
+    expect(current.body.data.effectiveFrom).toBe('2026-01-01')
+    const later = await someone.get(url('/advance-bands?kind=group_size&on=2027-01-01'))
+    expect(later.body.data).toMatchObject({ kind: 'group_size', currency: 'USD', effectiveFrom: '2027-01-01' })
+    expect(later.body.data.bands).toEqual([
+      { minCount: 1, maxCount: 3, amount: '100.00' },
+      { minCount: 4, maxCount: null, amount: '200.00' },
+    ])
+    await sys(async () => {
+      expect((await advanceOn('group_size', 5, '2027-01-01'))?.amount).toBe('200.00')
+    })
+    expect((await post('2026-10-21')).status).toBe(409)
+    expect((await manager.delete(url('/advance-bands/group_size/2026-01-01'))).status).toBe(409)
+    expect((await manager.delete(url('/advance-bands/group_size/2027-01-01'))).status).toBe(204)
+    expect((await someone.get(url('/advance-bands?kind=group_size'))).body.sets).toEqual(['2026-01-01'])
+    expect((await someone.get(url('/advance-bands?kind=nope'))).status).toBe(422)
+  })
+
+  it('lists flat rates, enters the fuel price for tomorrow and reads it then', async () => {
+    const post = (key: string, effectiveFrom: string, amount: string) =>
+      manager.post(url('/flat-rates'), { key, effectiveFrom, amount })
+    expect((await post('fuel_price', '2026-10-22', '32500')).status).toBe(201)
+    await sys(async () => {
+      expect(await flatRateOn('fuel_price', '2026-10-21')).toBeNull()
+      expect((await flatRateOn('fuel_price', '2026-10-22'))?.amount).toBe('32500.00')
+    })
+    const res = await someone.get(url('/flat-rates'))
+    expect(res.status).toBe(200)
+    const by = Object.fromEntries(res.body.data.map((r: { key: string }) => [r.key, r]))
+    expect(by.same_day).toMatchObject({ current: { effectiveFrom: '2026-01-01', amount: '150000.00' }, future: [] })
+    expect(by.fuel_price).toEqual({
+      key: 'fuel_price',
+      current: null,
+      future: [{ effectiveFrom: '2026-10-22', amount: '32500.00' }],
+    })
+    expect((await post('fuel_price', '2026-10-21', '1')).status).toBe(409)
+    expect((await post('bogus', '2027-01-01', '1')).status).toBe(422)
+    expect((await post('same_day', '2027-01-01', '1.234')).status).toBe(422)
+    expect((await manager.delete(url('/flat-rates/same_day/2026-01-01'))).status).toBe(409)
+    expect((await manager.delete(url('/flat-rates/fuel_price/2026-10-22'))).status).toBe(204)
+    expect((await manager.delete(url('/flat-rates/fuel_price/2026-10-22'))).status).toBe(404)
+    expect((await new TestClient(platform).get(url('/flat-rates'))).status).toBe(401)
+  })
+
+  it('refuses sets without travel_master.manage', async () => {
+    const bands = [{ minCount: 1, maxCount: null, amount: '1' }]
+    const rates = { zoneCode: 'D', effectiveFrom: '2027-01-01', rows: nine('1') }
+    expect((await someone.post(url('/rates'), rates)).status).toBe(403)
+    expect((await someone.delete(url('/rates/D/2027-01-01'))).status).toBe(403)
+    expect(
+      (await someone.post(url('/flat-rates'), { key: 'same_day', effectiveFrom: '2027-01-01', amount: '1' })).status,
+    ).toBe(403)
+    expect((await someone.delete(url('/flat-rates/same_day/2027-01-01'))).status).toBe(403)
+    expect(
+      (await someone.post(url('/advance-bands'), { kind: 'group_size', effectiveFrom: '2027-01-01', bands })).status,
+    ).toBe(403)
+    expect((await someone.delete(url('/advance-bands/group_size/2027-01-01'))).status).toBe(403)
+  })
+})
+
+describe.skipIf(!dbTestsEnabled)('travel-master today in HRM time', () => {
+  let platform: PlatformApp
+  let manager: TestClient
+
+  beforeAll(async () => {
+    setClock(() => new Date('2026-10-21T16:59:00Z')) // 23:59 on the 21st at +07:00; sign in on this clock
+    platform = await bootApp()
+    const admin = await adminClient(platform)
+    const roleId = await role(admin, 'travel_master_today_manager', ['travel_master.manage'])
+    manager = (await userWith(platform, admin, [roleId])).client
+  })
+  afterAll(async () => {
+    setClock(null)
+    await platform?.ctx.db.destroy()
+  })
+
+  it('counts the day at +07:00, not in UTC', async () => {
+    const post = () =>
+      manager.post(`${API}/travel-master/flat-rates`, { key: 'same_day', effectiveFrom: '2026-10-22', amount: '1' })
+    expect((await post()).status).toBe(201)
+    expect((await manager.delete(`${API}/travel-master/flat-rates/same_day/2026-10-22`)).status).toBe(204)
+    setClock(() => new Date('2026-10-21T17:01:00Z')) // 00:01 on the 22nd at +07:00
+    expect((await post()).status).toBe(409)
   })
 })
 

@@ -35,7 +35,18 @@ import {
   BorderRouteCreateSchema,
   BorderRouteQuery,
   BorderRouteSchema,
+  BandSetInputSchema,
+  BandSetParams,
+  BandSetQuery,
+  BandSetSchema,
   BorderRouteUpdateSchema,
+  FlatRateInputSchema,
+  FlatRateOverviewSchema,
+  FlatRateParams,
+  RateSetInputSchema,
+  RateSetParams,
+  RateSetQuery,
+  RateSetSchema,
   CountryCreateSchema,
   CountrySchema,
   CountryUpdateSchema,
@@ -48,6 +59,19 @@ import {
   RankSchema,
   ZoneSchema,
 } from './schema.ts'
+
+import {
+  bandsOf,
+  deleteBands,
+  deleteFlatRate,
+  deleteRates,
+  flatRatesOverview,
+  publishBands,
+  publishFlatRate,
+  publishRates,
+  ratesOf,
+  todayHrm,
+} from './sets.ts'
 
 const tags = ['Travel master']
 const MANAGE = 'travel_master.manage'
@@ -229,6 +253,155 @@ export function travelMasterRoutes(api: ApiRouter, ctx: ModuleContext) {
       await requirePermission(ctx, c, MANAGE)
       const { version, ...patch } = c.req.valid('json')
       return c.json({ data: await updateBorderRoute(c.req.valid('param').id, version, patch) }, 200)
+    },
+  )
+
+  // Effective-dated sets: published whole, a set in effect is never changed or deleted.
+  api.openapi(
+    createRoute({
+      method: 'get',
+      path: '/travel-master/rates',
+      tags,
+      summary: 'The rate set of a zone in effect on a date (default today), and all its start dates',
+      request: { query: RateSetQuery },
+      responses: { 200: jsonContent(RateSetSchema, 'Rate set'), ...errorResponses(401, 422) },
+    }),
+    async (c) => {
+      requireUser(c)
+      const { zone, on } = c.req.valid('query')
+      return c.json(await ratesOf(zone, on ?? todayHrm()), 200)
+    },
+  )
+
+  api.openapi(
+    createRoute({
+      method: 'post',
+      path: '/travel-master/rates',
+      tags,
+      summary: 'Publish a rate set (all nine ranks) from a future date, replacing a future set of that date',
+      request: jsonBody(RateSetInputSchema),
+      responses: { 201: { description: 'Published' }, ...errorResponses(401, 403, 409, 422) },
+    }),
+    async (c) => {
+      await requirePermission(ctx, c, MANAGE)
+      const body = c.req.valid('json')
+      await publishRates(ctx, body.zoneCode, body.effectiveFrom, body.rows)
+      return c.body(null, 201)
+    },
+  )
+
+  api.openapi(
+    createRoute({
+      method: 'delete',
+      path: '/travel-master/rates/{zoneCode}/{effectiveFrom}',
+      tags,
+      summary: 'Delete a future rate set',
+      request: { params: RateSetParams },
+      responses: { 204: { description: 'Deleted' }, ...errorResponses(401, 403, 404, 409, 422) },
+    }),
+    async (c) => {
+      await requirePermission(ctx, c, MANAGE)
+      const p = c.req.valid('param')
+      await deleteRates(ctx, p.zoneCode, p.effectiveFrom)
+      return c.body(null, 204)
+    },
+  )
+
+  api.openapi(
+    createRoute({
+      method: 'get',
+      path: '/travel-master/flat-rates',
+      tags,
+      summary: 'Flat rates: the value in effect today and the future ones, per key',
+      responses: { 200: jsonContent(dataOf(z.array(FlatRateOverviewSchema)), 'Flat rates'), ...errorResponses(401) },
+    }),
+    async (c) => {
+      requireUser(c)
+      return c.json({ data: await flatRatesOverview() }, 200)
+    },
+  )
+
+  api.openapi(
+    createRoute({
+      method: 'post',
+      path: '/travel-master/flat-rates',
+      tags,
+      summary: 'Publish a flat rate from a future date, replacing a future value of that date',
+      request: jsonBody(FlatRateInputSchema),
+      responses: { 201: { description: 'Published' }, ...errorResponses(401, 403, 409, 422) },
+    }),
+    async (c) => {
+      await requirePermission(ctx, c, MANAGE)
+      const body = c.req.valid('json')
+      await publishFlatRate(ctx, body.key, body.effectiveFrom, body.amount)
+      return c.body(null, 201)
+    },
+  )
+
+  api.openapi(
+    createRoute({
+      method: 'delete',
+      path: '/travel-master/flat-rates/{key}/{effectiveFrom}',
+      tags,
+      summary: 'Delete a future flat rate',
+      request: { params: FlatRateParams },
+      responses: { 204: { description: 'Deleted' }, ...errorResponses(401, 403, 404, 409, 422) },
+    }),
+    async (c) => {
+      await requirePermission(ctx, c, MANAGE)
+      const p = c.req.valid('param')
+      await deleteFlatRate(ctx, p.key, p.effectiveFrom)
+      return c.body(null, 204)
+    },
+  )
+
+  api.openapi(
+    createRoute({
+      method: 'get',
+      path: '/travel-master/advance-bands',
+      tags,
+      summary: 'The advance bands of a kind in effect on a date (default today), and all their start dates',
+      request: { query: BandSetQuery },
+      responses: { 200: jsonContent(BandSetSchema, 'Advance bands'), ...errorResponses(401, 422) },
+    }),
+    async (c) => {
+      requireUser(c)
+      const { kind, on } = c.req.valid('query')
+      return c.json(await bandsOf(kind, on ?? todayHrm()), 200)
+    },
+  )
+
+  api.openapi(
+    createRoute({
+      method: 'post',
+      path: '/travel-master/advance-bands',
+      tags,
+      summary: 'Publish advance bands from a future date, replacing a future set of that date',
+      request: jsonBody(BandSetInputSchema),
+      responses: { 201: { description: 'Published' }, ...errorResponses(401, 403, 409, 422) },
+    }),
+    async (c) => {
+      await requirePermission(ctx, c, MANAGE)
+      const body = c.req.valid('json')
+      await publishBands(ctx, body.kind, body.effectiveFrom, body.bands)
+      return c.body(null, 201)
+    },
+  )
+
+  api.openapi(
+    createRoute({
+      method: 'delete',
+      path: '/travel-master/advance-bands/{kind}/{effectiveFrom}',
+      tags,
+      summary: 'Delete future advance bands',
+      request: { params: BandSetParams },
+      responses: { 204: { description: 'Deleted' }, ...errorResponses(401, 403, 404, 409, 422) },
+    }),
+    async (c) => {
+      await requirePermission(ctx, c, MANAGE)
+      const p = c.req.valid('param')
+      await deleteBands(ctx, p.kind, p.effectiveFrom)
+      return c.body(null, 204)
     },
   )
 }

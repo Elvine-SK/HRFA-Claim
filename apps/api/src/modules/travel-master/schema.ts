@@ -1,5 +1,7 @@
 import type { FieldMap } from '@elvine-sk/platform-core'
 import { IsoDateTime, z } from '@elvine-sk/platform-server'
+import { AMOUNT_PATTERN } from './money.ts'
+import { ADVANCE_KINDS, FLAT_RATE_KEYS, RANK_CODES } from './sets.ts'
 
 export const RankSchema = z
   .object({
@@ -142,3 +144,110 @@ export const borderRouteHistory = {
   entityType: 'travel_border_route',
   tracked: ['nameLo', 'nameEn', 'active'],
 } as const
+
+// Effective-dated sets
+
+const isRealDate = (s: string) => {
+  const d = new Date(`${s}T00:00:00Z`)
+  return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === s
+}
+const DateOnly = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, 'YYYY-MM-DD')
+  .refine(isRealDate, 'Not a real date')
+const AmountField = z.string().regex(AMOUNT_PATTERN, 'Decimal with at most 2 decimals')
+const ZoneCodeField = z.string().trim().min(1).max(4)
+const SetAmount = z.object({ effectiveFrom: z.string(), amount: z.string() })
+
+export const RateSetQuery = z.object({ zone: ZoneCodeField, on: DateOnly.optional() })
+export const RateSetSchema = z
+  .object({
+    data: z
+      .object({
+        zoneCode: z.string(),
+        currency: z.enum(['LAK', 'USD']),
+        effectiveFrom: z.string(),
+        rows: z.array(
+          z.object({
+            rankCode: z.string(),
+            daily: z.string(),
+            accommodation: z.string(),
+            personal: z.string().nullable(),
+          }),
+        ),
+      })
+      .nullable(),
+    sets: z.array(z.string()),
+  })
+  .openapi('TravelRateSet')
+export const RateSetInputSchema = z
+  .object({
+    zoneCode: ZoneCodeField,
+    effectiveFrom: DateOnly,
+    rows: z.array(
+      z
+        .object({
+          rankCode: z.enum(RANK_CODES),
+          daily: AmountField,
+          accommodation: AmountField,
+          personal: AmountField.nullable().default(null),
+        })
+        .strict(),
+    ),
+  })
+  .strict()
+  .openapi('TravelRateSetInput')
+export const RateSetParams = z.object({
+  zoneCode: ZoneCodeField.openapi({ param: { name: 'zoneCode', in: 'path' } }),
+  effectiveFrom: DateOnly.openapi({ param: { name: 'effectiveFrom', in: 'path' } }),
+})
+
+export const FlatRateOverviewSchema = z
+  .object({ key: z.enum(FLAT_RATE_KEYS), current: SetAmount.nullable(), future: z.array(SetAmount) })
+  .openapi('TravelFlatRateOverview')
+export const FlatRateInputSchema = z
+  .object({ key: z.enum(FLAT_RATE_KEYS), effectiveFrom: DateOnly, amount: AmountField })
+  .strict()
+  .openapi('TravelFlatRateInput')
+export const FlatRateParams = z.object({
+  key: z.enum(FLAT_RATE_KEYS).openapi({ param: { name: 'key', in: 'path' } }),
+  effectiveFrom: DateOnly.openapi({ param: { name: 'effectiveFrom', in: 'path' } }),
+})
+
+export const BandSetQuery = z.object({ kind: z.enum(ADVANCE_KINDS), on: DateOnly.optional() })
+export const BandSetSchema = z
+  .object({
+    data: z
+      .object({
+        kind: z.enum(ADVANCE_KINDS),
+        currency: z.enum(['LAK', 'USD']),
+        effectiveFrom: z.string(),
+        bands: z.array(z.object({ minCount: z.number().int(), maxCount: z.number().int().nullable(), amount: z.string() })),
+      })
+      .nullable(),
+    sets: z.array(z.string()),
+  })
+  .openapi('TravelAdvanceBandSet')
+export const BandSetInputSchema = z
+  .object({
+    kind: z.enum(ADVANCE_KINDS),
+    effectiveFrom: DateOnly,
+    bands: z
+      .array(
+        z
+          .object({
+            minCount: z.number().int().min(1).max(100000),
+            maxCount: z.number().int().min(1).max(100000).nullable(),
+            amount: AmountField,
+          })
+          .strict(),
+      )
+      .min(1)
+      .max(50),
+  })
+  .strict()
+  .openapi('TravelAdvanceBandSetInput')
+export const BandSetParams = z.object({
+  kind: z.enum(ADVANCE_KINDS).openapi({ param: { name: 'kind', in: 'path' } }),
+  effectiveFrom: DateOnly.openapi({ param: { name: 'effectiveFrom', in: 'path' } }),
+})

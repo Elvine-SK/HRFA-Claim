@@ -3335,6 +3335,348 @@
         ],
         "additionalProperties": false
       },
+      "TravelRateSet": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "zoneCode": {
+                "type": "string"
+              },
+              "currency": {
+                "type": "string",
+                "enum": [
+                  "LAK",
+                  "USD"
+                ]
+              },
+              "effectiveFrom": {
+                "type": "string"
+              },
+              "rows": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "rankCode": {
+                      "type": "string"
+                    },
+                    "daily": {
+                      "type": "string"
+                    },
+                    "accommodation": {
+                      "type": "string"
+                    },
+                    "personal": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "rankCode",
+                    "daily",
+                    "accommodation",
+                    "personal"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "zoneCode",
+              "currency",
+              "effectiveFrom",
+              "rows"
+            ]
+          },
+          "sets": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "data",
+          "sets"
+        ]
+      },
+      "TravelRateSetInput": {
+        "type": "object",
+        "properties": {
+          "zoneCode": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4
+          },
+          "effectiveFrom": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "rankCode": {
+                  "type": "string",
+                  "enum": [
+                    "P1",
+                    "P2",
+                    "P3",
+                    "P4",
+                    "P5",
+                    "P6",
+                    "P7",
+                    "P8",
+                    "P9"
+                  ]
+                },
+                "daily": {
+                  "type": "string",
+                  "pattern": "^\\d{1,13}(\\.\\d{1,2})?$"
+                },
+                "accommodation": {
+                  "type": "string",
+                  "pattern": "^\\d{1,13}(\\.\\d{1,2})?$"
+                },
+                "personal": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "pattern": "^\\d{1,13}(\\.\\d{1,2})?$",
+                  "default": null
+                }
+              },
+              "required": [
+                "rankCode",
+                "daily",
+                "accommodation"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "zoneCode",
+          "effectiveFrom",
+          "rows"
+        ],
+        "additionalProperties": false
+      },
+      "TravelFlatRateOverview": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "enum": [
+              "same_day",
+              "fuel_price",
+              "km_per_litre"
+            ]
+          },
+          "current": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "effectiveFrom": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "effectiveFrom",
+              "amount"
+            ]
+          },
+          "future": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "effectiveFrom": {
+                  "type": "string"
+                },
+                "amount": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "effectiveFrom",
+                "amount"
+              ]
+            }
+          }
+        },
+        "required": [
+          "key",
+          "current",
+          "future"
+        ]
+      },
+      "TravelFlatRateInput": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "enum": [
+              "same_day",
+              "fuel_price",
+              "km_per_litre"
+            ]
+          },
+          "effectiveFrom": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "amount": {
+            "type": "string",
+            "pattern": "^\\d{1,13}(\\.\\d{1,2})?$"
+          }
+        },
+        "required": [
+          "key",
+          "effectiveFrom",
+          "amount"
+        ],
+        "additionalProperties": false
+      },
+      "TravelAdvanceBandSet": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "domestic_days",
+                  "group_size"
+                ]
+              },
+              "currency": {
+                "type": "string",
+                "enum": [
+                  "LAK",
+                  "USD"
+                ]
+              },
+              "effectiveFrom": {
+                "type": "string"
+              },
+              "bands": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "minCount": {
+                      "type": "integer"
+                    },
+                    "maxCount": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "amount": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "minCount",
+                    "maxCount",
+                    "amount"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "kind",
+              "currency",
+              "effectiveFrom",
+              "bands"
+            ]
+          },
+          "sets": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "data",
+          "sets"
+        ]
+      },
+      "TravelAdvanceBandSetInput": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "domestic_days",
+              "group_size"
+            ]
+          },
+          "effectiveFrom": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "bands": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "minCount": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 100000
+                },
+                "maxCount": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ],
+                  "minimum": 1,
+                  "maximum": 100000
+                },
+                "amount": {
+                  "type": "string",
+                  "pattern": "^\\d{1,13}(\\.\\d{1,2})?$"
+                }
+              },
+              "required": [
+                "minCount",
+                "maxCount",
+                "amount"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 1,
+            "maxItems": 50
+          }
+        },
+        "required": [
+          "kind",
+          "effectiveFrom",
+          "bands"
+        ],
+        "additionalProperties": false
+      },
       "PlatformManifest": {
         "type": "object",
         "properties": {
@@ -14451,6 +14793,611 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/travel-master/rates": {
+      "get": {
+        "tags": [
+          "Travel master"
+        ],
+        "summary": "The rate set of a zone in effect on a date (default today), and all its start dates",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4
+            },
+            "required": true,
+            "name": "zone",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "required": false,
+            "name": "on",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Rate set",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TravelRateSet"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Travel master"
+        ],
+        "summary": "Publish a rate set (all nine ranks) from a future date, replacing a future set of that date",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TravelRateSetInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Published"
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/travel-master/rates/{zoneCode}/{effectiveFrom}": {
+      "delete": {
+        "tags": [
+          "Travel master"
+        ],
+        "summary": "Delete a future rate set",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4
+            },
+            "required": true,
+            "name": "zoneCode",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "required": true,
+            "name": "effectiveFrom",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/travel-master/flat-rates": {
+      "get": {
+        "tags": [
+          "Travel master"
+        ],
+        "summary": "Flat rates: the value in effect today and the future ones, per key",
+        "responses": {
+          "200": {
+            "description": "Flat rates",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/TravelFlatRateOverview"
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Travel master"
+        ],
+        "summary": "Publish a flat rate from a future date, replacing a future value of that date",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TravelFlatRateInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Published"
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/travel-master/flat-rates/{key}/{effectiveFrom}": {
+      "delete": {
+        "tags": [
+          "Travel master"
+        ],
+        "summary": "Delete a future flat rate",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "same_day",
+                "fuel_price",
+                "km_per_litre"
+              ]
+            },
+            "required": true,
+            "name": "key",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "required": true,
+            "name": "effectiveFrom",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/travel-master/advance-bands": {
+      "get": {
+        "tags": [
+          "Travel master"
+        ],
+        "summary": "The advance bands of a kind in effect on a date (default today), and all their start dates",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "domestic_days",
+                "group_size"
+              ]
+            },
+            "required": true,
+            "name": "kind",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "required": false,
+            "name": "on",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Advance bands",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TravelAdvanceBandSet"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Travel master"
+        ],
+        "summary": "Publish advance bands from a future date, replacing a future set of that date",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TravelAdvanceBandSetInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Published"
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/travel-master/advance-bands/{kind}/{effectiveFrom}": {
+      "delete": {
+        "tags": [
+          "Travel master"
+        ],
+        "summary": "Delete future advance bands",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "domestic_days",
+                "group_size"
+              ]
+            },
+            "required": true,
+            "name": "kind",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "required": true,
+            "name": "effectiveFrom",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
           },
           "401": {
             "description": "Not authenticated",
