@@ -24,6 +24,8 @@ watch(
 )
 const zoneTabs = computed(() => (zones.data.value ?? []).map((z) => ({ label: localName(z), value: z.code })))
 
+const zoneKind = computed(() => zones.data.value?.find((z) => z.code === zone.value)?.kind)
+
 const rateSet = useTravelRateSet(zone, () => (isDate(on.value) ? on.value : undefined))
 const shown = computed(() => rateSet.data.value?.data ?? null)
 const currency = computed(() => zones.data.value?.find((z) => z.code === zone.value)?.currency ?? shown.value?.currency)
@@ -53,6 +55,9 @@ async function publish() {
     (r) => !isAmount(r.daily) || !isAmount(r.accommodation) || (r.personal !== '' && !isAmount(r.personal)),
   )
   if (bad) return void (formError.value = t('master.amountInvalid'))
+  const overseas = zoneKind.value === 'overseas'
+  if (rows.value.some((r) => (overseas ? r.personal === '' : r.personal !== '')))
+    return void (formError.value = t('master.personalInvalid'))
   try {
     await publishRates.mutateAsync({
       zoneCode: zone.value,

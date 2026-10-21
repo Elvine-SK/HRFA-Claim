@@ -1,13 +1,17 @@
+import { RANK_CODES } from './lookups.ts'
+
 /**
  * Seed values of the travel reference data, from `2. ກຳນົດ code and data.xlsx` (2026-10-16), `4. Format form
  * FA-M.xlsx` (2026-10-20) and the 2026 regulation. Read only by the seed migration: changing a value here never
  * changes a database that already ran it (add a migration or publish a new set instead).
+ *
+ * FROZEN: this file and `countries.ts` are frozen once the testing server has run migration 202610220110. A
+ * change goes in a new migration, never an edit here.
  */
 
 /** The 2026 regulation's sets take effect from its first day. */
 export const SEED_EFFECTIVE_FROM = '2026-01-01'
 
-export const RANK_CODES = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'P9'] as const
 
 /** The code file's `position code` sheet. */
 export const SEED_RANKS: { code: (typeof RANK_CODES)[number]; nameLo: string; nameEn: string }[] = [

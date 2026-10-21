@@ -26,7 +26,7 @@ pnpm install && pnpm migrate
 pnpm dev:api                         # :3001
 pnpm dev:web                         # :3000
 tooling/deploy/bundle.sh --hrm-login-url <URL>   # build/hr-fam-<sha>.tar.gz for the testing server
-RUN_DB_TESTS=1 pnpm test             # 44 tests; the test DBs are built on :3308 by global-setup
+RUN_DB_TESTS=1 pnpm test             # 89 tests; the test DBs are built on :3308 by global-setup
 ```
 
 `http://localhost:3001/api/v1/auth/hrm?code=valid-10001` signs in as fixture employee `10001` once per load of the
@@ -53,12 +53,14 @@ Reviews: a security review of the sign-in (0 Critical, 5 Important, all fixed) a
 - `travel-master` module: reference tables (ranks, zones, countries, border routes, rank map, rates, flat
   rates, advance bands, fuel, GL), seeded from the code file and the regulation; lookups `rankForPostType`,
   `zoneOf`, `countryByIso2`, `rateOn`, `flatRateOn`, `advanceOn`; a money helper (decimals and rounding);
-  routes under `/api/v1/travel-master`; effective-dated sets (a new set closes the previous one).
+  routes under `/api/v1/travel-master`; effective-dated sets (a new set closes the previous one). A set must start after today, except the fuel price,
+  which may start today (`fuel_price` only; earlier dates answer 409 `travel_master.set_in_effect`).
 - Web: master data pages under `/master`.
 - Deployment: `ecosystem.config.cjs` (PM2: `api`, `worker`, `web`, one instance each) and
   `tooling/deploy/bundle.sh --hrm-login-url <URL>`, which typechecks, builds the web (the login URL goes into
   `apps/web/hrm-login-url.txt`), copies the API with real production `node_modules` (no links, `tsx` added) and writes
-  `build/hr-fam-<sha>.tar.gz`. Build it on the server's OS (Linux x64): argon2 and esbuild are native.
+  `build/hr-fam-<sha>.tar.gz`. Build it on the server's OS (Linux x64): argon2 and esbuild are native; `bundle.sh` refuses elsewhere unless
+  `--allow-non-linux` (inspection only).
   Install steps for `10.0.7.110`: [`docs/deploy-testing.md`](docs/deploy-testing.md).
 
 ## Approach: app first, platform later

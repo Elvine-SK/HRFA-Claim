@@ -2,14 +2,12 @@ import { getAudit } from '@elvine-sk/platform-audit'
 import { AppError, now, uuidv7 } from '@elvine-sk/platform-core'
 import { createdStamp, currentDb, inTransaction } from '@elvine-sk/platform-db'
 import type { ModuleContext } from '@elvine-sk/platform-server'
+import { ADVANCE_CURRENCY, RANK_CODES } from './lookups.ts'
 import type { AdvanceKind, Currency, FlatRateKey } from './lookups.ts'
 import type { Amount } from './money.ts'
 
-export const RANK_CODES = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'P9'] as const
 export const FLAT_RATE_KEYS = ['same_day', 'fuel_price', 'km_per_litre'] as const
 export const ADVANCE_KINDS = ['domestic_days', 'group_size'] as const
-
-const ADVANCE_CURRENCY: Record<AdvanceKind, Currency> = { domestic_days: 'LAK', group_size: 'USD' }
 
 const HRM_OFFSET_MS = 7 * 60 * 60 * 1000
 
@@ -39,6 +37,9 @@ const bandsInvalid = (why: string) =>
 const ratesInvalid = (why: string) =>
   new AppError('travel_master.rates_invalid', `Rate set is invalid: ${why}`, { status: 422 })
 
+const personalInvalid = (why: string) =>
+  new AppError('travel_master.personal_invalid', `Personal allowance is invalid: ${why}`, { status: 422 })
+
 const unknownZone = () => new AppError('travel_master.unknown_zone', 'Unknown zone', { status: 422 })
 
 interface SetTarget {
@@ -46,6 +47,13 @@ interface SetTarget {
   key: string
   effectiveFrom: string
 }
+
+/**
+ * A set is locked once it is in effect: its date is today or past. The fuel price alone may start today, so
+ * only a date before today is locked for it (the price changes in the middle of the week).
+ */
+const locked = (t: SetTarget) =>
+  t.table === 'travel_flat_rates' && t.key === 'fuel_price' ? t.effectiveFrom < todayHrm() : t.effectiveFrom <= todayHrm()
 
 const stamp = () => {
   const s = createdStamp(uuidv7())
@@ -61,11 +69,11 @@ const auditSet = (ctx: ModuleContext, action: string, t: SetTarget) =>
   })
 
 /**
- * Replace the set of `target` as one unit: refuse a date that is today or past (409), delete the rows of that
+ * Replace the set of `target` as one unit: refuse a date that is locked (409, see `locked`), delete the rows of that
  * date, insert the new ones and audit, all in one transaction.
  */
 async function replaceSet(ctx: ModuleContext, target: SetTarget, del: () => Promise<unknown>, insert: () => Promise<unknown>) {
-  if (target.effectiveFrom <= todayHrm()) throw inEffect()
+  if (locked(target)) throw inEffect()
   await inTransaction(async () => {
     await del()
     await insert()
@@ -74,7 +82,7 @@ async function replaceSet(ctx: ModuleContext, target: SetTarget, del: () => Prom
 }
 
 async function removeSet(ctx: ModuleContext, target: SetTarget, del: () => Promise<{ numDeletedRows: bigint }>) {
-  if (target.effectiveFrom <= todayHrm()) throw inEffect()
+  if (locked(target)) throw inEffect()
   await inTransaction(async () => {
     if ((await del()).numDeletedRows === 0n) throw AppError.notFound()
     await auditSet(ctx, 'travel_master.set_deleted', target)
@@ -90,9 +98,9 @@ export async function publishRates(ctx: ModuleContext, zoneCode: string, effecti
   if (rows.length !== RANK_CODES.length || !RANK_CODES.every((r) => ranks.has(r)))
     throw ratesInvalid('exactly one row for each of the nine ranks')
   for (const r of rows) {
-    if (zone.kind === 'overseas' && r.personal === null) throw ratesInvalid('personal is required for overseas zones')
+    if (zone.kind === 'overseas' && r.personal === null) throw personalInvalid('personal is required for overseas zones')
     if (zone.kind !== 'overseas' && r.personal !== null)
-      throw ratesInvalid('personal must be empty for domestic and border zones')
+      throw personalInvalid('personal must be empty for domestic and border zones')
   }
   const db = () => currentDb()
   await replaceSet(

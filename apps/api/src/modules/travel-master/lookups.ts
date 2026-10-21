@@ -1,7 +1,8 @@
 import { currentDb } from '@elvine-sk/platform-db'
 import type { Amount } from './money.ts'
 
-export type RankCode = 'P1' | 'P2' | 'P3' | 'P4' | 'P5' | 'P6' | 'P7' | 'P8' | 'P9'
+export const RANK_CODES = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'P9'] as const
+export type RankCode = (typeof RANK_CODES)[number]
 export type ZoneCode = 'D' | 'OB1' | 'OA1' | 'OA2' | 'OE1' | 'OE2'
 export type ZoneKind = 'domestic' | 'border' | 'overseas'
 export type Currency = 'LAK' | 'USD'
@@ -9,7 +10,7 @@ export type FlatRateKey = 'same_day' | 'fuel_price' | 'km_per_litre'
 export type AdvanceKind = 'domestic_days' | 'group_size'
 
 /** Domestic advances are per trip in LAK; border and overseas advances per country in USD. */
-const ADVANCE_CURRENCY: Record<AdvanceKind, Currency> = { domestic_days: 'LAK', group_size: 'USD' }
+export const ADVANCE_CURRENCY: Record<AdvanceKind, Currency> = { domestic_days: 'LAK', group_size: 'USD' }
 
 /** The rank of an HRM PostType, or `null` when it is not mapped (never a default rank). */
 export async function rankForPostType(postType: number): Promise<RankCode | null> {

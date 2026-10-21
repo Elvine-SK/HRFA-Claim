@@ -1,7 +1,8 @@
 import type { FieldMap } from '@elvine-sk/platform-core'
 import { IsoDateTime, z } from '@elvine-sk/platform-server'
 import { AMOUNT_PATTERN } from './money.ts'
-import { ADVANCE_KINDS, FLAT_RATE_KEYS, RANK_CODES } from './sets.ts'
+import { RANK_CODES } from './lookups.ts'
+import { ADVANCE_KINDS, FLAT_RATE_KEYS } from './sets.ts'
 
 export const RankSchema = z
   .object({

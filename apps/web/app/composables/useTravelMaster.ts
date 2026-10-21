@@ -56,6 +56,12 @@ export function todayLaos(): string {
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Vientiane' }).format(new Date())
 }
 
+/** Same rule as the API: only the fuel price may start today; every other set must start after today. */
+export function isLockedFlatRate(key: string, effectiveFrom: string): boolean {
+  const today = todayLaos()
+  return key === 'fuel_price' ? effectiveFrom < today : effectiveFrom <= today
+}
+
 /** The name of a reference row in the language of the screen. */
 export function useLocalName() {
   const { locale } = useI18n()

@@ -472,8 +472,13 @@ describe.skipIf(!dbTestsEnabled)('travel-master effective-dated sets', () => {
       manager.post(url('/rates'), { zoneCode, effectiveFrom: '2027-02-01', rows })
     expect((await post('D', nine('1').slice(1))).status).toBe(422)
     expect((await post('D', [...nine('1').slice(1), ...nine('1').slice(1, 2)])).status).toBe(422)
-    expect((await post('OE1', nine('100'))).status).toBe(422) // personal missing
-    expect((await post('D', nine('1', '5'))).status).toBe(422) // personal on a LAK zone
+    const missing = await post('OE1', nine('100')) // personal missing
+    expect(missing.status).toBe(422)
+    expect(missing.body.error.code).toBe('travel_master.personal_invalid')
+    const onLak = await post('D', nine('1', '5')) // personal on a LAK zone
+    expect(onLak.status).toBe(422)
+    expect(onLak.body.error.code).toBe('travel_master.personal_invalid')
+    expect((await post('D', nine('1').slice(1))).body.error.code).toBe('travel_master.rates_invalid')
     expect((await post('D', nine('1.234'))).status).toBe(422)
     expect((await post('ZZ', nine('1'))).status).toBe(422)
     const badDate = { zoneCode: 'D', effectiveFrom: '2027-02-30', rows: nine('1') }
@@ -559,13 +564,28 @@ describe.skipIf(!dbTestsEnabled)('travel-master effective-dated sets', () => {
       current: null,
       future: [{ effectiveFrom: '2026-10-22', amount: '32500.00' }],
     })
-    expect((await post('fuel_price', '2026-10-21', '1')).status).toBe(409)
     expect((await post('bogus', '2027-01-01', '1')).status).toBe(422)
     expect((await post('same_day', '2027-01-01', '1.234')).status).toBe(422)
     expect((await manager.delete(url('/flat-rates/same_day/2026-01-01'))).status).toBe(409)
     expect((await manager.delete(url('/flat-rates/fuel_price/2026-10-22'))).status).toBe(204)
     expect((await manager.delete(url('/flat-rates/fuel_price/2026-10-22'))).status).toBe(404)
     expect((await new TestClient(platform).get(url('/flat-rates'))).status).toBe(401)
+  })
+
+  it('lets the fuel price start today, and nothing else', async () => {
+    const post = (key: string, effectiveFrom: string) =>
+      manager.post(url('/flat-rates'), { key, effectiveFrom, amount: '33000' })
+    expect((await post('fuel_price', '2026-10-21')).status).toBe(201)
+    await sys(async () => expect((await flatRateOn('fuel_price', '2026-10-21'))?.amount).toBe('33000.00'))
+    const yesterday = await post('fuel_price', '2026-10-20')
+    expect(yesterday.status).toBe(409)
+    expect(yesterday.body.error.code).toBe('travel_master.set_in_effect')
+    const sameDay = await post('same_day', '2026-10-21')
+    expect(sameDay.status).toBe(409)
+    expect(sameDay.body.error.code).toBe('travel_master.set_in_effect')
+    expect((await post('km_per_litre', '2026-10-21')).status).toBe(409)
+    expect((await manager.delete(url('/flat-rates/fuel_price/2026-10-20'))).status).toBe(409)
+    expect((await manager.delete(url('/flat-rates/fuel_price/2026-10-21'))).status).toBe(204)
   })
 
   it('refuses sets without travel_master.manage', async () => {

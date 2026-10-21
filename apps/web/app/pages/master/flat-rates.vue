@@ -11,6 +11,12 @@ const rates = useTravelFlatRates()
 const removeSet = useConfirmedRemoval()
 const { publishFlatRate, deleteFlatRate } = useTravelMasterMutations()
 const today = todayLaos()
+const minDate = computed(() => {
+  if (form.key === 'fuel_price') return today
+  const next = new Date(`${today}T00:00:00Z`)
+  next.setUTCDate(next.getUTCDate() + 1)
+  return next.toISOString().slice(0, 10)
+})
 
 const open = ref(false)
 const form = reactive({ key: 'same_day' as FlatRateKey, effectiveFrom: '', amount: '' })
@@ -25,6 +31,7 @@ function openForm(key: FlatRateKey) {
 async function publish() {
   formError.value = null
   if (!isDate(form.effectiveFrom)) return void (formError.value = t('master.dateInvalid'))
+  if (isLockedFlatRate(form.key, form.effectiveFrom)) return void (formError.value = t('master.dateNotFuture'))
   if (!isAmount(form.amount)) return void (formError.value = t('master.amountInvalid'))
   try {
     await publishFlatRate.mutateAsync({ key: form.key, effectiveFrom: form.effectiveFrom, amount: form.amount })
@@ -60,8 +67,18 @@ function remove(key: FlatRateKey, from: string) {
         <p class="text-2xl font-semibold tabular-nums">
           {{ formatAmount(rate.current?.amount, FLAT_RATE_CURRENCY[rate.key]) }}
         </p>
-        <p v-if="rate.current" class="text-[13px] text-muted">
+        <p v-if="rate.current" class="flex items-center gap-2 text-[13px] text-muted">
           {{ t('master.setFrom', { date: date(rate.current.effectiveFrom) }) }}
+          <UButton
+            v-if="canManage && !isLockedFlatRate(rate.key, rate.current.effectiveFrom)"
+            class="ms-auto"
+            size="sm"
+            color="error"
+            variant="ghost"
+            icon="i-lucide-trash-2"
+            :aria-label="t('platform.actions.delete')"
+            @click="remove(rate.key, rate.current.effectiveFrom)"
+          />
         </p>
         <p v-else class="text-[13px] text-muted">{{ t('master.flatRates.none') }}</p>
         <div v-if="rate.future.length" class="mt-4">
@@ -70,11 +87,11 @@ function remove(key: FlatRateKey, from: string) {
             <li v-for="f in rate.future" :key="f.effectiveFrom" class="flex items-center gap-2">
               <span class="mono">{{ date(f.effectiveFrom) }}</span>
               <span class="tabular-nums">{{ formatAmount(f.amount, FLAT_RATE_CURRENCY[rate.key]) }}</span>
-              <UBadge v-if="f.effectiveFrom > today" color="info" variant="subtle" size="sm">{{
+              <UBadge v-if="!isLockedFlatRate(rate.key, f.effectiveFrom)" color="info" variant="subtle" size="sm">{{
                 t('master.future')
               }}</UBadge>
               <UButton
-                v-if="canManage && f.effectiveFrom > today"
+                v-if="canManage && !isLockedFlatRate(rate.key, f.effectiveFrom)"
                 class="ms-auto"
                 size="sm"
                 color="error"
@@ -93,8 +110,8 @@ function remove(key: FlatRateKey, from: string) {
       <template #body>
         <form id="flat-form" class="grid gap-4" novalidate @submit.prevent="publish">
           <UAlert v-if="formError" color="error" variant="subtle" :description="formError" />
-          <UFormField :label="t('master.effectiveFrom')" :hint="t('master.futureHint')" required>
-            <UInput v-model="form.effectiveFrom" type="date" class="w-full" />
+          <UFormField :label="t('master.effectiveFrom')" :hint="t(form.key === 'fuel_price' ? 'master.todayOrLaterHint' : 'master.futureHint')" required>
+            <UInput v-model="form.effectiveFrom" type="date" :min="minDate" class="w-full" />
           </UFormField>
           <UFormField
             :label="t('master.amount')"
