@@ -3131,6 +3131,61 @@
           "nameLo"
         ]
       },
+      "TravelPostingEntry": {
+        "type": "object",
+        "properties": {
+          "component": {
+            "type": "string"
+          },
+          "side": {
+            "type": "string",
+            "enum": [
+              "DR",
+              "CR"
+            ]
+          },
+          "accountKind": {
+            "type": "string",
+            "enum": [
+              "gl",
+              "member"
+            ]
+          },
+          "gl": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "seq": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "glNameEn": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "glNameLo": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "component",
+          "side",
+          "accountKind",
+          "gl",
+          "seq",
+          "glNameEn",
+          "glNameLo"
+        ]
+      },
       "TravelRankMap": {
         "type": "object",
         "properties": {
@@ -15456,6 +15511,81 @@
           },
           "401": {
             "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/travel-master/posting-entries": {
+      "get": {
+        "tags": [
+          "Travel master"
+        ],
+        "summary": "Posting entries of a case for a zone kind",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "default": "payment"
+            },
+            "required": false,
+            "name": "caseKey",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "domestic",
+                "border",
+                "overseas"
+              ]
+            },
+            "required": true,
+            "name": "zoneKind",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Posting entries",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/TravelPostingEntry"
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
             "content": {
               "application/json": {
                 "schema": {

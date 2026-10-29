@@ -66,6 +66,18 @@ export interface TravelGlAccountsTable {
   nameLo: string
 }
 
+export interface TravelPostingEntriesTable {
+  id: string
+  caseKey: string
+  zoneKind: 'domestic' | 'border' | 'overseas'
+  component: string
+  side: 'DR' | 'CR'
+  accountKind: 'gl' | 'member'
+  gl: string | null
+  seq: string | null
+  sortOrder: number
+}
+
 export interface AgreementsTable extends StandardColumns {
   ref: string
   formType: 'domestic' | 'district' | 'overseas' | 'border'
@@ -177,6 +189,7 @@ export interface AppTables {
   travelFlatRates: TravelFlatRatesTable
   travelAdvanceBands: TravelAdvanceBandsTable
   travelGlAccounts: TravelGlAccountsTable
+  travelPostingEntries: TravelPostingEntriesTable
   agreements: AgreementsTable
   agreementMembers: AgreementMembersTable
   agreementRefCounters: AgreementRefCountersTable

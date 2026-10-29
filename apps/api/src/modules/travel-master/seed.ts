@@ -1,4 +1,4 @@
-import { RANK_CODES } from './lookups.ts'
+import { RANK_CODES, type ZoneKind } from './lookups.ts'
 
 /**
  * Seed values of the travel reference data, from `2. ກຳນົດ code and data.xlsx` (2026-10-16), `4. Format form
@@ -205,3 +205,31 @@ export const SEED_GL_ACCOUNTS: { gl: string; seq: string; nameEn: string; nameLo
     nameLo: 'ຄ່າໃຊ້ຈ່າຍເຂົ້າໃນກອງປະຊຸມ ແລະ ສຳມະນາຢູ່ຕ່າງປະເທດ',
   },
 ]
+
+/** Which GL account each payment component debits; every component credits the member's own account. */
+const PAYMENT_DEBITS: { component: string; gl: string; kinds: ZoneKind[] }[] = [
+  { component: 'daily', gl: '4408720001', kinds: ['domestic', 'border', 'overseas'] },
+  { component: 'accommodation', gl: '4408730001', kinds: ['domestic', 'border', 'overseas'] },
+  { component: 'fuel', gl: '4405100001', kinds: ['domestic', 'border'] },
+  { component: 'personal', gl: '4408600002', kinds: ['overseas'] },
+  { component: 'advance', gl: '1362220001', kinds: ['domestic', 'border', 'overseas'] },
+]
+
+export interface SeedPostingEntry {
+  caseKey: string
+  zoneKind: ZoneKind
+  component: string
+  side: 'DR' | 'CR'
+  accountKind: 'gl' | 'member'
+  gl: string | null
+  seq: string | null
+}
+
+/** Case `payment`: a DR on the GL account and a CR on the member, per component and zone kind. */
+export const SEED_POSTING_ENTRIES: SeedPostingEntry[] = (['domestic', 'border', 'overseas'] as const).flatMap(
+  (zoneKind) =>
+    PAYMENT_DEBITS.filter((d) => d.kinds.includes(zoneKind)).flatMap((d): SeedPostingEntry[] => [
+      { caseKey: 'payment', zoneKind, component: d.component, side: 'DR', accountKind: 'gl', gl: d.gl, seq: '0001' },
+      { caseKey: 'payment', zoneKind, component: d.component, side: 'CR', accountKind: 'member', gl: null, seq: null },
+    ]),
+)

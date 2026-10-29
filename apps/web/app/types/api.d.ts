@@ -8979,6 +8979,65 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/travel-master/posting-entries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Posting entries of a case for a zone kind */
+        get: {
+            parameters: {
+                query: {
+                    caseKey?: string;
+                    zoneKind: "domestic" | "border" | "overseas";
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Posting entries */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["TravelPostingEntry"][];
+                        };
+                    };
+                };
+                /** @description Not authenticated */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Validation failed */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/travel-master/rank-map": {
         parameters: {
             query?: never;
@@ -11576,6 +11635,17 @@ export interface components {
             seq: string;
             nameEn: string;
             nameLo: string;
+        };
+        TravelPostingEntry: {
+            component: string;
+            /** @enum {string} */
+            side: "DR" | "CR";
+            /** @enum {string} */
+            accountKind: "gl" | "member";
+            gl: string | null;
+            seq: string | null;
+            glNameEn: string | null;
+            glNameLo: string | null;
         };
         TravelRankMap: {
             /** Format: uuid */

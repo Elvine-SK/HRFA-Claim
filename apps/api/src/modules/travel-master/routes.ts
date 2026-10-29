@@ -15,6 +15,7 @@ import {
   type ApiRouter,
   type ModuleContext,
 } from '@elvine-sk/platform-server'
+import { postingEntries } from './lookups.ts'
 import {
   createBorderRoute,
   createCountry,
@@ -53,6 +54,8 @@ import {
   countryFields,
   GlAccountSchema,
   HrmPostTypeSchema,
+  PostingEntryQuery,
+  PostingEntrySchema,
   PostTypeParam,
   RankMapBodySchema,
   RankMapSchema,
@@ -97,6 +100,25 @@ export function travelMasterRoutes(api: ApiRouter, ctx: ModuleContext) {
   read('/travel-master/ranks', 'Ranks P1 to P9', RankSchema, listRanks)
   read('/travel-master/zones', 'Travel zones', ZoneSchema, listZones)
   read('/travel-master/gl-accounts', 'GL accounts', GlAccountSchema, listGlAccounts)
+  api.openapi(
+    createRoute({
+      method: 'get',
+      path: '/travel-master/posting-entries',
+      tags,
+      summary: 'Posting entries of a case for a zone kind',
+      request: { query: PostingEntryQuery },
+      responses: {
+        200: jsonContent(dataOf(z.array(PostingEntrySchema)), 'Posting entries'),
+        ...errorResponses(401, 422),
+      },
+    }),
+    async (c) => {
+      requireUser(c)
+      const { caseKey, zoneKind } = c.req.valid('query')
+      return c.json({ data: await postingEntries(caseKey, zoneKind) }, 200)
+    },
+  )
+
   read('/travel-master/rank-map', 'HRM PostType to rank map', RankMapSchema, listRankMap)
 
   api.openapi(

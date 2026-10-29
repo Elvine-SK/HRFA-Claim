@@ -8,6 +8,7 @@ import {
   advanceOn,
   countryByIso2,
   flatRateOn,
+  postingEntries,
   rankForPostType,
   rateOn,
   zoneOf,
@@ -234,6 +235,45 @@ describe.skipIf(!dbTestsEnabled)('travel-master routes', () => {
     expect(map.status).toBe(200)
     expect(map.body.data).toEqual([expect.objectContaining({ postType: 7, rankCode: 'P3', version: 1 })])
     expect((await new TestClient(platform).get(url('/rank-map'))).status).toBe(401)
+  })
+
+  it('lists the payment entries', async () => {
+    type Entry = { component: string; side: string; accountKind: string; gl: string | null; glNameEn: string | null }
+    const entries = async (zoneKind: string) => {
+      const res = await someone.get(url(`/posting-entries?zoneKind=${zoneKind}`))
+      expect(res.status).toBe(200)
+      return res.body.data as Entry[]
+    }
+    const domestic = await entries('domestic')
+    expect(domestic).toHaveLength(8)
+    expect(domestic.map((e) => `${e.component} ${e.side}`)).toEqual([
+      'daily DR',
+      'daily CR',
+      'accommodation DR',
+      'accommodation CR',
+      'fuel DR',
+      'fuel CR',
+      'advance DR',
+      'advance CR',
+    ])
+    expect(domestic.find((e) => e.component === 'accommodation' && e.side === 'DR')).toMatchObject({
+      gl: '4408730001',
+      accountKind: 'gl',
+      glNameEn: 'Expense on Accomodati',
+    })
+    expect(domestic.find((e) => e.side === 'CR')).toMatchObject({ accountKind: 'member', gl: null, glNameEn: null })
+    const components = async (zoneKind: string) => [...new Set((await entries(zoneKind)).map((e) => e.component))]
+    expect(await components('border')).toEqual(['daily', 'accommodation', 'fuel', 'advance'])
+    expect(await components('overseas')).toEqual(['daily', 'accommodation', 'personal', 'advance'])
+    expect((await someone.get(url('/posting-entries?zoneKind=moon'))).status).toBe(422)
+    expect((await new TestClient(platform).get(url('/posting-entries?zoneKind=domestic'))).status).toBe(401)
+  })
+
+  it('looks up posting entries by case and zone kind', async () => {
+    await sys(async () => {
+      expect(await postingEntries('payment', 'overseas')).toHaveLength(8)
+      expect(await postingEntries('settlement', 'overseas')).toEqual([])
+    })
   })
 
   it('refuses writes without travel_master.manage', async () => {

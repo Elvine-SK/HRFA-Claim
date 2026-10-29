@@ -28,6 +28,23 @@ export const GlAccountSchema = z
   .object({ gl: z.string(), seq: z.string(), nameEn: z.string(), nameLo: z.string() })
   .openapi('TravelGlAccount')
 
+export const PostingEntrySchema = z
+  .object({
+    component: z.string(),
+    side: z.enum(['DR', 'CR']),
+    accountKind: z.enum(['gl', 'member']),
+    gl: z.string().nullable(),
+    seq: z.string().nullable(),
+    glNameEn: z.string().nullable(),
+    glNameLo: z.string().nullable(),
+  })
+  .openapi('TravelPostingEntry')
+
+export const PostingEntryQuery = z.object({
+  caseKey: z.string().default('payment'),
+  zoneKind: z.enum(['domestic', 'border', 'overseas']),
+})
+
 export const RankMapSchema = z
   .object({
     id: z.string().uuid(),

@@ -113,3 +113,25 @@ export async function advanceOn(
     .executeTakeFirst()
   return band ? { ...band, currency: ADVANCE_CURRENCY[kind] } : null
 }
+
+export interface PostingEntry {
+  component: string
+  side: 'DR' | 'CR'
+  accountKind: 'gl' | 'member'
+  gl: string | null
+  seq: string | null
+  glNameEn: string | null
+  glNameLo: string | null
+}
+
+/** The lines to post for a case (`payment`) in a zone kind, in posting order; a member line has no GL. */
+export async function postingEntries(caseKey: string, zoneKind: ZoneKind): Promise<PostingEntry[]> {
+  return currentDb()
+    .selectFrom('travelPostingEntries as e')
+    .leftJoin('travelGlAccounts as g', (j) => j.onRef('g.gl', '=', 'e.gl').onRef('g.seq', '=', 'e.seq'))
+    .select(['e.component', 'e.side', 'e.accountKind', 'e.gl', 'e.seq', 'g.nameEn as glNameEn', 'g.nameLo as glNameLo'])
+    .where('e.caseKey', '=', caseKey)
+    .where('e.zoneKind', '=', zoneKind)
+    .orderBy('e.sortOrder')
+    .execute()
+}

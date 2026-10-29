@@ -17,6 +17,7 @@ import {
   SEED_EFFECTIVE_FROM,
   SEED_FLAT_RATES,
   SEED_GL_ACCOUNTS,
+  SEED_POSTING_ENTRIES,
   SEED_RANK_MAP,
   SEED_RANKS,
   SEED_RATES,
@@ -187,6 +188,49 @@ export const travelMasterMigrations: MigrationSet = {
       await db
         .insertInto('travel_gl_accounts')
         .values(SEED_GL_ACCOUNTS.map((g) => ({ gl: g.gl, seq: g.seq, name_en: g.nameEn, name_lo: g.nameLo })))
+        .execute()
+    },
+  },
+
+  // Which GL account is debited or credited for each payment component (plan 4); settlement cases come later.
+  '202610300100_travel-master_posting_entries': {
+    async up(db: Kysely<any>) {
+      await createTable(db, 'travel_posting_entries')
+        .addColumn('id', uuidType, (c) => c.primaryKey().notNull())
+        .addColumn('case_key', sql`varchar(30)`, (c) => c.notNull())
+        .addColumn('zone_kind', sql`varchar(10)`, (c) => c.notNull())
+        .addColumn('component', sql`varchar(30)`, (c) => c.notNull())
+        .addColumn('side', sql`char(2)`, (c) => c.notNull())
+        .addColumn('account_kind', sql`varchar(10)`, (c) => c.notNull())
+        .addColumn('gl', sql`char(10)`)
+        .addColumn('seq', sql`char(4)`)
+        .addColumn('sort_order', sql`int`, (c) => c.notNull())
+        .addForeignKeyConstraint('fk_travel_posting_entries_gl', ['gl', 'seq'], 'travel_gl_accounts', ['gl', 'seq'])
+        .addCheckConstraint('ck_travel_posting_entries_zone_kind', inCheck('zone_kind', ['domestic', 'border', 'overseas']))
+        .addCheckConstraint('ck_travel_posting_entries_side', inCheck('side', ['DR', 'CR']))
+        .addCheckConstraint('ck_travel_posting_entries_account_kind', inCheck('account_kind', ['gl', 'member']))
+        .addCheckConstraint(
+          'ck_travel_posting_entries_account',
+          sql`(account_kind = 'member') = (gl IS NULL) and (gl IS NULL) = (seq IS NULL)`,
+        )
+        .addUniqueConstraint('uq_travel_posting_entries', ['case_key', 'zone_kind', 'component', 'side'])
+        .execute()
+
+      await db
+        .insertInto('travel_posting_entries')
+        .values(
+          SEED_POSTING_ENTRIES.map((e, i) => ({
+            id: uuidBin(uuidv7()),
+            case_key: e.caseKey,
+            zone_kind: e.zoneKind,
+            component: e.component,
+            side: e.side,
+            account_kind: e.accountKind,
+            gl: e.gl,
+            seq: e.seq,
+            sort_order: i + 1,
+          })),
+        )
         .execute()
     },
   },
