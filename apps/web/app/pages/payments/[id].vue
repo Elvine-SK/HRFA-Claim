@@ -39,11 +39,16 @@ const totals = computed(() => Object.entries(p.value?.totals ?? {}))
 // Bills for nights from day 8: a text field per flagged night, kept as the decimal string the API takes.
 const bills = reactive<Record<string, string>>({})
 const billKey = (eid: string, night: number) => `${eid}:${night}`
+// A refill keeps what was typed and not saved, unless the server value of that key changed.
+let saved: Record<string, string> = {}
 watch(
   p,
   (x) => {
-    for (const key of Object.keys(bills)) delete bills[key]
-    for (const b of x?.bills ?? []) bills[billKey(b.eid, b.night)] = b.amount
+    const next: Record<string, string> = {}
+    for (const b of x?.bills ?? []) next[billKey(b.eid, b.night)] = b.amount
+    for (const key of Object.keys(saved)) if (!(key in next)) delete bills[key]
+    for (const [key, amount] of Object.entries(next)) if (saved[key] !== amount || bills[key] === undefined) bills[key] = amount
+    saved = next
   },
   { immediate: true },
 )
@@ -116,6 +121,9 @@ async function onDownload() {
 
 const posting = ref(false)
 const coreRef = ref('')
+watch(posting, (open) => {
+  if (!open) coreRef.value = ''
+})
 async function onPosted() {
   const x = p.value
   if (!x) return
@@ -192,7 +200,11 @@ async function onPosted() {
               </div>
               <div class="text-sm text-[var(--ui-text-muted)]">
                 {{ formatDayFirst(m.departureDate) }} – {{ formatDayFirst(m.returnDate) }} ·
-                {{ t('payments.member.days', { n: m.paidDays }, m.paidDays) }}
+                {{ t('payments.member.days', { n: m.paidDays }, m.paidDays) }} ·
+                {{ t('payments.member.nights', { n: Math.max(m.paidDays - 1, 0) }, Math.max(m.paidDays - 1, 0)) }}
+                <UBadge v-if="flagsOf(m.eid).length" class="ms-2" color="warning" variant="subtle">{{
+                  t('payments.member.flag', { nights: flagsOf(m.eid).join(', ') })
+                }}</UBadge>
               </div>
             </div>
           </template>

@@ -317,7 +317,9 @@
       "advance": "Advance"
     },
     "member": {
-      "days": "{n} day | {n} days"
+      "days": "{n} day | {n} days",
+      "nights": "{n} night | {n} nights",
+      "flag": "Nights from day 8: {nights}"
     },
     "item": {
       "component": "Component",
