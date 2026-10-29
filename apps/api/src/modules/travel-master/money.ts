@@ -38,6 +38,20 @@ export function divCeilWhole(a: Amount, d: number): Amount {
   return fromCents(((cents + step - 1n) / step) * unit)
 }
 
+/** a × n ÷ d rounded up to a whole unit, e.g. km × price ÷ km per litre (fuel). n must be a non-negative integer, d positive. */
+export function mulDivCeilWhole(a: Amount, n: number, d: Amount): Amount {
+  if (!Number.isInteger(n) || n < 0) throw new TypeError(`count must be a non-negative integer: ${n}`)
+  const divisor = toCents(d)
+  if (divisor <= 0n) throw new TypeError(`divisor must be positive: ${d}`)
+  const num = toCents(a) * BigInt(n)
+  return fromCents(((num + divisor - 1n) / divisor) * 100n)
+}
+
+/** True when a fits the 13-digit amount format and is not negative. */
+export function fitsAmount(a: Amount): boolean {
+  return typeof a === 'string' && AMOUNT_PATTERN.test(a)
+}
+
 /** Compare two amounts numerically. */
 export function compareAmounts(a: Amount, b: Amount): -1 | 0 | 1 {
   const x = toCents(a)

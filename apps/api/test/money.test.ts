@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { addAmounts, compareAmounts, divCeilWhole, fromCents, mulAmount, toCents } from '../src/modules/travel-master/money.ts'
+import { addAmounts, compareAmounts, divCeilWhole, fitsAmount, fromCents, mulAmount, mulDivCeilWhole, toCents } from '../src/modules/travel-master/money.ts'
 
 describe('money', () => {
   it('formats with two decimals', () => {
@@ -20,4 +20,16 @@ describe('money', () => {
     for (const bad of ['-1', '1.234', '1e3', '', ' 1', '12345678901234']) expect(() => toCents(bad)).toThrow(TypeError)
   })
   it('compares', () => expect([compareAmounts('2', '10'), compareAmounts('10.00', '10'), compareAmounts('3', '2')]).toEqual([-1, 0, 1]))
+  it('fuel: km × price ÷ km per litre, rounded up to a whole unit', () => {
+    expect(mulDivCeilWhole('25000.00', 100, '7.00')).toBe('357143.00') // 357142.857…
+    expect(mulDivCeilWhole('21000', 70, '7')).toBe('210000.00') // exact
+    expect(mulDivCeilWhole('25000', 0, '7')).toBe('0.00')
+    expect(() => mulDivCeilWhole('1', 1, '0')).toThrow(TypeError)
+    expect(() => mulDivCeilWhole('1', -1, '7')).toThrow(TypeError)
+  })
+  it('guards 13 digits', () => {
+    expect(fitsAmount('9999999999999.99')).toBe(true)
+    expect(fitsAmount(fromCents(10n ** 15n))).toBe(false)
+    expect(fitsAmount('-1.00')).toBe(false)
+  })
 })
