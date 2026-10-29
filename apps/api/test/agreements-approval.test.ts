@@ -114,13 +114,30 @@ describe.skipIf(!dbTestsEnabled)('agreements (submit and approval)', () => {
     )
   })
 
-  it('refuses an edit while in approval and after approval', async () => {
-    const a = await ready()
+  it('refuses an edit while in approval, after approval and after cancel, whatever the body', async () => {
+    const a = await ready({ members: [{ eid: '10030', isLeader: true }, { eid: '10032' }] })
     await ho.post(url(`/${a.id}/submit`), {})
     const body = { ...domestic({ docNo: a.docNo }), version: 2 }
-    const locked = await ho.put(url(`/${a.id}`), body)
-    expect([locked.status, locked.body.error.code]).toEqual([409, 'agreements.not_draft'])
+    // A body that would fail its own checks (and a Doc.no of another branch) still answers "not a draft".
+    const bad = { ...body, docNo: '0001.BCEL.888020.2027', members: [{ eid: '10030', returnDate: '2020-01-01' }] }
+    const expectLocked = async (b: unknown) => {
+      const res = await ho.put(url(`/${a.id}`), b)
+      expect([res.status, res.body.error.code], JSON.stringify(res.body)).toEqual([409, 'agreements.not_draft'])
+    }
+    await expectLocked(body)
+    await expectLocked(bad)
     expect((await ho.post(url(`/${a.id}/submit`), {})).body.error.code).toBe('agreements.not_draft')
+    await approve(sectionHead, a.id)
+    await approve(deptHead, a.id)
+    await approve(mgmt, a.id)
+    const approved = (await ho.get(url(`/${a.id}`))).body.data
+    expect(approved.status).toBe('approved')
+    await expectLocked({ ...body, version: approved.version })
+    await expectLocked({ ...bad, version: approved.version })
+    const cancelled = await ho.post(url(`/${a.id}/cancel`), { version: approved.version, reason: 'Trip called off' })
+    expect(cancelled.status).toBe(200)
+    await expectLocked({ ...body, version: cancelled.body.data.version })
+    await expectLocked({ ...bad, version: cancelled.body.data.version })
   })
 
   it('returns to draft when a reviewer returns it, and resubmits', async () => {

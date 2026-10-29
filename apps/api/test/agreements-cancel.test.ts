@@ -85,4 +85,18 @@ describe.skipIf(!dbTestsEnabled)('agreements (cancel and signed copies)', () => 
     const files = await member.get(`${API}/files?entityType=agreement&entityId=${a.id}`)
     expect(files.body.meta).toMatchObject({ total: 1, canAttach: false })
   })
+
+  it('keeps the signed copy once submitted; a draft may remove it', async () => {
+    const draft = (await ho.post(url(), domestic({ members: TEAM }))).body.data
+    const first = await attachPdf(platform, ho, draft.id)
+    const firstId = ((await first.json()) as any).data.id
+    expect((await ho.delete(`${API}/files/${firstId}`)).status).toBe(204)
+    const kept = await attachPdf(platform, ho, draft.id)
+    const keptId = ((await kept.json()) as any).data.id
+    expect((await ho.post(url(`/${draft.id}/submit`), {})).status).toBe(200)
+    const refused = await ho.delete(`${API}/files/${keptId}`)
+    expect([refused.status, refused.body.error.code]).toEqual([409, 'agreements.signed_copy_locked'])
+    const files = await ho.get(`${API}/files?entityType=agreement&entityId=${draft.id}`)
+    expect(files.body.meta.total).toBe(1)
+  })
 })

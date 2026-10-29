@@ -77,11 +77,13 @@ watch(
     }
   },
 )
+// A trip without an overnight stay is one day: the return date follows the departure date, whichever is set first.
 watch(
-  () => form.overnight,
-  (overnight) => {
-    if (!overnight && form.travelFrom) form.travelTo = form.travelFrom
+  () => [form.formType, form.overnight, form.travelFrom] as const,
+  ([formType, overnight, from]) => {
+    if (formType === 'district' && !overnight) form.travelTo = from
   },
+  { immediate: true },
 )
 
 // The radio group takes strings; the API takes a boolean, or null until answered.

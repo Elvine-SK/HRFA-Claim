@@ -176,6 +176,8 @@ export function agreementRoutes(api: ApiRouter, ctx: ModuleContext) {
       const id = c.req.valid('param').id
       const { version, ...input } = c.req.valid('json')
       const { row } = await readable(ctx, c, id)
+      // Before the body is checked: a submitted agreement is never edited, whatever the body says.
+      if (row.status !== 'draft') throw notDraft()
       const docNo = docNoOf(input)
       if (!(await mayEdit(ctx, c, row)) || !(await mayCreateFor(ctx, c, docNo.branch))) throw AppError.forbidden()
       const saved = await updateDraft(id, version, input, docNo)
