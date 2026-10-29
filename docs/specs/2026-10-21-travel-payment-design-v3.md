@@ -254,9 +254,8 @@ Two numbers, by decision ກ12:
   - `NNNN` is typed from the paper and padded to four digits. Agreements and notices share one series, which
     restarts every year (ກ12).
   - `<branch>` defaults to the user's branch; head office may choose any branch when it enters an agreement on a
-    branch's behalf. **Open:** the business's answer writes it as three digits (`0001.BCEL.010.2026`), the
-    correction of 2026-10-20 as HRM's six-digit `BRANCH_CODE` (`0001.BCEL.888010.2026`). The app stores the branch
-    as HRM's `BRANCH_CODE` either way; only the printed and typed form changes, and the parser accepts both.
+    branch's behalf. It is HRM's six-digit `BRANCH_CODE` (`0001.BCEL.888010.2026`; decided 2026-10-29). The parser
+    also accepts a three-digit branch (`010`) and reads it as `888010`.
   - `YYYY` is the year of the document date.
   - The Lao form `NNNN.ທຄຕລ.<branch>.YYYY` maps to it one to one. The app stores the `BCEL` form, accepts either
     form (and the paper spelling with `/`) on entry and in search, and displays the form that matches the user's
@@ -509,7 +508,7 @@ Assumptions the build follows unless corrected:
 
 Needed from the business:
 
-1. Doc.no branch part: three digits (`0001.BCEL.010.2026`) or six (`0001.BCEL.888010.2026`) (ກ12)?
+1. ~~Doc.no branch part: three digits or six (ກ12)?~~ Answered 2026-10-29: six digits (`0001.BCEL.888010.2026`).
 2. Regulation 4.2, Europe group 1: which country is "ອຽກລັງ" (code file "ອັງກະລັງ")? If it is Italy, Italy moves
    from `OE2` to `OE1`. Is Brazil, which the 4.3 list does not name, `OE1` like the rest of the Americas?
 3. FA-M `ສາຍເດີນ`, section 1: is the second debit 4408730001 (accommodation)?

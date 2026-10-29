@@ -1,20 +1,16 @@
 import { getAudit } from '@elvine-sk/platform-audit'
-import { AppError, now, uuidv7 } from '@elvine-sk/platform-core'
+import { AppError, uuidv7 } from '@elvine-sk/platform-core'
 import { createdStamp, currentDb, inTransaction } from '@elvine-sk/platform-db'
 import type { ModuleContext } from '@elvine-sk/platform-server'
 import { ADVANCE_CURRENCY, RANK_CODES } from './lookups.ts'
 import type { AdvanceKind, Currency, FlatRateKey } from './lookups.ts'
 import type { Amount } from './money.ts'
+import { todayHrm } from '../../shared/dates.ts'
 
 export const FLAT_RATE_KEYS = ['same_day', 'fuel_price', 'km_per_litre'] as const
 export const ADVANCE_KINDS = ['domestic_days', 'group_size'] as const
 
-const HRM_OFFSET_MS = 7 * 60 * 60 * 1000
-
-/** Today's date (`YYYY-MM-DD`) in HRM time (`+07:00`), from the platform clock. */
-export function todayHrm(): string {
-  return new Date(now().getTime() + HRM_OFFSET_MS).toISOString().slice(0, 10)
-}
+export { todayHrm }
 
 export interface RateRowInput {
   rankCode: string
