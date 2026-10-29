@@ -142,6 +142,38 @@ export interface AgreementRefCountersTable {
   year: number
   lastValue: number
 }
+export interface PaymentsTable extends StandardColumns {
+  agreementId: string
+  branchCode: string
+  status: Generated<
+    'calculated' | 'in_approval' | 'approved' | 'exported' | 'posted' | 'void' | 'cancelled_after_export'
+  >
+  calculatedAt: Date
+  submittedAt: Date | null
+  exportedAt: Date | null
+  postedAt: Date | null
+  coreRef: string | null
+  cancelledAt: Date | null
+  agreementLive: Generated<string | null>
+}
+export interface PaymentItemsTable {
+  id: string
+  paymentId: string
+  sortOrder: number
+  eid: string
+  component: string
+  currency: 'LAK' | 'USD'
+  rate: string
+  count: number
+  amount: string
+  basis: string
+}
+export interface PaymentBillsTable {
+  paymentId: string
+  eid: string
+  night: number
+  amount: string
+}
 // Platform tables the app reads directly.
 export interface RolesTable {
   id: string
@@ -193,6 +225,9 @@ export interface AppTables {
   agreements: AgreementsTable
   agreementMembers: AgreementMembersTable
   agreementRefCounters: AgreementRefCountersTable
+  payments: PaymentsTable
+  paymentItems: PaymentItemsTable
+  paymentBills: PaymentBillsTable
   roles: RolesTable
   rolePermissions: RolePermissionsTable
   userRoles: UserRolesTable

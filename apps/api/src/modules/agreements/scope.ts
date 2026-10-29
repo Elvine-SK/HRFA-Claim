@@ -63,10 +63,11 @@ async function loadCaller(ctx: ModuleContext, c: C): Promise<Caller> {
   }
 }
 
-export async function callerScope(ctx: ModuleContext, c: C): Promise<CallerScope> {
+/** The caller's scope for `permission` (`agreement.read` for agreements; payments pass `payment.read`). */
+export async function callerScope(ctx: ModuleContext, c: C, permission = 'agreement.read'): Promise<CallerScope> {
   const me = await caller(ctx, c)
   if (me.isSuper) return { kind: 'all' }
-  if (me.branch && (await me.can('agreement.read')))
+  if (me.branch && (await me.can(permission)))
     return me.branch === HEAD_OFFICE_BRANCH ? { kind: 'all' } : { kind: 'branch', branch: me.branch }
   return { kind: 'own', userId: me.userId, eid: me.eid }
 }

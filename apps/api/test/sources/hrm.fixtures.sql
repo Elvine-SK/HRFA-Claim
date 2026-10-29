@@ -70,7 +70,14 @@ INSERT INTO hrm_employee
   ('10041', 'ແພງ', 'ສີ', 'Phaeng', 'Sy', '888020', '0101', NULL, NULL, '00', '12', 1, 'N', 'A'),
   ('10042', 'ຕຸ້ຍ', 'ມີ', 'Tui', 'Mee', '888020', '0101', NULL, NULL, '00', '12', 1, 'N', 'A'),
   ('10043', 'ບຸນ', 'ຕາ', 'Boun', 'Ta', '888020', '0101', NULL, NULL, '00', '12', 1, 'N', 'A'),
-  ('10044', 'ສອນ', 'ໄຊ', 'Sone', 'Xay', '888020', '0101', NULL, NULL, '00', '12', 1, 'N', 'A');
+  ('10044', 'ສອນ', 'ໄຊ', 'Sone', 'Xay', '888020', '0101', NULL, NULL, '00', '12', 1, 'N', 'A'),
+  -- Payment tests. Head office: finance officer, HR officer, two members; branch 888020: finance officer, HR officer.
+  ('10050', 'ດວງ', 'ສີ', 'Duang', 'Sy', '888010', '0101', NULL, NULL, '00', '12', 1, 'N', 'A'),
+  ('10051', 'ມາລີ', 'ວົງ', 'Malee', 'Vong', '888010', '0101', NULL, NULL, '00', '12', 1, 'N', 'A'),
+  ('10052', 'ວັນ', 'ໄຊ', 'Vanh', 'Xay', '888010', '0101', NULL, NULL, '00', '12', 1, 'N', 'A'),
+  ('10053', 'ແສງ', 'ດາ', 'Saeng', 'Da', '888010', '0101', NULL, NULL, '00', '12', 1, 'N', 'A'),
+  ('10060', 'ບຸນ', 'ມີ', 'Boun', 'Mee', '888020', '0101', NULL, NULL, '00', '12', 1, 'N', 'A'),
+  ('10061', 'ຄຳ', 'ພອນ', 'Kham', 'Phone', '888020', '0101', NULL, NULL, '00', '12', 1, 'N', 'A');
 
 INSERT INTO hrm_employee_account_currency (eid, ccy, account_no, account_name, is_deleted, created_at) VALUES
   ('10001', 'LAK', '0101-OLD', 'SOMPHONE KEOMANY', 0, '2025-01-01 09:00:00'),
@@ -93,7 +100,19 @@ INSERT INTO hrm_employee_account_currency (eid, ccy, account_no, account_name, i
   ('10032', 'LAK', '1032-LAK', 'NANG KHAM', 0, '2026-01-01 09:00:00'),
   ('10032', 'USD', '1032-USD', 'NANG KHAM', 0, '2026-01-01 09:00:00'),
   ('10035', 'LAK', '1035-LAK', 'ON CHANH', 0, '2026-01-01 09:00:00'),
-  ('10040', 'LAK', '2040-LAK', 'LA VONG', 0, '2026-01-01 09:00:00');
+  ('10040', 'LAK', '2040-LAK', 'LA VONG', 0, '2026-01-01 09:00:00'),
+  ('10050', 'LAK', '0050-LAK', 'DUANG SY', 0, '2026-01-01 09:00:00'),
+  ('10050', 'USD', '0050-USD', 'DUANG SY', 0, '2026-01-01 09:00:00'),
+  ('10051', 'LAK', '0051-LAK', 'MALEE VONG', 0, '2026-01-01 09:00:00'),
+  ('10051', 'USD', '0051-USD', 'MALEE VONG', 0, '2026-01-01 09:00:00'),
+  ('10052', 'LAK', '0052-LAK', 'VANH XAY', 0, '2026-01-01 09:00:00'),
+  ('10052', 'USD', '0052-USD', 'VANH XAY', 0, '2026-01-01 09:00:00'),
+  ('10053', 'LAK', '0053-LAK', 'SAENG DA', 0, '2026-01-01 09:00:00'),
+  ('10053', 'USD', '0053-USD', 'SAENG DA', 0, '2026-01-01 09:00:00'),
+  ('10060', 'LAK', '0060-LAK', 'BOUN MEE', 0, '2026-01-01 09:00:00'),
+  ('10060', 'USD', '0060-USD', 'BOUN MEE', 0, '2026-01-01 09:00:00'),
+  ('10061', 'LAK', '0061-LAK', 'KHAM PHONE', 0, '2026-01-01 09:00:00'),
+  ('10061', 'USD', '0061-USD', 'KHAM PHONE', 0, '2026-01-01 09:00:00');
 
 INSERT INTO tb_current_login (eid, session_token, start_time, last_act) VALUES
   ('10001', 'fixture-session-10001', NOW(), NOW()),

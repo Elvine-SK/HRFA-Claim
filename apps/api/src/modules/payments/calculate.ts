@@ -77,6 +77,18 @@ const DROPS_ACCOMMODATION: ReadonlySet<PolicyOption> = new Set(['host_accommodat
 const FUEL_FORMS: ReadonlySet<FormType> = new Set(['domestic', 'district', 'border'])
 
 /** Cents of a possibly negative amount; no 13-digit check, so a too-large result reaches the amount_too_large test. */
+/**
+ * Nights Finance enters a bill for (regulation 3.1.5): day 8 onward of a form 1 trip whose accommodation BCEL pays,
+ * nights 8 … (days − 1) of the member. Night `n` is the night after day `n`.
+ */
+export function billedNights(a: Pick<CalcAgreement, 'formType' | 'policyOption'>, m: CalcMember): number[] {
+  if (a.formType !== 'domestic' || DROPS_ACCOMMODATION.has(a.policyOption)) return []
+  const days = Math.max(daysInclusive(m.departureDate, m.returnDate) - m.daysSubtracted, 0)
+  const nights: number[] = []
+  for (let night = RATE_NIGHTS + 1; night <= days - 1; night++) nights.push(night)
+  return nights
+}
+
 const signedCents = (a: Amount): bigint => {
   const [whole = '0', frac = ''] = a.replace(/^-/, '').split('.')
   const cents = BigInt(whole) * 100n + BigInt(frac.padEnd(2, '0'))
@@ -140,7 +152,7 @@ export function calculate(
           const rateNights = a.formType === 'domestic' ? Math.min(nights, RATE_NIGHTS) : nights
           push('accommodation', r.currency, r.accommodation, rateNights, mulAmount(r.accommodation, rateNights), `accommodation ${basis}`)
           if (a.formType === 'domestic') {
-            for (let night = RATE_NIGHTS + 1; night <= nights; night++) {
+            for (const night of billedNights(a, m)) {
               const billed = bills.get(m.eid)?.get(night)
               if (billed === undefined) continue
               const paid = compareAmounts(billed, r.accommodation) > 0 ? r.accommodation : billed

@@ -4894,6 +4894,448 @@
           "reason"
         ]
       },
+      "Payment": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PaymentListItem"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "members": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/PaymentMember"
+                }
+              },
+              "flags": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "eid": {
+                      "type": "string"
+                    },
+                    "billedNights": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      }
+                    }
+                  },
+                  "required": [
+                    "eid",
+                    "billedNights"
+                  ]
+                }
+              },
+              "totals": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string",
+                  "example": "-150000.00"
+                }
+              },
+              "bills": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "eid": {
+                      "type": "string"
+                    },
+                    "night": {
+                      "type": "integer"
+                    },
+                    "amount": {
+                      "type": "string",
+                      "example": "-150000.00"
+                    }
+                  },
+                  "required": [
+                    "eid",
+                    "night",
+                    "amount"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "members",
+              "flags",
+              "totals",
+              "bills"
+            ]
+          }
+        ]
+      },
+      "PaymentMember": {
+        "type": "object",
+        "properties": {
+          "eid": {
+            "type": "string"
+          },
+          "nameLao": {
+            "type": "string"
+          },
+          "snameLao": {
+            "type": "string"
+          },
+          "nameEng": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "snameEng": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "branchCode": {
+            "type": "string"
+          },
+          "rankCode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "accountLak": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "accountUsd": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "departureDate": {
+            "type": "string"
+          },
+          "returnDate": {
+            "type": "string"
+          },
+          "paidDays": {
+            "type": "integer"
+          },
+          "hostMeals": {
+            "type": "integer"
+          },
+          "privateCarKm": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "isLeader": {
+            "type": "boolean"
+          },
+          "isAdvanceHolder": {
+            "type": "boolean"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentItem"
+            }
+          }
+        },
+        "required": [
+          "eid",
+          "nameLao",
+          "snameLao",
+          "nameEng",
+          "snameEng",
+          "branchCode",
+          "rankCode",
+          "accountLak",
+          "accountUsd",
+          "departureDate",
+          "returnDate",
+          "paidDays",
+          "hostMeals",
+          "privateCarKm",
+          "isLeader",
+          "isAdvanceHolder",
+          "items"
+        ]
+      },
+      "PaymentItem": {
+        "type": "object",
+        "properties": {
+          "component": {
+            "type": "string",
+            "enum": [
+              "daily",
+              "same_day",
+              "meal_deduction",
+              "accommodation",
+              "billed_accommodation",
+              "fuel",
+              "personal",
+              "advance"
+            ]
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "LAK",
+              "USD"
+            ]
+          },
+          "rate": {
+            "type": "string",
+            "example": "-150000.00"
+          },
+          "count": {
+            "type": "integer"
+          },
+          "amount": {
+            "type": "string",
+            "example": "-150000.00"
+          },
+          "basis": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "component",
+          "currency",
+          "rate",
+          "count",
+          "amount",
+          "basis"
+        ]
+      },
+      "PaymentListItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "agreementId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ref": {
+            "type": "string"
+          },
+          "docNo": {
+            "type": "string"
+          },
+          "formType": {
+            "type": "string",
+            "enum": [
+              "domestic",
+              "district",
+              "overseas",
+              "border"
+            ]
+          },
+          "subject": {
+            "type": "string"
+          },
+          "zoneCode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "branchCode": {
+            "type": "string"
+          },
+          "travelFrom": {
+            "type": "string"
+          },
+          "travelTo": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "calculated",
+              "in_approval",
+              "approved",
+              "exported",
+              "posted",
+              "void",
+              "cancelled_after_export"
+            ]
+          },
+          "calculatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "submittedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "exportedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "postedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "coreRef": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "cancelledAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "createdBy": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "agreementId",
+          "ref",
+          "docNo",
+          "formType",
+          "subject",
+          "zoneCode",
+          "branchCode",
+          "travelFrom",
+          "travelTo",
+          "status",
+          "calculatedAt",
+          "submittedAt",
+          "exportedAt",
+          "postedAt",
+          "coreRef",
+          "cancelledAt",
+          "createdBy",
+          "createdAt",
+          "updatedAt",
+          "version"
+        ]
+      },
+      "PaymentCreate": {
+        "type": "object",
+        "properties": {
+          "agreementId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "agreementId"
+        ]
+      },
+      "PaymentLookup": {
+        "type": "object",
+        "properties": {
+          "agreementId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "paymentId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "agreementId",
+          "paymentId"
+        ]
+      },
+      "PaymentVersion": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "version"
+        ]
+      },
+      "PaymentBills": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "bills": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentBill"
+            },
+            "maxItems": 2000
+          }
+        },
+        "required": [
+          "version",
+          "bills"
+        ]
+      },
+      "PaymentBill": {
+        "type": "object",
+        "properties": {
+          "eid": {
+            "type": "string",
+            "pattern": "^\\d{5}$"
+          },
+          "night": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 400
+          },
+          "amount": {
+            "type": "string",
+            "pattern": "^\\d{1,13}(\\.\\d{1,2})?$"
+          }
+        },
+        "required": [
+          "eid",
+          "night",
+          "amount"
+        ]
+      },
       "PlatformManifest": {
         "type": "object",
         "properties": {
@@ -17569,6 +18011,511 @@
                   "properties": {
                     "data": {
                       "$ref": "#/components/schemas/Agreement"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/payments": {
+      "post": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Calculate an approved agreement into its payment (the checking table, spec §9)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Payment"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Payments the caller may see (filters: status, agreementId, formType, branchCode; search: REF, Doc.no)",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "1"
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "example": "20"
+            },
+            "required": false,
+            "name": "pageSize",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "example": "-createdAt"
+            },
+            "required": false,
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "q",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payments",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PaymentListItem"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PageMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/payments/lookup": {
+      "get": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Find an agreement by REF or Doc.no for Finance, with its payment if it has one",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 40
+            },
+            "required": true,
+            "name": "number",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/PaymentLookup"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/payments/{id}": {
+      "get": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "A payment: members with their items, day-8 flags, totals per currency, bills",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Payment"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/payments/{id}/recalculate": {
+      "post": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Calculate a payment again from the current rates (calculated status only)",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentVersion"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Recalculated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Payment"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/payments/{id}/bills": {
+      "put": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Replace Finance's bills for nights from day 8 and recalculate (calculated status only)",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentBills"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Saved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Payment"
                     }
                   },
                   "required": [

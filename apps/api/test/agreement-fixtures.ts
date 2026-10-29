@@ -1,9 +1,11 @@
-import { runWithContext, SYSTEM_CONTEXT } from '@elvine-sk/platform-db'
+import { inTransaction, runWithContext, SYSTEM_CONTEXT } from '@elvine-sk/platform-db'
 import type { PlatformApp } from '@elvine-sk/platform-server'
 import { TEST_ORIGIN, type TestClient } from '@elvine-sk/platform-server/testing'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { expect } from 'vitest'
+import { transition } from '../src/modules/agreements/procedures.ts'
+import { prepareSubmission } from '../src/modules/agreements/queries.ts'
 import { appDb } from '../src/shared/db.ts'
 import { API } from './helpers.ts'
 
@@ -79,4 +81,25 @@ export async function approve(client: TestClient, agreementId: string, decision:
   expect(item, 'in the inbox').toBeTruthy()
   const res = await client.post(`${API}/approval/requests/${item.requestId}/${decision}`, { comment: 'checked' })
   expect(res.status, JSON.stringify(res.body)).toBe(200)
+}
+
+/**
+ * An approved agreement, reached without a workflow: the draft is created by `by` with a signed copy, then the
+ * submission checks and the two status changes run as the system. Returns the agreement as `by` reads it.
+ */
+export async function approvedAgreement(platform: PlatformApp, by: TestClient, body: Record<string, unknown>) {
+  const res = await by.post(`${API}/agreements`, body)
+  expect(res.status, JSON.stringify(res.body)).toBe(201)
+  const id = res.body.data.id as string
+  expect((await attachPdf(platform, by, id)).status).toBe(201)
+  await runWithContext(SYSTEM_CONTEXT, () =>
+    inTransaction(async () => {
+      await prepareSubmission(id)
+      await transition(id, 1, 'in_approval')
+      await transition(id, 2, 'approved')
+    }),
+  )
+  const read = await by.get(`${API}/agreements/${id}`)
+  expect(read.body.data.status).toBe('approved')
+  return read.body.data
 }
