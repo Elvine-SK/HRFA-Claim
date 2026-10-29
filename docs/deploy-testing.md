@@ -61,7 +61,8 @@ Every variable of `.env.example`; set the ones marked here.
 | `AUTH_SESSION_IDLE_MINUTES` | `240` |
 | `MAIL_TRANSPORT` | `console` until mail is decided; then see `docs/platform/` |
 | `MAIL_FROM` | `HR-FAM <no-reply@...>` |
-| `BODY_LIMIT_KB` | `11264` (the proxy's `client_max_body_size` must be at least 11m) |
+| `BODY_LIMIT_KB` | `52224` (the proxy's `client_max_body_size` must be at least 51m) |
+| `FILES_MAX_BYTES` | `52428800` (50 MB, the largest signed agreement, spec §13) |
 | `FILES_STORAGE` | `local` on one server |
 | `FILES_DIR` | An absolute folder that survives upgrades, for example `/var/lib/hr-fam/files` (the PM2 user must write to it) |
 
@@ -104,6 +105,23 @@ node --import tsx --env-file-if-exists=.env src/cli.ts admin:create --email admi
 ```
 
 It prints an invite link: open it to set the password. Then assign roles to HRM users in the web app.
+
+## Agreement approval and roles
+
+Once, after the first migration that includes plan 3:
+
+1. Administration → Approvals → New workflow: key `agreement`, record type "Travel agreement", name as in
+   `apps/api/src/modules/agreements/workflow.json`. Add the three stages of that file (section head, department
+   head, management; each one step whose approvers are the resolver of the same name), publish it and make it the
+   default. The same file can be posted to `POST /api/v1/approval/workflows` and `.../{id}/versions` with
+   `activate: true`.
+2. Administration → Users: give HRM users the roles the migration created: `hr_officer` (enters and submits),
+   `hr_section_head`, `hr_department_head`, `management` (approval steps of their own HRM branch), and
+   `finance_officer` (told when an agreement of their branch is approved). An approver is found by their HRM
+   branch: a branch without a section head, department head or management user cannot submit (`no eligible
+   approver`).
+3. Travel master data → Rank map: map every PostType of the members (only PostType 7 → P3 is seeded, ຂ1). A member
+   whose PostType has no rank blocks submission.
 
 ## Upgrade
 

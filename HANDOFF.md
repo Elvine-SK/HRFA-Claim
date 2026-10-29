@@ -1,8 +1,9 @@
-# Handoff — hr-fam (2026-10-21)
+# Handoff — hr-fam (2026-10-29)
 
 Travel payment app for BCEL on nelvine-platform. Working name "HR-FAM" until the business names it (ຂ9).
-**Plans 1 and 2 are built** (local git only): plan 1 the app scaffold, the HRM read layer and sign-in from
-HRM; plan 2 the master data and the PM2 bundle. Next: plan 3 (agreements).
+**Plans 1–3 are built** (local git only): plan 1 the app scaffold, the HRM read layer and sign-in from HRM;
+plan 2 the master data and the PM2 bundle; plan 3 the agreements (forms 1–4, REF, Doc.no, approval, cancel).
+Next: plan 4 (payment calculation, checking table, upload file).
 
 ## Start here
 
@@ -12,9 +13,10 @@ HRM; plan 2 the master data and the PM2 bundle. Next: plan 3 (agreements).
   2026-10-21T02:44), questions in [`docs/questions-for-business-finance-lo.html`](docs/questions-for-business-finance-lo.html),
   plus the updated `2. ກຳນົດ code and data.xlsx` (2026-10-16) and `4. Format form FA-M.xlsx` (2026-10-20, new
   sheets `GL` and `ສາຍເດີນ`). All are in spec v3; its §17 lists what is still open. The Doc.no branch part
-  (3 digits per ກ12, 6 digits per the chat of 2026-10-20) is undecided.
-- **Done:** [plan 1](docs/superpowers/plans/2026-10-20-plan-1-foundation.md), plan 2 (master data, deployment bundle).
-  **Next:** write plan 3 (agreements).
+  is six digits (`888010`, decided 2026-10-29).
+- **Done:** [plan 1](docs/superpowers/plans/2026-10-20-plan-1-foundation.md),
+  [plan 2](docs/superpowers/plans/2026-10-21-plan-2-master-data.md),
+  [plan 3](docs/superpowers/plans/2026-10-29-plan-3-agreements.md). **Next:** write plan 4.
 - **HRM team kit:** [`docs/hrm-handoff.md`](docs/hrm-handoff.md) (handoff table, redirect script, grants, errors).
 
 ## Run it
@@ -26,7 +28,7 @@ pnpm install && pnpm migrate
 pnpm dev:api                         # :3335
 pnpm dev:web                         # :3336
 tooling/deploy/bundle.sh --hrm-login-url <URL>   # build/hr-fam-<sha>.tar.gz for the testing server
-RUN_DB_TESTS=1 pnpm test             # 89 tests; the test DBs are built on :3308 by global-setup
+RUN_DB_TESTS=1 pnpm test             # 135 tests; the test DBs are built on :3308 by global-setup
 ```
 
 `http://localhost:3335/api/v1/auth/hrm?code=valid-10001` signs in as fixture employee `10001` once per load of the
@@ -63,6 +65,32 @@ Reviews: a security review of the sign-in (0 Critical, 5 Important, all fixed) a
   `--allow-non-linux` (inspection only).
   Install steps for `10.0.7.110`: [`docs/deploy-testing.md`](docs/deploy-testing.md).
 
+## What plan 3 built
+
+- `agreements` module: tables `agreements`, `agreement_members`, `agreement_ref_counters`; procedures
+  `agreements_next_ref` (REF `TA-YYYY-NNNNNN`, counter per HRM year) and `agreements_transition` (status changes,
+  writes the history row); roles `hr_officer`, `hr_section_head`, `hr_department_head`, `management`,
+  `finance_officer` seeded with their permissions.
+- Routes under `/api/v1/agreements`: create, list, get, `PUT` (drafts only), `lookup?number=` (REF or any Doc.no
+  spelling), history, `submit`, `cancel`. Doc.no is stored `NNNN.BCEL.888010.YYYY` (six-digit branch, decided
+  2026-10-29), shown in Lao as `ທຄຕລ`; one live agreement per Doc.no (generated column + unique key).
+- Who sees what is TypeScript (`agreements/scope.ts`): head office `agreement.read` holders see all, other
+  branches their own HRM branch, everyone else their memberships and their own drafts. Platform policies cannot see
+  the HRM branch (no `subjectAttributes` hook in the generated `platform.modules.ts`). **Later (agreed
+  2026-10-29):** ask the platform team to let apps pass `subjectAttributes`, then move the branch rule to a policy.
+- Submission (`onStatusChange('pending')`, so the platform's resubmit gets it too): refreshes the HRM snapshot
+  (names, position, rank from the rank map or the post filled, LAK/USD accounts), sets the zone, and refuses
+  without one leader, the advance holder, a rank, the accounts the payment needs, or a signed copy.
+- Approval: workflow `apps/api/src/modules/agreements/workflow.json`, resolvers `agreement.section_head`,
+  `agreement.department_head`, `agreement.management` (role holders of the agreement's HRM branch). Approved
+  notifies the branch's `finance_officer` users; return, reject or withdraw goes back to draft; cancel needs a
+  reason and frees the Doc.no.
+- `hrm` module: `GET /hrm/provinces`, `/hrm/provinces/{code}/districts`, `/hrm/positions?q=`; `employeeOfUser`.
+- Web: `/agreements` (list, REF/Doc.no box), `/agreements/new?form=`, `/agreements/{id}` (members, signed copy,
+  history, approval card, cancel), `/agreements/{id}/edit`.
+- Set-up on a server: [`docs/deploy-testing.md`](docs/deploy-testing.md) "Agreement approval and roles".
+- Not checked in a browser yet (no browser tool in the build session): try each form in en and lo.
+
 ## Approach: app first, platform later
 
 nelvine-platform is at `1.0.0` and has none of the proposal's items released
@@ -74,7 +102,7 @@ the platform package once released.
 | --------------------------- | --------------------------------------------------------------- | --------------------------------------------------------------- |
 | M1 data sources             | On platform `main` (tasks 1–5 of 7), not released                | Used directly (`source('hrm')`); the app is linked to `../nelvine-platform` |
 | M2 portal sign-in handoff   | Next on the platform roadmap                                     | App module `auth-hrm` (built); swap later                       |
-| M3 document numbering       | Not started                                                      | REF counter and Doc.no parser in `agreements` (plan 3)          |
+| M3 document numbering       | Not started                                                      | REF counter and Doc.no parser in `agreements` (plan 3, built)   |
 | M4 reference data           | Not started                                                      | Effective-dated tables in `travel-master` (plan 2)              |
 | C1 org approval routing     | Not started                                                      | Approval resolvers in the app (plans 3–5)                       |
 | C2 XLSX writer              | Not started                                                      | App writer behind an interface (plan 4)                         |
@@ -94,12 +122,12 @@ PascalCase upstream columns do not survive `CamelCasePlugin`.
 | ---- | -------------------------------------------------------- | ------------ |
 | 1    | Scaffold, HRM read layer, sign-in handoff                | Done         |
 | 2    | Master data with seed (ranks, zones, rates, bands, fuel, GL), PM2 bundle | Done |
-| 3    | Agreements: forms 1–4, REF, Doc.no, approval             | To write     |
+| 3    | Agreements: forms 1–4, REF, Doc.no, approval             | Done         |
 | 4    | Payment calculation, checking table, upload file         | To write     |
 | 5    | Settlement, approval chain, posting batch                | To write     |
 | 6    | Dashboard, reminders, printable views, transit form      | To write     |
 
-Plan 3 is next. Write each plan when the previous one is done, so it can use the real code.
+Plan 4 is next. Write each plan when the previous one is done, so it can use the real code.
 
 ## Decisions
 
@@ -136,19 +164,17 @@ Plan 3 is next. Write each plan when the previous one is done, so it can use the
   bundle stores it in `apps/web/hrm-login-url.txt` and `ecosystem.config.cjs` passes it on.
 - `/me` says "not linked" for any error, also when HRM is down.
 
-Carry into plans 3–4 (from the plan 2 final review):
+Carry into plan 4:
 
-- `currentDb()` has no Kysely types for the `travel_*` tables: add a `declare module '@elvine-sk/platform-db'`
-  table interface before plan 3 or 4 queries them, so a wrong column name fails typecheck.
-- Country zones and the rank map are not effective-dated: plan 3 must snapshot the zone (as it does the rank)
-  when an agreement is submitted.
-- Plan 3 models the "Other" border route (no seed row): a nullable route id plus free text.
-- Move `todayHrm()` out of `travel-master/sets.ts` into a shared helper; plan 3 deadlines need the same
-  `+07:00` today.
-- Plan 4: fuel = distance ÷ `km_per_litre` (an Amount, `"7.00"`) needs a helper that divides by an Amount and a
-  rounding rule the spec does not give yet; validate totals fit 13 digits before writing; test the money
-  guards. `flatRateOn('fuel_price')` is `null` until a price is entered: treat it as "cannot calculate".
+- Fuel = distance ÷ `km_per_litre` (an Amount, `"7.00"`) needs a helper that divides by an Amount and a rounding
+  rule the spec does not give yet; validate totals fit 13 digits before writing; test the money guards.
+  `flatRateOn('fuel_price')` is `null` until a price is entered: treat it as "cannot calculate".
 - The seed migration imports `RANK_CODES` from `lookups.ts`; keep that constant unchanged (the seed is frozen).
+- Cancel after the payment batch is exported must mark the batch "cancelled after export" (spec §8, ກ16): hook it
+  into `POST /agreements/{id}/cancel`.
+- `shared/db.ts` types the app's tables; new plan 4 tables go there too.
+- Test files share one database per run: give each file its own people (fixture EIDs), Doc.no year
+  (`domesticBodies(year)`) and REF year when it counts them.
 
 ## Blockers and open items
 
@@ -159,7 +185,6 @@ Carry into plans 3–4 (from the plan 2 final review):
   Brazil depend on it), the `PostType` → `P1`–`P9` map (ຂ1), the Lao spelling of AE to confirm, and the
   Caucasus countries (AM, AZ, GE) seeded in zone group OA2. The visual browser checks of the `/master` pages
   are still to do.
-- Later plans: the Doc.no branch part (plan 3),
-  the overseas LAK/USD entries, fuel and border entries, `REMARK` (plan 4), the holding-account timing and `RVS_NO`
+- Later plans: the overseas LAK/USD entries, fuel and border entries, `REMARK` (plan 4), the holding-account timing and `RVS_NO`
   (plan 5). The full list, with the build step each blocks, is spec v3 §17–18.
 - Deployment: PM2 bundle built (see above); not yet installed on the testing server.
