@@ -44,6 +44,7 @@ import {
   CancelSchema,
   LookupQuery,
 } from './schema.ts'
+import { agreementCancelled } from './events.ts'
 import { transition } from './procedures.ts'
 import { caller, mayCreateFor, mayRead, scopedAgreements, type C } from './scope.ts'
 
@@ -255,6 +256,7 @@ export function agreementRoutes(api: ApiRouter, ctx: ModuleContext) {
         // Cancelled first, so the request's own "cancelled" status change finds nothing to move back to draft.
         await transition(id, version, 'cancelled', reason)
         await approval.cancelForEntity('agreement', id)
+        await agreementCancelled(id, reason)
         await getAudit(ctx).record({
           action: 'agreements.cancelled',
           targetType: 'agreement',

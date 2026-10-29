@@ -1,5 +1,7 @@
 import { defineModule, type ModuleContext } from '@elvine-sk/platform-server'
+import { onAgreementCancelled } from '../agreements/events.ts'
 import { paymentApproval, paymentResolvers } from './approval.ts'
+import { cancelPaymentOf } from './batches.ts'
 import { paymentsMigrations } from './migrations.ts'
 import { paymentRoutes } from './routes.ts'
 import { paymentFields } from './schema.ts'
@@ -25,6 +27,8 @@ const messages = {
     'posting.unbalanced': 'Debits and credits of the batch differ in a currency',
     'notify.payments.approved.title': 'Payment {ref} is approved',
     'notify.payments.approved.body': 'It is ready for the upload file.',
+    'notify.payments.cancelled_after_export.title': 'Payment {ref} was cancelled after its upload file',
+    'notify.payments.cancelled_after_export.body': 'The agreement was cancelled: {reason}. No reversal file is made; settle it with the bank.',
   },
   lo: {
     'payments.bad_transition': 'ການຈ່າຍເງິນບໍ່ສາມາດປ່ຽນໄປເປັນສະຖານະນີ້ຈາກສະຖານະປັດຈຸບັນໄດ້',
@@ -46,6 +50,8 @@ const messages = {
     'posting.unbalanced': 'ຍອດ DR ແລະ CR ຂອງຊຸດລົງບັນຊີບໍ່ເທົ່າກັນໃນສະກຸນເງິນໃດໜຶ່ງ',
     'notify.payments.approved.title': 'ການຈ່າຍເງິນ {ref} ໄດ້ຮັບອະນຸມັດແລ້ວ',
     'notify.payments.approved.body': 'ພ້ອມສຳລັບໄຟລ໌ອັບໂຫຼດ.',
+    'notify.payments.cancelled_after_export.title': 'ການຈ່າຍເງິນ {ref} ຖືກຍົກເລີກຫຼັງສ້າງໄຟລ໌ອັບໂຫຼດ',
+    'notify.payments.cancelled_after_export.body': 'ສັນຍາຖືກຍົກເລີກ: {reason}. ບໍ່ມີໄຟລ໌ກັບລາຍການ; ໃຫ້ແກ້ໄຂກັບທະນາຄານ.',
   },
 }
 
@@ -67,11 +73,12 @@ export const paymentsModule = defineModule({
   lists: { payments: { fields: paymentFields } },
   approvalEntities: [paymentApproval(ctx)],
   approvalResolvers: paymentResolvers,
-  notificationTypes: { 'payments.approved': {} },
-  auditActions: ['payments.exported', 'payments.downloaded', 'payments.posted'],
+  notificationTypes: { 'payments.approved': {}, 'payments.cancelled_after_export': {} },
+  auditActions: ['payments.exported', 'payments.downloaded', 'payments.posted', 'payments.cancelled_after_export'],
   messages,
   setup(c) {
     moduleCtx = c
+    onAgreementCancelled((agreementId, reason) => cancelPaymentOf(c, agreementId, reason))
   },
   routes: (api, c) => paymentRoutes(api, c),
 })

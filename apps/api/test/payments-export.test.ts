@@ -192,4 +192,47 @@ describe.skipIf(!dbTestsEnabled)('payments (batch, upload file, posted)', () => 
     expect((await download(hr, batch.id)).status).toBe(404)
     expect((await brFinance.post(url(`/${p.id}/posted`), { version: p.version + 1 })).status).toBe(404)
   })
+
+  const cancelAgreement = (agreementId: string, version: number) =>
+    finance.post(`${API}/agreements/${agreementId}/cancel`, { version, reason: 'Trip dropped' })
+
+  it('cancel before export voids the payment', async () => {
+    const p = await approved()
+    const ag = (await hr.get(`${API}/agreements/${p.agreementId}`)).body.data
+    const res = await cancelAgreement(p.agreementId, ag.version)
+    expect(res.status, JSON.stringify(res.body)).toBe(200)
+    expect((await finance.get(url(`/${p.id}`))).body.data.status).toBe('void')
+    // The Doc.no is free again, and the replacement can be paid.
+    const again = await approvedAgreement(
+      platform,
+      hr,
+      domestic({ docNo: ag.docNo, members: [{ eid: '10082', isLeader: true }] }),
+    )
+    const paid = await finance.post(url(), { agreementId: again.id })
+    expect(paid.status, JSON.stringify(paid.body)).toBe(201)
+  })
+
+  it('cancel after export marks it', async () => {
+    const p = await approved()
+    const exported = (await finance.post(url(`/${p.id}/export`), { version: p.version })).body.data
+    const ag = (await hr.get(`${API}/agreements/${p.agreementId}`)).body.data
+    const res = await cancelAgreement(p.agreementId, ag.version)
+    expect(res.status, JSON.stringify(res.body)).toBe(200)
+
+    const read = (await finance.get(url(`/${p.id}`))).body.data
+    expect(read.status).toBe('cancelled_after_export')
+    const listed = await finance.get(url('?status=cancelled_after_export'))
+    expect(listed.body.data.map((x: any) => x.id)).toContain(p.id)
+    const told = await finance
+      .get(`${API}/notifications`)
+      .then((r) => r.body.data.filter((n: any) => n.type === 'payments.cancelled_after_export'))
+    expect(told.map((n: any) => n.link)).toContain(`/payments/${p.id}`)
+    expect((await brFinance.get(`${API}/notifications`)).body.data.filter((n: any) => n.link === `/payments/${p.id}`)).toHaveLength(0)
+    const stamp = await runWithContext(SYSTEM_CONTEXT, () =>
+      appDb().selectFrom('postingBatches').select('cancelledAfterExportAt').where('id', '=', uuidBin(exported.batch.id)).executeTakeFirstOrThrow(),
+    )
+    expect(stamp.cancelledAfterExportAt).toBeTruthy()
+    // No reversal file: the file still downloads.
+    expect((await download(finance, exported.batch.id)).status).toBe(200)
+  })
 })

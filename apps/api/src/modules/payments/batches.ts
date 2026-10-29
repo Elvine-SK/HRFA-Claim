@@ -1,14 +1,19 @@
+import { APPROVAL } from '@elvine-sk/platform-approval'
+import { getAudit } from '@elvine-sk/platform-audit'
+import { NOTIFICATIONS } from '@elvine-sk/platform-notifications'
+import type { ModuleContext } from '@elvine-sk/platform-server'
 import { AppError, now, uuidv7 } from '@elvine-sk/platform-core'
 import { callProcedure, getContext, inTransaction, uuidArg, uuidBin } from '@elvine-sk/platform-db'
 import { daysInclusive } from '../../shared/dates.ts'
 import { appDb } from '../../shared/db.ts'
+import { branchRoleUsers } from '../agreements/approval.ts'
 import { membersOf, type MemberRow } from '../agreements/queries.ts'
 import { findProvince } from '../hrm/geography.ts'
 import { countryByIso2, postingEntries, zoneOf, type ZoneCode } from '../travel-master/lookups.ts'
 import type { PaymentItem } from './calculate.ts'
 import { buildPaymentLines, paymentRemark, type PostingMember, type UploadLine } from './posting.ts'
 import { transition } from './procedures.ts'
-import { findPayment, itemsOf, type PaymentRow } from './queries.ts'
+import { findPayment, itemsOf, livePaymentOf, type PaymentRow } from './queries.ts'
 import type { Component } from './types.ts'
 import { xlsxWriter } from './xlsx.ts'
 
@@ -183,4 +188,46 @@ export async function exportPayment(
     await transition(id, version, 'exported')
     return { batchId, lines: lines.length }
   })
+}
+
+/**
+ * The agreement was cancelled (spec §8, ກ16). Before export the payment is void and its approval request is
+ * cancelled; after export the file stays as it is (no reversal file), the payment is marked and Finance of its
+ * branch is told. A payment already void or cancelled after export is left alone.
+ */
+export async function cancelPaymentOf(
+  ctx: ModuleContext,
+  agreementId: string,
+  reason: string,
+): Promise<void> {
+  const id = await livePaymentOf(agreementId)
+  if (!id) return
+  const row = await findPayment(id)
+  if (!row || row.status === 'void' || row.status === 'cancelled_after_export') return
+  if (row.status === 'exported' || row.status === 'posted') {
+    await transition(id, row.version, 'cancelled_after_export')
+    await appDb()
+      .updateTable('postingBatches')
+      .set({ cancelledAfterExportAt: now() })
+      .where('sourceId', '=', uuidBin(id))
+      .where('kind', '=', 'payment')
+      .execute()
+    await getAudit(ctx).record({
+      action: 'payments.cancelled_after_export',
+      targetType: 'payment',
+      targetId: id,
+      details: { ref: row.ref, from: row.status, reason },
+    })
+    await ctx.services.get(NOTIFICATIONS).notify({
+      userIds: await branchRoleUsers('finance_officer', row.branchCode),
+      type: 'payments.cancelled_after_export',
+      params: { ref: row.ref, reason },
+      link: `/payments/${id}`,
+      subject: { type: 'payment', id },
+    })
+    return
+  }
+  // Void first, so the request's own "cancelled" status change finds nothing to move.
+  await transition(id, row.version, 'void')
+  await ctx.services.get(APPROVAL).cancelForEntity('payment', id)
 }
