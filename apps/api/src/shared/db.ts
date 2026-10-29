@@ -4,6 +4,9 @@ import { currentDb, type DbTables, type StandardColumns } from '@elvine-sk/platf
 // UUID columns read as strings and are written with `uuidBin`; DATE reads as `YYYY-MM-DD`; DECIMAL as a string;
 // TINYINT(1) as a boolean.
 
+/** Kysely's `Generated`: optional on insert (the app has no direct `kysely` dependency). */
+type Generated<S> = { readonly __select__: S; readonly __insert__: S | undefined; readonly __update__: S }
+
 export interface TravelRanksTable {
   code: string
   nameLo: string
@@ -63,6 +66,80 @@ export interface TravelGlAccountsTable {
   nameLo: string
 }
 
+export interface AgreementsTable extends StandardColumns {
+  ref: string
+  formType: 'domestic' | 'district' | 'overseas' | 'border'
+  subject: string
+  title: string
+  reference: string | null
+  docNo: string
+  docDate: string
+  branchCode: string
+  travelFrom: string
+  travelTo: string
+  fromProvinceCode: string | null
+  toProvinceCode: string | null
+  provinceCode: string | null
+  fromDistrictCode: string | null
+  toDistrictCode: string | null
+  overnight: boolean | null
+  sameDay50Km: boolean | null
+  countryIso2: string | null
+  zoneCode: string | null
+  borderRouteId: string | null
+  borderRouteOther: string | null
+  policyOption: 'bcel_all' | 'host_travel' | 'host_accommodation' | 'host_meals' | 'host_meals_accommodation'
+  hasAdvance: boolean
+  status: Generated<'draft' | 'in_approval' | 'approved' | 'cancelled'>
+  submittedAt: Date | null
+  cancelReason: string | null
+  cancelledAt: Date | null
+  cancelledBy: string | null
+  docNoLive: Generated<string | null>
+}
+export interface AgreementMembersTable {
+  id: string
+  agreementId: string
+  sortOrder: number
+  eid: string
+  departureDate: string
+  returnDate: string
+  daysSubtracted: number
+  isLeader: boolean
+  isDeputy: boolean
+  isAdvanceHolder: boolean
+  hostMeals: number
+  privateCarKm: number | null
+  actingPositionCode: string | null
+  nameLao: string
+  snameLao: string
+  nameEng: string | null
+  snameEng: string | null
+  branchCode: string
+  departmentName: string | null
+  sectionName: string | null
+  positionCode: string | null
+  positionName: string | null
+  postType: number | null
+  actingPositionName: string | null
+  rankCode: string | null
+  accountLak: string | null
+  accountUsd: string | null
+}
+export interface AgreementRefCountersTable {
+  year: number
+  lastValue: number
+}
+// Platform tables the app reads directly.
+export interface RolesTable {
+  id: string
+  key: string
+}
+export interface RolePermissionsTable {
+  roleId: string
+  permissionKey: string
+}
+
 export interface AppTables {
   travelRanks: TravelRanksTable
   travelRankMap: TravelRankMapTable
@@ -73,6 +150,11 @@ export interface AppTables {
   travelFlatRates: TravelFlatRatesTable
   travelAdvanceBands: TravelAdvanceBandsTable
   travelGlAccounts: TravelGlAccountsTable
+  agreements: AgreementsTable
+  agreementMembers: AgreementMembersTable
+  agreementRefCounters: AgreementRefCountersTable
+  roles: RolesTable
+  rolePermissions: RolePermissionsTable
 }
 
 /** `currentDb()` typed with the app's tables. */
