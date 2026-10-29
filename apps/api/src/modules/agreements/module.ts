@@ -48,6 +48,7 @@ export const agreementsModule = defineModule({
   approvalResolvers: agreementResolvers,
   fileEntities: [agreementFiles(ctx)],
   notificationTypes: { 'agreements.approved': {}, 'agreements.cancelled': {} },
+  auditActions: ['agreements.cancelled'],
   messages,
   setup(c) {
     moduleCtx = c

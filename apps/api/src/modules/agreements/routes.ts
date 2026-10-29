@@ -1,8 +1,10 @@
 import { APPROVAL } from '@elvine-sk/platform-approval'
 import { SubmitBody } from '@elvine-sk/platform-approval/schemas'
+import { getAudit } from '@elvine-sk/platform-audit'
 import { requireUser } from '@elvine-sk/platform-auth'
 import { AppError } from '@elvine-sk/platform-core'
-import { paginate } from '@elvine-sk/platform-db'
+import { NOTIFICATIONS } from '@elvine-sk/platform-notifications'
+import { inTransaction, paginate } from '@elvine-sk/platform-db'
 import {
   createRoute,
   dataOf,
@@ -39,8 +41,10 @@ import {
   AgreementListItemSchema,
   AgreementSchema,
   AgreementUpdateSchema,
+  CancelSchema,
   LookupQuery,
 } from './schema.ts'
+import { transition } from './procedures.ts'
 import { caller, mayCreateFor, mayRead, scopedAgreements, type C } from './scope.ts'
 
 const tags = ['Agreements']
@@ -220,6 +224,51 @@ export function agreementRoutes(api: ApiRouter, ctx: ModuleContext) {
       if (open?.status === 'returned') await approval.resubmit(open.id, user.id)
       else await approval.submit('agreement', id, user.id, { workflow: c.req.valid('json').workflow })
       const saved = await loadAgreement(id)
+      return c.json({ data: toAgreement(saved.row, saved.members, lang(c)) }, 200)
+    },
+  )
+
+  api.openapi(
+    createRoute({
+      method: 'post',
+      path: '/agreements/{id}/cancel',
+      tags,
+      summary: 'Cancel an agreement with a reason (spec §8, ກ16); its Doc.no is free for the replacement',
+      request: { params: IdParam, ...jsonBody(CancelSchema) },
+      responses: {
+        200: jsonContent(dataOf(AgreementSchema), 'Cancelled'),
+        ...errorResponses(401, 403, 404, 409, 422),
+      },
+    }),
+    async (c) => {
+      const { user } = requireUser(c)
+      const id = c.req.valid('param').id
+      const { version, reason } = c.req.valid('json')
+      const { row } = await readable(ctx, c, id)
+      const approval = ctx.services.get(APPROVAL)
+      const me = await caller(ctx, c)
+      const allowed = (await me.can('agreement.cancel')) || (await approval.isApproverOf(user.id, 'agreement', id))
+      if (!allowed) throw AppError.forbidden()
+      const saved = await inTransaction(async () => {
+        // Cancelled first, so the request's own "cancelled" status change finds nothing to move back to draft.
+        await transition(id, version, 'cancelled', reason)
+        await approval.cancelForEntity('agreement', id)
+        await getAudit(ctx).record({
+          action: 'agreements.cancelled',
+          targetType: 'agreement',
+          targetId: id,
+          details: { ref: row.ref, from: row.status, reason },
+        })
+        if (row.createdBy && row.createdBy !== user.id)
+          await ctx.services.get(NOTIFICATIONS).notify({
+            userIds: [row.createdBy],
+            type: 'agreements.cancelled',
+            params: { ref: row.ref, reason },
+            link: `/agreements/${id}`,
+            subject: { type: 'agreement', id },
+          })
+        return loadAgreement(id)
+      })
       return c.json({ data: toAgreement(saved.row, saved.members, lang(c)) }, 200)
     },
   )

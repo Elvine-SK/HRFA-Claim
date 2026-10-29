@@ -158,3 +158,7 @@ export const agreementFields: FieldMap = {
   createdAt: { type: 'datetime', sortable: true },
   updatedAt: { type: 'datetime', sortable: true },
 }
+
+export const CancelSchema = z
+  .object({ version: z.number().int().min(1), reason: z.string().trim().min(1).max(500) })
+  .openapi('AgreementCancel')
