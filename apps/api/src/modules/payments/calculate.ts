@@ -109,13 +109,21 @@ export function calculate(
     if (km > 0 && !FUEL_FORMS.has(a.formType)) throw new CalcError('payments.fuel_not_overseas', path('privateCarKm'))
 
     const r = rates.get(m.eid) ?? null
-    if ((!noAllowance || km > 0) && !r) throw new CalcError('payments.rate_missing', path('departureDate'))
+    const paidDaily = !noAllowance && !dropDaily
+    const paysRateItem =
+      km > 0 ||
+      paidDaily ||
+      (!noAllowance && !sameDayTrip && !dropAccommodation) ||
+      (!noAllowance && a.formType === 'overseas')
+    if (paysRateItem && !r) throw new CalcError('payments.rate_missing', path('departureDate'))
 
     if (r && !noAllowance) {
       const basis = `${r.currency} rate from ${r.effectiveFrom}`
       if (sameDayTrip) {
-        if (r.sameDay === null) throw new CalcError('payments.same_day_rate_missing', path('departureDate'))
-        if (!dropDaily) push('same_day', r.currency, r.sameDay, days, mulAmount(r.sameDay, days), `same day ${basis}`)
+        if (!dropDaily) {
+          if (r.sameDay === null) throw new CalcError('payments.same_day_rate_missing', path('departureDate'))
+          push('same_day', r.currency, r.sameDay, days, mulAmount(r.sameDay, days), `same day ${basis}`)
+        }
       } else {
         if (!dropDaily) {
           const dailyTotal = mulAmount(r.daily, days)

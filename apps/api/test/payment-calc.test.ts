@@ -129,6 +129,12 @@ describe('payment calculation', () => {
     expect(rows(a, null)).toEqual([])
   })
 
+  it('no rate needed when the policy leaves the member no rate-based item', () => {
+    expect(rows(agreement({ policyOption: 'host_meals_accommodation' }), null)).toEqual([])
+    const sameDay = agreement({ formType: 'district', overnight: false, sameDayOver50km: true, policyOption: 'host_meals' })
+    expect(rows(sameDay, { ...D, sameDay: null })).toEqual([])
+  })
+
   it('form 2 same day without a same-day rate', () => {
     const a = agreement({ formType: 'district', overnight: false, sameDayOver50km: true })
     expect(() => rows(a, { ...D, sameDay: null })).toThrow(expect.objectContaining({ code: 'payments.same_day_rate_missing' }))
