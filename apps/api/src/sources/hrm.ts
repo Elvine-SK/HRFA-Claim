@@ -33,6 +33,20 @@ export interface HrmPositionTable {
   poststatus: string | null
 }
 
+export interface HrmProvinceTable {
+  provinceCode: string
+  countryCode: string
+  provinceLa: string | null
+  province: string | null
+}
+
+export interface HrmDistrictTable {
+  provinceCode: string
+  districtCode: string
+  nameLa: string | null
+  nameEn: string | null
+}
+
 export interface HrmBranchTable {
   branchId: string | null
   nameLa: string | null
@@ -91,6 +105,8 @@ export interface HrmDatabase {
   hrmEmployee: HrmEmployeeTable
   hrmPosition: HrmPositionTable
   hrmBranch: HrmBranchTable
+  hrmProvince: HrmProvinceTable
+  hrmDistrict: HrmDistrictTable
   hrmDepartment: HrmDepartmentTable
   hrmSection: HrmSectionTable
   hrmUnit: HrmUnitTable

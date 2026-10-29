@@ -1,6 +1,6 @@
 import { now, uuidv7 } from '@elvine-sk/platform-core'
 import { createdStamp, currentDb, inTransaction, sql, uuidBin } from '@elvine-sk/platform-db'
-import type { HrmEmployee } from '../hrm/employees.ts'
+import { findEmployee, type HrmEmployee } from '../hrm/employees.ts'
 import { EMPLOYEE_ROLE_KEY } from './migrations.ts'
 
 /** The platform user linked to an EID, if any. */
@@ -17,6 +17,12 @@ export async function linkedEid(userId: string): Promise<string | null> {
     .where('userId', '=', uuidBin(userId))
     .executeTakeFirst()
   return row?.eid ?? null
+}
+
+/** The selectable HRM employee behind a platform user; `null` for a local user or one HRM no longer lists. */
+export async function employeeOfUser(userId: string): Promise<HrmEmployee | null> {
+  const eid = await linkedEid(userId)
+  return eid ? findEmployee(eid) : null
 }
 
 /**

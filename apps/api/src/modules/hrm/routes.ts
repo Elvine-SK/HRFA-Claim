@@ -1,3 +1,4 @@
+import { requireUser } from '@elvine-sk/platform-auth'
 import { AppError } from '@elvine-sk/platform-core'
 import { paginate } from '@elvine-sk/platform-db'
 import {
@@ -12,10 +13,22 @@ import {
   requirePermission,
   sourcePicker,
   type ApiRouter,
+  z,
   type ModuleContext,
 } from '@elvine-sk/platform-server'
 import { findEmployee, selectableEmployees } from './employees.ts'
-import { EidParam, employeeOptionFields, HrmEmployeeOptionSchema, HrmEmployeeSchema } from './schema.ts'
+import { findProvince, listDistricts, listProvinces } from './geography.ts'
+import { searchPositions } from './positions.ts'
+import {
+  EidParam,
+  employeeOptionFields,
+  HrmEmployeeOptionSchema,
+  HrmEmployeeSchema,
+  HrmPositionOptionSchema,
+  PlaceSchema,
+  PositionQuery,
+  ProvinceParam,
+} from './schema.ts'
 
 const tags = ['HRM']
 const unavailable = { 503: jsonContent(ErrorSchema, 'HRM is unavailable') }
@@ -67,6 +80,61 @@ export function hrmRoutes(api: ApiRouter, ctx: ModuleContext) {
       const employee = await findEmployee(c.req.valid('param').eid)
       if (!employee) throw AppError.notFound()
       return c.json({ data: employee }, 200)
+    },
+  )
+
+  // Reference data for the agreement forms: any signed-in user.
+  api.openapi(
+    createRoute({
+      method: 'get',
+      path: '/hrm/provinces',
+      tags,
+      summary: 'Provinces of Laos',
+      responses: { 200: jsonContent(dataOf(z.array(PlaceSchema)), 'Provinces'), ...errorResponses(401), ...unavailable },
+    }),
+    async (c) => {
+      requireUser(c)
+      return c.json({ data: await listProvinces() }, 200)
+    },
+  )
+
+  api.openapi(
+    createRoute({
+      method: 'get',
+      path: '/hrm/provinces/{code}/districts',
+      tags,
+      summary: 'Districts of a province',
+      request: { params: ProvinceParam },
+      responses: {
+        200: jsonContent(dataOf(z.array(PlaceSchema)), 'Districts'),
+        ...errorResponses(401, 404),
+        ...unavailable,
+      },
+    }),
+    async (c) => {
+      requireUser(c)
+      const { code } = c.req.valid('param')
+      if (!(await findProvince(code))) throw AppError.notFound()
+      return c.json({ data: await listDistricts(code) }, 200)
+    },
+  )
+
+  api.openapi(
+    createRoute({
+      method: 'get',
+      path: '/hrm/positions',
+      tags,
+      summary: 'Find active HRM positions by the first letters of their name (20 at most)',
+      request: { query: PositionQuery },
+      responses: {
+        200: jsonContent(dataOf(z.array(HrmPositionOptionSchema)), 'Positions'),
+        ...errorResponses(401, 422),
+        ...unavailable,
+      },
+    }),
+    async (c) => {
+      requireUser(c)
+      return c.json({ data: await searchPositions(c.req.valid('query').q) }, 200)
     },
   )
 }

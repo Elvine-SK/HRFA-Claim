@@ -43,3 +43,15 @@ export const employeeOptionFields: FieldMap = {
   nameEng: { type: 'string', searchable: true },
   snameEng: { type: 'string', searchable: true },
 }
+
+export const PlaceSchema = z
+  .object({ code: z.string(), nameLo: z.string(), nameEn: z.string().nullable() })
+  .openapi('HrmPlace')
+
+export const ProvinceParam = z.object({ code: z.string().regex(/^\d{2}$/) })
+
+export const HrmPositionOptionSchema = z
+  .object({ code: z.string(), name: z.string(), postType: z.number().int().nullable() })
+  .openapi('HrmPositionOption')
+
+export const PositionQuery = z.object({ q: z.string().trim().min(1).max(50) })

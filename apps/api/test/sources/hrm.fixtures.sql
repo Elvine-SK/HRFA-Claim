@@ -19,7 +19,24 @@ INSERT INTO hrm_unit (BRANCH_ID, UNIT_ID, FULL_NAME_LA, FULL_NAME_EN) VALUES
 
 INSERT INTO hrm_position (PostID, PostName, PostNameEng, PostType, PostStatus, PostOrderBy) VALUES
   (12, 'ຫົວໜ້າພະແນກ', 'Head of Department', 7, 'Y', 1),
-  (30, 'ວິຊາການ', 'Officer', 9, 'Y', 2);
+  (30, 'ວິຊາການ', 'Officer', 9, 'Y', 2),
+  -- PostType 3 has no rank mapping in the app's seed.
+  (40, 'ຮອງຫົວໜ້າຂະແໜງ', 'Deputy Head of Section', 3, 'Y', 3);
+
+INSERT INTO hrm_province (PROVINCE_CODE, COUNTRY_CODE, PROVINCE_LA, PROVINCE) VALUES
+  ('01', 'LA', 'ນະຄອນຫຼວງວຽງຈັນ', 'Vientiane Prefecture'),
+  ('06', 'LA', 'ແຂວງ ຫຼວງພະບາງ', 'Luang Prabang Province'),
+  ('13', 'LA', 'ແຂວງ ສະຫວັນນະເຂດ', 'Savannakhet Province'),
+  -- Not Laos: never listed.
+  ('01', 'TH', 'ບາງກອກ', 'Bangkok');
+
+INSERT INTO hrm_district (PROVINCE_CODE, DISTRICT_CODE, NAME_LA, NAME_EN) VALUES
+  ('01', '0101', 'ເມືອງ ຈັນທະບູລີ', 'Chanthabuly District'),
+  ('01', '0102', 'ເມືອງ ສີໂຄດຕະບອງ', 'Sikhottabong District'),
+  ('06', '0601', 'ເມືອງ ຫຼວງພະບາງ', 'Luang Prabang District'),
+  ('06', '0602', 'ເມືອງ ຊຽງເງິນ', 'Xiengngeun District'),
+  ('13', '1301', 'ເມືອງ ໄກສອນ ພົມວິຫານ', 'Kaysone Phomvihane District'),
+  ('13', '1302', 'ເມືອງ ອຸທຸມພອນ', 'Outhoumphone District');
 
 INSERT INTO hrm_employee
   (EID, NAME_LAO, SNAME_LAO, NAME_ENG, SNAME_ENG, BRANCH_CODE, DEPARTMENT_CODE, SECTION_CODE, UNIT_CODE,
@@ -29,14 +46,33 @@ INSERT INTO hrm_employee
   ('10003', 'ຄຳຫຼ້າ', 'ວົງສາ', 'Khamla', 'Vongsa', '888010', '0101', NULL, NULL, '00', '30', 1, 'Y', 'A'),
   ('10004', 'ນ້ອຍ', 'ພົມມະຈັນ', 'Noy', 'Phommachanh', '888010', '0101', NULL, NULL, '00', '30', 1, 'N', 'P'),
   ('10005', 'ແສງ', 'ໄຊຍະວົງ', 'Saeng', 'Xayavong', '888010', '0101', NULL, NULL, '00', '30', 2, 'N', 'A'),
-  ('10006', 'ດາວ', 'ອິນທະວົງ', 'Dao', 'Inthavong', '888010', '0101', NULL, NULL, '01', '30', 1, 'N', 'A');
+  ('10006', 'ດາວ', 'ອິນທະວົງ', 'Dao', 'Inthavong', '888010', '0101', NULL, NULL, '01', '30', 1, 'N', 'A'),
+  -- Agreement tests: head office (888010) HR officer, section head, department head, management.
+  ('10010', 'ມະນີ', 'ສີລາ', 'Manee', 'Sila', '888010', '0101', '0201', NULL, '00', '30', 1, 'N', 'A'),
+  ('10011', 'ພອນ', 'ສະຫວັນ', 'Phone', 'Savanh', '888010', '0101', '0201', NULL, '00', '40', 1, 'N', 'A'),
+  ('10012', 'ຈັນ', 'ທະວີ', 'Chanh', 'Thavy', '888010', '0101', NULL, NULL, '00', '12', 1, 'N', 'A'),
+  ('10013', 'ສຸກ', 'ມາລາ', 'Souk', 'Mala', '888010', '0101', NULL, NULL, '00', '12', 1, 'N', 'A'),
+  -- Branch 888020: HR officer (LAK account only) and its approvers.
+  ('10020', 'ແກ້ວ', 'ພູມີ', 'Keo', 'Phoumy', '888020', '0101', NULL, NULL, '00', '30', 1, 'N', 'A'),
+  ('10021', 'ບົວ', 'ລະພາ', 'Boua', 'Lapha', '888020', '0101', NULL, NULL, '00', '40', 1, 'N', 'A'),
+  ('10022', 'ສີ', 'ວົງໄຊ', 'Sy', 'Vongxay', '888020', '0101', NULL, NULL, '00', '12', 1, 'N', 'A'),
+  ('10023', 'ຄຳ', 'ແສງ', 'Kham', 'Saeng', '888020', '0101', NULL, NULL, '00', '12', 1, 'N', 'A');
 
 INSERT INTO hrm_employee_account_currency (eid, ccy, account_no, account_name, is_deleted, created_at) VALUES
   ('10001', 'LAK', '0101-OLD', 'SOMPHONE KEOMANY', 0, '2025-01-01 09:00:00'),
   ('10001', 'LAK', '0101-NEW', 'SOMPHONE KEOMANY', 0, '2026-01-01 09:00:00'),
   ('10001', 'USD', '0102-USD', 'SOMPHONE KEOMANY', 0, '2026-01-01 09:00:00'),
   ('10002', 'LAK', '0201-GONE', 'BOUNMY SISAVATH', 1, '2026-02-01 09:00:00'),
-  ('10002', 'LAK', '0201-LAK', 'BOUNMY SISAVATH', 0, '2025-02-01 09:00:00');
+  ('10002', 'LAK', '0201-LAK', 'BOUNMY SISAVATH', 0, '2025-02-01 09:00:00'),
+  ('10010', 'LAK', '1010-LAK', 'MANEE SILA', 0, '2026-01-01 09:00:00'),
+  ('10010', 'USD', '1010-USD', 'MANEE SILA', 0, '2026-01-01 09:00:00'),
+  ('10011', 'LAK', '1011-LAK', 'PHONE SAVANH', 0, '2026-01-01 09:00:00'),
+  ('10011', 'USD', '1011-USD', 'PHONE SAVANH', 0, '2026-01-01 09:00:00'),
+  ('10012', 'LAK', '1012-LAK', 'CHANH THAVY', 0, '2026-01-01 09:00:00'),
+  ('10012', 'USD', '1012-USD', 'CHANH THAVY', 0, '2026-01-01 09:00:00'),
+  ('10013', 'LAK', '1013-LAK', 'SOUK MALA', 0, '2026-01-01 09:00:00'),
+  ('10013', 'USD', '1013-USD', 'SOUK MALA', 0, '2026-01-01 09:00:00'),
+  ('10020', 'LAK', '2020-LAK', 'KEO PHOUMY', 0, '2026-01-01 09:00:00');
 
 INSERT INTO tb_current_login (eid, session_token, start_time, last_act) VALUES
   ('10001', 'fixture-session-10001', NOW(), NOW()),

@@ -1,11 +1,13 @@
 import { dbTestsEnabled } from '@elvine-sk/platform-db/testing'
 import type { PlatformApp } from '@elvine-sk/platform-server'
-import type { TestClient } from '@elvine-sk/platform-server/testing'
+import { TestClient } from '@elvine-sk/platform-server/testing'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { activeAccount } from '../src/modules/hrm/accounts.ts'
 import { findEmployee } from '../src/modules/hrm/employees.ts'
 import { loggedInEids } from '../src/modules/hrm/logins.ts'
-import { adminClient, API, bootApp, DOWN_URL, role, userWith } from './helpers.ts'
+import { runWithContext, SYSTEM_CONTEXT } from '@elvine-sk/platform-db'
+import { employeeOfUser } from '../src/modules/auth-hrm/users.ts'
+import { adminClient, API, bootApp, DOWN_URL, hrmClient, role, userWith } from './helpers.ts'
 
 describe.skipIf(!dbTestsEnabled)('hrm read layer', () => {
   let platform: PlatformApp
@@ -103,6 +105,48 @@ describe.skipIf(!dbTestsEnabled)('hrm read layer', () => {
     expect(ok.status).toBe(200)
     expect(ok.body.data).toMatchObject({ eid: '10001', postType: 7 })
     expect((await reader.get(`${API}/hrm/employees/10003`)).status).toBe(404)
+  })
+})
+
+describe.skipIf(!dbTestsEnabled)('hrm geography and positions', () => {
+  let platform: PlatformApp
+  let admin: TestClient
+  let someone: TestClient
+
+  beforeAll(async () => {
+    platform = await bootApp()
+    admin = await adminClient(platform)
+    someone = (await userWith(platform, admin)).client
+  })
+  afterAll(async () => {
+    await platform?.ctx.db.destroy()
+  })
+
+  it('lists provinces and the districts of one', async () => {
+    const p = await someone.get(`${API}/hrm/provinces`)
+    expect(p.status).toBe(200)
+    expect(p.body.data.map((x: any) => x.code)).toEqual(['01', '06', '13'])
+    expect(p.body.data[0]).toEqual({ code: '01', nameLo: 'ນະຄອນຫຼວງວຽງຈັນ', nameEn: 'Vientiane Prefecture' })
+    const d = await someone.get(`${API}/hrm/provinces/06/districts`)
+    expect(d.body.data.map((x: any) => x.code)).toEqual(['0601', '0602'])
+    expect((await someone.get(`${API}/hrm/provinces/99/districts`)).status).toBe(404)
+  })
+
+  it('searches positions and needs a term', async () => {
+    expect((await someone.get(`${API}/hrm/positions?q=`)).status).toBe(422)
+    const res = await someone.get(`${API}/hrm/positions?q=${encodeURIComponent('ຫົວໜ້າ')}`)
+    expect(res.body.data[0]).toEqual({ code: '12', name: 'ຫົວໜ້າພະແນກ', postType: 7 })
+  })
+
+  it('needs sign-in', async () => {
+    expect((await new TestClient(platform).get(`${API}/hrm/provinces`)).status).toBe(401)
+    expect((await new TestClient(platform).get(`${API}/hrm/positions?q=a`)).status).toBe(401)
+  })
+
+  it('finds the employee of a signed-in HRM user', async () => {
+    const { userId, client } = await hrmClient(platform, admin, '10010')
+    expect((await runWithContext(SYSTEM_CONTEXT, () => employeeOfUser(userId)))?.branchCode).toBe('888010')
+    expect((await client.get(`${API}/hrm/me`)).status).toBe(200)
   })
 })
 
