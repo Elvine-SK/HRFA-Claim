@@ -110,6 +110,14 @@ describe.skipIf(!dbTestsEnabled)('payments (submit and approval)', () => {
     expect(ok.body.data.status).toBe('in_approval')
   })
 
+  it('refuses a payment with nothing to pay', async () => {
+    const p = await calculated({ policyOption: 'host_meals_accommodation' })
+    expect(p.totals).toEqual({})
+    const refused = await finance.post(url(`/${p.id}/submit`), {})
+    expect([refused.status, refused.body.error.code]).toEqual([422, 'payments.nothing_to_pay'])
+    expect((await get(p.id)).status).toBe('calculated')
+  })
+
   it('no approver', async () => {
     const a = await approvedAgreement(
       platform,

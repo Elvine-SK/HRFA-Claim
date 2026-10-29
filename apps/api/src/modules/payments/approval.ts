@@ -5,7 +5,7 @@ import { z, type ModuleContext } from '@elvine-sk/platform-server'
 import { branchRoleUsers } from '../agreements/approval.ts'
 import { HEAD_OFFICE_BRANCH } from '../agreements/types.ts'
 import { transition } from './procedures.ts'
-import { assertBillsComplete, findPayment } from './queries.ts'
+import { assertBillsComplete, assertSomethingToPay, findPayment } from './queries.ts'
 import { mayReadPayment } from './scope.ts'
 
 /** Approval step 2 of ກ18 (step 1, the finance officer, is the submission). */
@@ -41,6 +41,7 @@ export const paymentApproval = (ctx: () => ModuleContext) =>
         // Submitted or resubmitted: the bills are checked here, so every way in gets the check.
         if (row.status !== 'calculated') return
         await assertBillsComplete(id)
+        await assertSomethingToPay(id)
         await transition(id, row.version, 'in_approval')
         return
       }

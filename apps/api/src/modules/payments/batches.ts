@@ -13,7 +13,7 @@ import { countryByIso2, postingEntries, zoneOf, type ZoneCode } from '../travel-
 import type { PaymentItem } from './calculate.ts'
 import { buildPaymentLines, paymentRemark, type PostingMember, type UploadLine } from './posting.ts'
 import { transition } from './procedures.ts'
-import { findPayment, itemsOf, livePaymentOf, type PaymentRow } from './queries.ts'
+import { assertSomethingToPay, findPayment, itemsOf, livePaymentOf, type PaymentRow } from './queries.ts'
 import type { Component } from './types.ts'
 import { xlsxWriter } from './xlsx.ts'
 
@@ -175,6 +175,7 @@ export async function exportPayment(
     if (!row) throw AppError.notFound()
     // Checked first, so exporting again creates nothing and answers like the transition would.
     if (row.status !== 'approved') throw badTransition()
+    await assertSomethingToPay(id)
     const lines = await paymentLines(row, branch)
     await createBatch({
       id: batchId,

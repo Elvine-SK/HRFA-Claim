@@ -301,7 +301,7 @@ async function onPosted() {
       <template #body>
         <p class="mb-3 text-sm text-[var(--ui-text-muted)]">{{ t('payments.detail.markPostedText') }}</p>
         <UFormField :label="t('payments.field.coreRef')" :hint="t('payments.detail.optional')">
-          <UInput v-model="coreRef" class="w-full" maxlength="100" />
+          <UInput v-model="coreRef" class="w-full" maxlength="50" />
         </UFormField>
       </template>
       <template #footer>

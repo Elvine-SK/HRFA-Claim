@@ -37,8 +37,8 @@ describe.skipIf(!dbTestsEnabled)('payments (batch, upload file, posted)', () => 
   })
 
   /** An approved payment of a fresh head office agreement (approved as the system, without the workflow). */
-  async function approved() {
-    const a = await approvedAgreement(platform, hr, domestic({ members: [{ eid: '10082', isLeader: true }] }))
+  async function approved(over: Record<string, unknown> = {}) {
+    const a = await approvedAgreement(platform, hr, domestic({ members: [{ eid: '10082', isLeader: true }], ...over }))
     const res = await finance.post(url(), { agreementId: a.id })
     expect(res.status, JSON.stringify(res.body)).toBe(201)
     const id = res.body.data.id as string
@@ -135,6 +135,14 @@ describe.skipIf(!dbTestsEnabled)('payments (batch, upload file, posted)', () => 
       appDb().selectFrom('agreements').select('docNo').where('id', '=', uuidBin(p.agreementId)).executeTakeFirstOrThrow(),
     )
     for (const r of rows) expect(r.remark).toBe(`D ວັນ ໄຊ 4 ແຂວງ ຫຼວງພະບາງ ${docNo} 02/11/2026-05/11/2026 ${p.ref}`)
+  })
+
+  it('refuses to export a payment with nothing to pay', async () => {
+    const p = await approved({ policyOption: 'host_meals_accommodation' })
+    const res = await finance.post(url(`/${p.id}/export`), { version: p.version })
+    expect([res.status, res.body.error.code]).toEqual([422, 'payments.nothing_to_pay'])
+    expect(await batchCount(p.agreementId)).toBe(0)
+    expect((await finance.get(url(`/${p.id}`))).body.data.status).toBe('approved')
   })
 
   it('exports once', async () => {

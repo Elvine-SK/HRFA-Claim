@@ -24,6 +24,7 @@ import { exportPayment, findBatch, linesOf } from './batches.ts'
 import { transition } from './procedures.ts'
 import {
   assertBillsComplete,
+  assertSomethingToPay,
   createPayment,
   findPayment,
   livePaymentOf,
@@ -193,6 +194,7 @@ export function paymentRoutes(api: ApiRouter, ctx: ModuleContext) {
       // One transaction: with no approver the submission fails and the payment stays calculated.
       await inTransaction(async () => {
         await assertBillsComplete(id)
+        await assertSomethingToPay(id)
         const open = await approval.openRequestOf('payment', id)
         if (open?.status === 'returned') await approval.resubmit(open.id, user.id)
         else await approval.submit('payment', id, user.id, { workflow: c.req.valid('json').workflow })

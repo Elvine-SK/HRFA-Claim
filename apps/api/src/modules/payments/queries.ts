@@ -271,6 +271,12 @@ export async function assertBillsComplete(id: string): Promise<void> {
     throw new AppError('payments.bills_missing', 'A night from day 8 has no bill', { status: 422, details: errors })
 }
 
+/** 422 `payments.nothing_to_pay` when the payment has no items (e.g. the host pays everything). */
+export async function assertSomethingToPay(id: string): Promise<void> {
+  if ((await itemsOf(id)).length === 0)
+    throw new AppError('payments.nothing_to_pay', 'The payment has nothing to pay', { status: 422 })
+}
+
 /**
  * Finance's bills for nights from day 8 replace the stored ones, then the payment is calculated again. Every bill
  * must be for a night that takes one (422 `payments.night_invalid` at `bills.<n>.night`).

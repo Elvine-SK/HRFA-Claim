@@ -76,7 +76,6 @@ const DROPS_DAILY: ReadonlySet<PolicyOption> = new Set(['host_meals', 'host_meal
 const DROPS_ACCOMMODATION: ReadonlySet<PolicyOption> = new Set(['host_accommodation', 'host_meals_accommodation'])
 const FUEL_FORMS: ReadonlySet<FormType> = new Set(['domestic', 'district', 'border'])
 
-/** Cents of a possibly negative amount; no 13-digit check, so a too-large result reaches the amount_too_large test. */
 /**
  * Nights Finance enters a bill for (regulation 3.1.5): day 8 onward of a form 1 trip whose accommodation BCEL pays,
  * nights 8 … (days − 1) of the member. Night `n` is the night after day `n`.
@@ -89,6 +88,7 @@ export function billedNights(a: Pick<CalcAgreement, 'formType' | 'policyOption'>
   return nights
 }
 
+/** Cents of a possibly negative amount; no 13-digit check, so a too-large result reaches the amount_too_large test. */
 const signedCents = (a: Amount): bigint => {
   const [whole = '0', frac = ''] = a.replace(/^-/, '').split('.')
   const cents = BigInt(whole) * 100n + BigInt(frac.padEnd(2, '0'))
