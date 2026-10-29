@@ -44,6 +44,8 @@ export const agreementsModule = defineModule({
   migrations: agreementsMigrations,
   permissions: { agreement: ['read', 'create', 'cancel'] },
   lists: { agreements: { fields: agreementFields } },
+  // No permission: every signed-in user has the agreements they are a member of.
+  menus: [{ key: 'agreements', label: 'agreements.nav.title', to: '/agreements', icon: 'i-lucide-plane', group: 'workspace' }],
   approvalEntities: [agreementApproval(ctx)],
   approvalResolvers: agreementResolvers,
   fileEntities: [agreementFiles(ctx)],

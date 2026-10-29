@@ -133,5 +133,157 @@
       "gl": "GL",
       "seq": "SEQ"
     }
+  },
+  "agreements": {
+    "entity": "Travel agreement",
+    "nav": {
+      "title": "Travel agreements"
+    },
+    "list": {
+      "title": "Travel agreements",
+      "subtitle": "Agreements and notices of official travel (forms 1–4)",
+      "new": "New agreement",
+      "lookup": "REF or Doc.no, e.g. TA-2026-000001 or 0001.BCEL.888010.2026",
+      "open": "Open",
+      "entities": "agreements"
+    },
+    "new": {
+      "title": "New travel agreement"
+    },
+    "edit": {
+      "title": "Edit agreement",
+      "notDraft": "Only a draft can be edited. Cancel it and file a new agreement instead."
+    },
+    "detail": {
+      "title": "Travel agreement",
+      "files": "Signed copy",
+      "history": "History",
+      "cancel": "Cancel agreement",
+      "cancelTitle": "Cancel {ref}",
+      "cancelText": "The agreement keeps its REF and its Doc.no becomes free for the replacement. This cannot be undone.",
+      "cancelled": "Agreement cancelled"
+    },
+    "formType": {
+      "domestic": "Form 1: between provinces",
+      "district": "Form 2: between districts of a province",
+      "overseas": "Form 3: overseas (one country)",
+      "border": "Form 4: border zone"
+    },
+    "status": {
+      "draft": "Draft",
+      "in_approval": "In approval",
+      "approved": "Approved",
+      "cancelled": "Cancelled"
+    },
+    "policy": {
+      "bcel_all": "BCEL pays everything",
+      "host_travel": "Host pays travel",
+      "host_accommodation": "Host pays accommodation",
+      "host_meals": "Host pays meals",
+      "host_meals_accommodation": "Host pays meals and accommodation"
+    },
+    "field": {
+      "ref": "REF",
+      "docNo": "Doc.no",
+      "docDate": "Document date",
+      "subject": "Subject",
+      "title": "Title",
+      "reference": "Reference",
+      "formType": "Form",
+      "status": "Status",
+      "branch": "Branch",
+      "branchCode": "Branch",
+      "travel": "Travel dates",
+      "travelFrom": "From",
+      "travelTo": "To",
+      "where": "Route",
+      "fromProvince": "From province",
+      "toProvince": "To province",
+      "fromProvinceCode": "From province",
+      "toProvinceCode": "To province",
+      "province": "Province",
+      "provinceCode": "Province",
+      "fromDistrict": "From district",
+      "toDistrict": "To district",
+      "fromDistrictCode": "From district",
+      "toDistrictCode": "To district",
+      "overnight": "Overnight stay",
+      "sameDayOver50km": "50 km or more",
+      "country": "Country",
+      "countryIso2": "Country",
+      "borderRoute": "Border route",
+      "borderRouteId": "Border route",
+      "borderRouteOther": "Route (typed)",
+      "policy": "Who pays",
+      "policyOption": "Who pays",
+      "hasAdvance": "Group travel advance",
+      "cancelReason": "Reason for cancelling",
+      "createdAt": "Created",
+      "members": "Members",
+      "docNoLive": "Doc.no"
+    },
+    "form": {
+      "saveDraft": "Save draft",
+      "saved": "Saved as {ref}",
+      "docNoHint": "As on the paper: NNNN.BCEL.888010.YYYY, ທຄຕລ or / also work",
+      "oneCountry": "One country per agreement: a trip to two countries is two agreements",
+      "otherRoute": "Other (type the route)",
+      "notFound": "Not a selectable HRM employee",
+      "noActing": "Own position",
+      "yes": "Yes",
+      "no": "No",
+      "over50": "50 km or more",
+      "under50": "under 50 km"
+    },
+    "members": {
+      "title": "Members",
+      "add": "Add member"
+    },
+    "member": {
+      "eid": "EID",
+      "name": "Name",
+      "position": "Position",
+      "rank": "Rank",
+      "dates": "Dates",
+      "departure": "Departure",
+      "return": "Return",
+      "daysSubtracted": "Days subtracted",
+      "days": "Days (calculated → paid)",
+      "hostMeals": "Meals provided by the host",
+      "privateCarKm": "Private car, km",
+      "acting": "Filling the post of (ວ່າການ)",
+      "actingHint": "Search by the first letters of the position",
+      "actingAs": "filling: {name}",
+      "leader": "Team leader",
+      "deputy": "Deputy leader",
+      "holder": "Advance holder",
+      "role": "Role",
+      "remove": "Remove member"
+    }
+  },
+  "errors": {
+    "agreements_doc_no_invalid": "Doc.no reads NNNN.BCEL.<branch>.YYYY (or ທຄຕລ, or with /)",
+    "agreements_doc_no_year": "The Doc.no year is the year of the document date",
+    "agreements_doc_no_taken": "Another agreement that is not cancelled has this Doc.no",
+    "agreements_dates_invalid": "The dates do not fit",
+    "agreements_days_invalid": "More days subtracted than the trip has",
+    "agreements_meals_invalid": "More meals than three a day",
+    "agreements_unknown_place": "Not a known place",
+    "agreements_same_place": "Choose two different places",
+    "agreements_same_day": "A trip without an overnight stay is one day",
+    "agreements_required": "Required",
+    "agreements_route_twice": "Choose a route or type one, not both",
+    "agreements_member_not_found": "Not a selectable HRM employee",
+    "agreements_member_twice": "Already a member",
+    "agreements_unknown_position": "This HRM position does not exist",
+    "agreements_one_leader": "An agreement has one team leader",
+    "agreements_one_holder": "The advance has one holder",
+    "agreements_no_advance": "This agreement has no advance",
+    "agreements_leader_required": "Mark exactly one team leader",
+    "agreements_holder_required": "Mark the member who holds the advance",
+    "agreements_rank_unmapped": "This member's position has no rank yet: ask an administrator to map its PostType",
+    "agreements_account_missing": "No account in this currency in HRM",
+    "agreements_signed_copy_required": "Attach the signed agreement before submitting",
+    "agreements_not_draft": "Only a draft agreement can be changed"
   }
 }

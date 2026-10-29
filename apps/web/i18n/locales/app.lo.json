@@ -133,5 +133,157 @@
       "gl": "GL",
       "seq": "SEQ"
     }
+  },
+  "agreements": {
+    "entity": "ສັນຍາເດີນທາງ",
+    "nav": {
+      "title": "ສັນຍາເດີນທາງ"
+    },
+    "list": {
+      "title": "ສັນຍາເດີນທາງ",
+      "subtitle": "ສັນຍາ ແລະ ແຈ້ງການເດີນທາງໄປປະຕິບັດໜ້າທີ່ (ແບບຟອມ 1–4)",
+      "new": "ສ້າງສັນຍາໃໝ່",
+      "lookup": "REF ຫຼື ເລກທີເອກະສານ, ເຊັ່ນ TA-2026-000001 ຫຼື 0001.ທຄຕລ.888010.2026",
+      "open": "ເປີດ",
+      "entities": "ສັນຍາ"
+    },
+    "new": {
+      "title": "ສ້າງສັນຍາເດີນທາງໃໝ່"
+    },
+    "edit": {
+      "title": "ແກ້ໄຂສັນຍາ",
+      "notDraft": "ແກ້ໄຂໄດ້ສະເພາະສະບັບຮ່າງ. ໃຫ້ຍົກເລີກ ແລ້ວສ້າງສັນຍາໃໝ່ແທນ."
+    },
+    "detail": {
+      "title": "ສັນຍາເດີນທາງ",
+      "files": "ສຳເນົາທີ່ເຊັນແລ້ວ",
+      "history": "ປະຫວັດ",
+      "cancel": "ຍົກເລີກສັນຍາ",
+      "cancelTitle": "ຍົກເລີກ {ref}",
+      "cancelText": "ສັນຍາຈະເກັບ REF ໄວ້ ແລະ ເລກທີເອກະສານຈະໃຊ້ໄດ້ອີກສຳລັບສັນຍາແທນ. ບໍ່ສາມາດຍ້ອນຄືນໄດ້.",
+      "cancelled": "ຍົກເລີກສັນຍາແລ້ວ"
+    },
+    "formType": {
+      "domestic": "ແບບຟອມ 1: ລະຫວ່າງແຂວງ",
+      "district": "ແບບຟອມ 2: ລະຫວ່າງເມືອງພາຍໃນແຂວງ",
+      "overseas": "ແບບຟອມ 3: ຕ່າງປະເທດ (ໜຶ່ງປະເທດ)",
+      "border": "ແບບຟອມ 4: ເຂດຊາຍແດນ"
+    },
+    "status": {
+      "draft": "ສະບັບຮ່າງ",
+      "in_approval": "ກຳລັງອະນຸມັດ",
+      "approved": "ອະນຸມັດແລ້ວ",
+      "cancelled": "ຍົກເລີກແລ້ວ"
+    },
+    "policy": {
+      "bcel_all": "ທຄຕລ ຮັບຜິດຊອບທັງໝົດ",
+      "host_travel": "ເຈົ້າພາບຮັບຜິດຊອບການເດີນທາງ",
+      "host_accommodation": "ເຈົ້າພາບຮັບຜິດຊອບທີ່ພັກ",
+      "host_meals": "ເຈົ້າພາບຮັບຜິດຊອບອາຫານ",
+      "host_meals_accommodation": "ເຈົ້າພາບຮັບຜິດຊອບອາຫານ ແລະ ທີ່ພັກ"
+    },
+    "field": {
+      "ref": "REF",
+      "docNo": "ເລກທີເອກະສານ",
+      "docDate": "ວັນທີເອກະສານ",
+      "subject": "ເລື່ອງ",
+      "title": "ຫົວຂໍ້",
+      "reference": "ອີງຕາມ",
+      "formType": "ແບບຟອມ",
+      "status": "ສະຖານະ",
+      "branch": "ສາຂາ",
+      "branchCode": "ສາຂາ",
+      "travel": "ວັນທີເດີນທາງ",
+      "travelFrom": "ແຕ່",
+      "travelTo": "ຫາ",
+      "where": "ເສັ້ນທາງ",
+      "fromProvince": "ຈາກແຂວງ",
+      "toProvince": "ຫາແຂວງ",
+      "fromProvinceCode": "ຈາກແຂວງ",
+      "toProvinceCode": "ຫາແຂວງ",
+      "province": "ແຂວງ",
+      "provinceCode": "ແຂວງ",
+      "fromDistrict": "ຈາກເມືອງ",
+      "toDistrict": "ຫາເມືອງ",
+      "fromDistrictCode": "ຈາກເມືອງ",
+      "toDistrictCode": "ຫາເມືອງ",
+      "overnight": "ຄ້າງຄືນ",
+      "sameDayOver50km": "50 ກມ ຂຶ້ນໄປ",
+      "country": "ປະເທດ",
+      "countryIso2": "ປະເທດ",
+      "borderRoute": "ເສັ້ນທາງຊາຍແດນ",
+      "borderRouteId": "ເສັ້ນທາງຊາຍແດນ",
+      "borderRouteOther": "ເສັ້ນທາງ (ພິມເອງ)",
+      "policy": "ຜູ້ຮັບຜິດຊອບ",
+      "policyOption": "ຜູ້ຮັບຜິດຊອບ",
+      "hasAdvance": "ເງິນລ່ວງໜ້າຂອງຄະນະ",
+      "cancelReason": "ເຫດຜົນທີ່ຍົກເລີກ",
+      "createdAt": "ສ້າງເມື່ອ",
+      "members": "ສະມາຊິກ",
+      "docNoLive": "ເລກທີເອກະສານ"
+    },
+    "form": {
+      "saveDraft": "ບັນທຶກສະບັບຮ່າງ",
+      "saved": "ບັນທຶກເປັນ {ref} ແລ້ວ",
+      "docNoHint": "ຕາມເອກະສານ: NNNN.ທຄຕລ.888010.YYYY, ໃຊ້ BCEL ຫຼື / ກໍໄດ້",
+      "oneCountry": "ໜຶ່ງສັນຍາຕໍ່ໜຶ່ງປະເທດ: ເດີນທາງສອງປະເທດ ແມ່ນສອງສັນຍາ",
+      "otherRoute": "ອື່ນໆ (ພິມເສັ້ນທາງ)",
+      "notFound": "ບໍ່ແມ່ນພະນັກງານ HRM ທີ່ເລືອກໄດ້",
+      "noActing": "ຕຳແໜ່ງຂອງຕົນເອງ",
+      "yes": "ແມ່ນ",
+      "no": "ບໍ່",
+      "over50": "50 ກມ ຂຶ້ນໄປ",
+      "under50": "ຕ່ຳກວ່າ 50 ກມ"
+    },
+    "members": {
+      "title": "ສະມາຊິກ",
+      "add": "ເພີ່ມສະມາຊິກ"
+    },
+    "member": {
+      "eid": "EID",
+      "name": "ຊື່",
+      "position": "ຕຳແໜ່ງ",
+      "rank": "ຊັ້ນ",
+      "dates": "ວັນທີ",
+      "departure": "ວັນອອກເດີນທາງ",
+      "return": "ວັນກັບ",
+      "daysSubtracted": "ຈຳນວນມື້ທີ່ຫັກອອກ",
+      "days": "ຈຳນວນມື້ (ຄິດໄລ່ → ຈ່າຍ)",
+      "hostMeals": "ຄາບອາຫານທີ່ເຈົ້າພາບລ້ຽງ",
+      "privateCarKm": "ລົດສ່ວນຕົວ, ກມ",
+      "acting": "ວ່າການຕຳແໜ່ງ",
+      "actingHint": "ຄົ້ນຫາດ້ວຍຕົວອັກສອນທຳອິດຂອງຕຳແໜ່ງ",
+      "actingAs": "ວ່າການ: {name}",
+      "leader": "ຫົວໜ້າຄະນະ",
+      "deputy": "ຮອງຫົວໜ້າຄະນະ",
+      "holder": "ຜູ້ຖືເງິນລ່ວງໜ້າ",
+      "role": "ໜ້າທີ່",
+      "remove": "ລຶບສະມາຊິກ"
+    }
+  },
+  "errors": {
+    "agreements_doc_no_invalid": "ເລກທີເອກະສານຕ້ອງເປັນ NNNN.ທຄຕລ.<ສາຂາ>.YYYY (ຫຼື BCEL, ຫຼື ໃຊ້ /)",
+    "agreements_doc_no_year": "ປີຂອງເລກທີເອກະສານ ຕ້ອງແມ່ນປີຂອງວັນທີເອກະສານ",
+    "agreements_doc_no_taken": "ມີສັນຍາອື່ນທີ່ຍັງບໍ່ຖືກຍົກເລີກ ໃຊ້ເລກທີເອກະສານນີ້ແລ້ວ",
+    "agreements_dates_invalid": "ວັນທີບໍ່ຖືກຕ້ອງ",
+    "agreements_days_invalid": "ຫັກມື້ຫຼາຍກວ່າຈຳນວນມື້ເດີນທາງ",
+    "agreements_meals_invalid": "ຄາບອາຫານເກີນສາມຄາບຕໍ່ມື້",
+    "agreements_unknown_place": "ບໍ່ພົບສະຖານທີ່ນີ້",
+    "agreements_same_place": "ເລືອກສອງບ່ອນທີ່ຕ່າງກັນ",
+    "agreements_same_day": "ການເດີນທາງທີ່ບໍ່ຄ້າງຄືນ ແມ່ນໜຶ່ງມື້",
+    "agreements_required": "ຕ້ອງໃສ່",
+    "agreements_route_twice": "ເລືອກເສັ້ນທາງ ຫຼື ພິມເອງ, ບໍ່ແມ່ນທັງສອງ",
+    "agreements_member_not_found": "ບໍ່ແມ່ນພະນັກງານ HRM ທີ່ເລືອກໄດ້",
+    "agreements_member_twice": "ເປັນສະມາຊິກຢູ່ແລ້ວ",
+    "agreements_unknown_position": "ບໍ່ມີຕຳແໜ່ງນີ້ໃນ HRM",
+    "agreements_one_leader": "ສັນຍາມີຫົວໜ້າຄະນະໄດ້ຄົນດຽວ",
+    "agreements_one_holder": "ເງິນລ່ວງໜ້າມີຜູ້ຖືໄດ້ຄົນດຽວ",
+    "agreements_no_advance": "ສັນຍານີ້ບໍ່ມີເງິນລ່ວງໜ້າ",
+    "agreements_leader_required": "ໝາຍຫົວໜ້າຄະນະໜຶ່ງຄົນ",
+    "agreements_holder_required": "ໝາຍສະມາຊິກທີ່ຖືເງິນລ່ວງໜ້າ",
+    "agreements_rank_unmapped": "ຕຳແໜ່ງຂອງສະມາຊິກນີ້ຍັງບໍ່ມີຊັ້ນ: ໃຫ້ຜູ້ດູແລລະບົບກຳນົດ PostType",
+    "agreements_account_missing": "ບໍ່ມີບັນຊີສະກຸນເງິນນີ້ໃນ HRM",
+    "agreements_signed_copy_required": "ແນບສັນຍາທີ່ເຊັນແລ້ວກ່ອນສົ່ງ",
+    "agreements_not_draft": "ແກ້ໄຂໄດ້ສະເພາະສັນຍາທີ່ເປັນສະບັບຮ່າງ"
   }
 }
