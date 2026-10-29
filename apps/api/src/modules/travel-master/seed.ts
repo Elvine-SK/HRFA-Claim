@@ -5,8 +5,9 @@ import { RANK_CODES, type ZoneKind } from './lookups.ts'
  * FA-M.xlsx` (2026-10-20) and the 2026 regulation. Read only by the seed migration: changing a value here never
  * changes a database that already ran it (add a migration or publish a new set instead).
  *
- * FROZEN: this file and `countries.ts` are frozen once the testing server has run migration 202610220110. A
- * change goes in a new migration, never an edit here.
+ * FROZEN: each block of this file is frozen once its migration has run on the testing server: the master data
+ * and `countries.ts` by 202610220110, `SEED_POSTING_ENTRIES` by 202610300100. A change goes in a new migration,
+ * never an edit here.
  */
 
 /** The 2026 regulation's sets take effect from its first day. */

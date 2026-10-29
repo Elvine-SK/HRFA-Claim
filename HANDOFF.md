@@ -111,7 +111,7 @@ Reviews: a security review of the sign-in (0 Critical, 5 Important, all fixed) a
   - Day 8 onward (form 1, between provinces): nights 1–7 are paid at the rate, night 8 onward from Finance's bill
     for that night, capped at the rate. A billed night with no amount blocks submission (`payments.bills_missing`);
     Finance may enter `0`. Calculate leaves unbilled nights at 0.
-  - Meal deduction = per meal (daily total ÷ 3, rounded up to a whole unit) × host meals, capped at the member's
+  - Meal deduction = per meal (daily rate ÷ 3, rounded up to a whole unit) × host meals, capped at the member's
     daily total. A same-day trip (form 2, 50 km or more) has no meal deduction.
   - Fuel = `ceil(private-car km × fuel price ÷ km per litre)` in whole kip, on forms 1, 2 and 4 only; overseas
     answers `payments.fuel_not_overseas`. No fuel price on the date answers `payments.fuel_price_missing`.
@@ -123,11 +123,15 @@ Reviews: a security review of the sign-in (0 Critical, 5 Important, all fixed) a
   `/master/posting-entries` (`GET /travel-master/posting-entries?zoneKind=`). A change is a new migration until a
   second case needs editing on screen. An item with no posting entry is refused, not dropped.
 - Approval: workflow `apps/api/src/modules/payments/workflow.json` (one stage, `finance_section_head`, resolver
-  `payment.finance_section_head`: role holders of the payment's HRM branch). Submit needs all bills complete.
+  `payment.finance_section_head`: role holders of the payment's HRM branch). Submit needs all bills complete and at least one item:
+  a payment with nothing to pay (e.g. host pays meals and accommodation, no advance, no private car; or a same-day
+  trip under 50 km) is refused with 422 `payments.nothing_to_pay` at submit, in the approval hook and at export.
 - Posting batch (`batches.ts`): `POST /payments/{id}/export` on an approved payment writes one batch and its lines
   (debit lines from the posting entries, credit lines per member in member order) and sets `exported`. The batch
-  branch is the HRM branch of the exporting Finance user. A second export answers 409 (an existing batch, or
-  `resource.conflict` when two exports race). Export refuses an unbalanced batch.
+  branch is the HRM branch of the exporting Finance user. A normal second export answers 409
+  `payments.bad_transition`; the batch table also refuses a second batch per agreement (`posting.batch_exists`), and
+  two exports racing may surface as 409 `resource.conflict`. Export refuses an unbalanced batch, and a payment with
+  no items (422 `payments.nothing_to_pay`).
 - Upload file (`xlsx.ts`, exceljs 4.4.0, behind a small writer interface for proposal C2): columns `ACCOUNT, BRANCH,
   NAME, CCY, CHEQUE_NO, AMT, RVS_NO, DR_CR, REMARK`; `AMT` is a number cell formatted `#,##0.00`; `CHEQUE_NO` and
   `RVS_NO` empty. Account string = 6-digit branch + CCY + 10-digit GL + 4-digit SEQ, 23 characters, e.g.
@@ -139,8 +143,9 @@ Reviews: a security review of the sign-in (0 Critical, 5 Important, all fixed) a
   snapshot `name_lao` + `sname_lao`. If Finance objects to the prefix, strip it in the remark builder.
 - `POST /payments/{id}/posted`: Finance marks the batch posted, with an optional CORE reference (no direct posting
   to CORE in version 1; the process stops at the upload file).
-- Cancel after export: cancelling an agreement marks its exported payment `cancelled_after_export` and the batch
-  `cancelled_after_export_at` (spec §8, ກ16). The app produces no reversal file; Finance corrects in CORE.
+- Cancel: cancelling an agreement before export makes the payment `void` and cancels its approval request. An
+  exported or posted payment becomes `cancelled_after_export`, the batch is stamped `cancelled_after_export_at` and
+  Finance of the branch is notified (spec §8, ກ16). The app produces no reversal file; Finance corrects in CORE.
 - Web: `/payments` (list, REF/Doc.no box), `/payments/{id}` (checking table with nights and the day-8 marker, bills,
   recalculate, submit, approval card, export and download, posted confirmation, history), `/master/posting-entries`.
 - Set-up on a server: [`docs/deploy-testing.md`](docs/deploy-testing.md) "Payment approval".
@@ -249,8 +254,7 @@ Carry into plan 5:
     twice; a missing zone in `rates.ts` throws a plain `Error` (500).
   - Posting lines: a negative GL total reports `amount_too_large`; a null GL or SEQ, or an unknown GL, writes a
     malformed account or empty NAME; REMARK gets a double space when a part is empty or the agreement has no leader; a
-    payment netting to zero would export an empty batch; a blank CORE reference is stored as `''` but audited as null;
-    the batch insert has an audit entry but no `writeHistory` row.
+    payment netting to zero (items that cancel out, not an empty payment) still exports; the batch insert has an audit entry but no `writeHistory` row.
   - Cancel and approval: the cancel listener closes over the setup context (use the module `ctx()` accessor); the
     cancel paths from `in_approval`, `calculated` and `posted`, the no-op, and a listener error rolling back are
     untested, as are the bills re-check on `onStatusChange('pending')` and cancelled to void.
