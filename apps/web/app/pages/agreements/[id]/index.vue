@@ -94,6 +94,20 @@ async function confirmCancel() {
     notify.error(error)
   }
 }
+// Finance opens the payment of an approved agreement, calculating it the first time.
+const { lookup: findPayment, create: createPayment } = usePaymentMutations()
+const router = useRouter()
+const canPay = computed(() => a.value?.status === 'approved' && access.canSome('payment.calculate'))
+async function openPayment() {
+  if (!a.value) return
+  try {
+    const found = await findPayment.mutateAsync(a.value.ref)
+    const paymentId = found.paymentId ?? (await createPayment.mutateAsync(a.value.id)).id
+    await router.push(`/payments/${paymentId}`)
+  } catch (error) {
+    notify.error(error)
+  }
+}
 const isDraft = computed(() => a.value?.status === 'draft')
 const mayEdit = computed(() => isDraft.value && access.canSome('agreement.create'))
 </script>
@@ -107,6 +121,9 @@ const mayEdit = computed(() => isDraft.value && access.canSome('agreement.create
         <UBadge :color="STATUS_TONE[a.status]" variant="subtle" size="lg">{{ t(`agreements.status.${a.status}`) }}</UBadge>
         <UButton v-if="mayEdit" icon="i-lucide-pencil" variant="soft" :to="`/agreements/${a.id}/edit`">{{
           t('platform.actions.edit')
+        }}</UButton>
+        <UButton v-if="canPay" icon="i-lucide-banknote" :loading="findPayment.isPending.value || createPayment.isPending.value" @click="openPayment">{{
+          t('agreements.detail.payment')
         }}</UButton>
         <UButton v-if="canCancel" icon="i-lucide-ban" color="error" variant="soft" @click="cancelling = true">{{
           t('agreements.detail.cancel')

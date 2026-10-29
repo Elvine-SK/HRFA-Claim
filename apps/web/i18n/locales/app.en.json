@@ -132,6 +132,21 @@
       "line": "General ledger accounts used for posting (read only)",
       "gl": "GL",
       "seq": "SEQ"
+    },
+    "postingEntries": {
+      "title": "Posting entries",
+      "line": "Accounts debited and credited for each payment component (read only)",
+      "component": "Component",
+      "side": "Side",
+      "account": "Account",
+      "glName": "GL name",
+      "gl": "GL account",
+      "member": "Member's own account",
+      "kind": {
+        "domestic": "Domestic",
+        "border": "Border zone",
+        "overseas": "Overseas"
+      }
     }
   },
   "agreements": {
@@ -161,7 +176,8 @@
       "cancel": "Cancel agreement",
       "cancelTitle": "Cancel {ref}",
       "cancelText": "The agreement keeps its REF and its Doc.no becomes free for the replacement. This cannot be undone.",
-      "cancelled": "Agreement cancelled"
+      "cancelled": "Agreement cancelled",
+      "payment": "Payment"
     },
     "formType": {
       "domestic": "Form 1: between provinces",
@@ -259,6 +275,95 @@
       "holder": "Advance holder",
       "role": "Role",
       "remove": "Remove member"
+    }
+  },
+  "payments": {
+    "entity": "Travel payment",
+    "nav": {
+      "title": "Travel payments"
+    },
+    "list": {
+      "title": "Travel payments",
+      "subtitle": "Payments of approved agreements: check, approve, export and post",
+      "entities": "payments",
+      "calculate": "Calculate payment",
+      "readyTitle": "{ref} is approved and has no payment yet",
+      "readyText": "Calculate its payment to open the checking table.",
+      "noPayment": "{ref} has no payment, and only an approved agreement can be calculated by Finance"
+    },
+    "status": {
+      "calculated": "Calculated",
+      "in_approval": "In approval",
+      "approved": "Approved",
+      "exported": "Exported",
+      "posted": "Posted",
+      "void": "Void",
+      "cancelled_after_export": "Cancelled after export"
+    },
+    "field": {
+      "zone": "Zone",
+      "exportedAt": "Exported on",
+      "postedAt": "Posted on",
+      "coreRef": "CORE reference"
+    },
+    "component": {
+      "daily": "Daily allowance",
+      "same_day": "Same-day trip",
+      "meal_deduction": "Meals deduction",
+      "accommodation": "Accommodation",
+      "billed_accommodation": "Accommodation by bill",
+      "fuel": "Fuel",
+      "personal": "Personal allowance",
+      "advance": "Advance"
+    },
+    "member": {
+      "days": "{n} day | {n} days"
+    },
+    "item": {
+      "component": "Component",
+      "rate": "Rate",
+      "count": "Count",
+      "amount": "Amount",
+      "basis": "Basis",
+      "none": "Nothing to pay"
+    },
+    "bills": {
+      "title": "Bills for nights from day 8",
+      "hint": "Enter the amount on the bill for each night, or 0 if there is no bill.",
+      "night": "Night {n}",
+      "placeholder": "0.00",
+      "save": "Save bills",
+      "saved": "Bills saved",
+      "invalid": "Enter every bill as a number with at most two decimals, or 0"
+    },
+    "totals": {
+      "title": "Totals",
+      "none": "No amounts yet"
+    },
+    "batch": {
+      "title": "Upload file",
+      "file": "File",
+      "branch": "Branch",
+      "cancelledAt": "Cancelled after export on"
+    },
+    "detail": {
+      "title": "Travel payment",
+      "recalculate": "Recalculate",
+      "recalculated": "Payment recalculated",
+      "recalculateTitle": "Recalculate {ref}",
+      "recalculateText": "The payment is calculated again from the current rates. Bills you saved are kept.",
+      "export": "Create upload file",
+      "exportTitle": "Create the upload file for {ref}",
+      "exportText": "The payment is marked exported and the file for CORE is made from its posting entries. This cannot be undone.",
+      "exported": "Upload file created",
+      "download": "Download file",
+      "markPosted": "Mark as posted",
+      "markPostedTitle": "Mark {ref} as posted",
+      "markPostedText": "Confirm that the file was uploaded and posted in CORE. Add the CORE reference if you have it.",
+      "postedDone": "Payment marked as posted",
+      "optional": "Optional",
+      "cancelledAfterExport": "Cancelled after its upload file was made",
+      "cancelledAfterExportText": "The agreement was cancelled. No reversal file is made: settle it with the bank."
     }
   },
   "errors": {

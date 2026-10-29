@@ -10,6 +10,7 @@ const pages = [
   { id: 'flatRates', to: '/master/flat-rates', icon: 'i-lucide-fuel' },
   { id: 'advanceBands', to: '/master/advance-bands', icon: 'i-lucide-wallet' },
   { id: 'glAccounts', to: '/master/gl-accounts', icon: 'i-lucide-book-open' },
+  { id: 'postingEntries', to: '/master/posting-entries', icon: 'i-lucide-arrow-left-right' },
 ]
 </script>
 

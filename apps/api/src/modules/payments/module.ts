@@ -71,6 +71,16 @@ export const paymentsModule = defineModule({
   migrations: paymentsMigrations,
   permissions: { payment: ['read', 'calculate', 'export'] },
   lists: { payments: { fields: paymentFields } },
+  menus: [
+    {
+      key: 'payments',
+      label: 'payments.nav.title',
+      to: '/payments',
+      icon: 'i-lucide-banknote',
+      group: 'workspace',
+      permission: 'payment.read',
+    },
+  ],
   approvalEntities: [paymentApproval(ctx)],
   approvalResolvers: paymentResolvers,
   notificationTypes: { 'payments.approved': {}, 'payments.cancelled_after_export': {} },
