@@ -33,8 +33,17 @@ export async function mayReadPayment(ctx: ModuleContext, c: C, row: { branchCode
  * `payment.calculate` for a document of `branchCode`: 403 without the permission, 404 for another branch's
  * document (head office works for every branch), so other branches' numbers do not leak.
  */
-export async function requireCalculate(ctx: ModuleContext, c: C, branchCode: string): Promise<void> {
+export function requireCalculate(ctx: ModuleContext, c: C, branchCode: string): Promise<void> {
+  return requireFinance(ctx, c, 'payment.calculate', branchCode)
+}
+
+/** `payment.export` (the upload file and the posting confirmation), by the same rule as `requireCalculate`. */
+export function requireExport(ctx: ModuleContext, c: C, branchCode: string): Promise<void> {
+  return requireFinance(ctx, c, 'payment.export', branchCode)
+}
+
+async function requireFinance(ctx: ModuleContext, c: C, permission: string, branchCode: string): Promise<void> {
   const me = await caller(ctx, c)
-  if (!(await me.can('payment.calculate'))) throw AppError.forbidden()
+  if (!(await me.can(permission))) throw AppError.forbidden()
   if (!(me.isSuper || me.branch === HEAD_OFFICE_BRANCH || me.branch === branchCode)) throw AppError.notFound()
 }

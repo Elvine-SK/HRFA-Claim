@@ -340,11 +340,32 @@ export function toListItem(row: PaymentRow, lang: string) {
   }
 }
 
-/** The checking table: the header, each member with their items, day-8 flags, totals per currency and the bills. */
+/** The payment's posting batch, once exported. */
+async function batchOf(paymentId: string) {
+  const b = await appDb()
+    .selectFrom('postingBatches')
+    .select(['id', 'kind', 'branchCode', 'fileName', 'createdAt', 'createdBy', 'cancelledAfterExportAt'])
+    .where('sourceId', '=', uuidBin(paymentId))
+    .where('kind', '=', 'payment')
+    .executeTakeFirst()
+  return b
+    ? { ...b, createdAt: toIso(b.createdAt)!, cancelledAfterExportAt: toIso(b.cancelledAfterExportAt) }
+    : null
+}
+
+/**
+ * The checking table: the header, each member with their items, day-8 flags, totals per currency, the bills and,
+ * once exported, the batch.
+ */
 export async function loadPayment(id: string, lang: string) {
   const row = await findPayment(id)
   if (!row) throw AppError.notFound()
-  const [members, items, bills] = await Promise.all([membersOf(row.agreementId), itemsOf(id), billsOf(id)])
+  const [members, items, bills, batch] = await Promise.all([
+    membersOf(row.agreementId),
+    itemsOf(id),
+    billsOf(id),
+    batchOf(id),
+  ])
   const flags = [...billedNightsOf(row, members)].map(([eid, billedNights]) => ({ eid, billedNights }))
   return {
     ...toListItem(row, lang),
@@ -372,5 +393,6 @@ export async function loadPayment(id: string, lang: string) {
     flags,
     totals: totalsOf(items),
     bills,
+    batch,
   }
 }

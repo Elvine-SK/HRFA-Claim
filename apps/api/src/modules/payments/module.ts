@@ -20,6 +20,9 @@ const messages = {
     'posting.entry_missing': 'The posting entries of a component are missing, duplicated or on the same side',
     'posting.account_missing': 'A member has no account in the currency to be paid',
     'payments.bills_missing': 'A night from day 8 has no bill; enter 0 if there is none',
+    'payments.no_branch': 'Your HRM record has no branch, which the upload file needs for its GL accounts',
+    'posting.batch_exists': 'This agreement already has a posting batch of this kind',
+    'posting.unbalanced': 'Debits and credits of the batch differ in a currency',
     'notify.payments.approved.title': 'Payment {ref} is approved',
     'notify.payments.approved.body': 'It is ready for the upload file.',
   },
@@ -38,6 +41,9 @@ const messages = {
     'posting.entry_missing': 'ລາຍການບັນຊີຂອງປະເພດຄ່າໃຊ້ຈ່າຍຂາດ, ຊ້ຳກັນ ຫຼື ຢູ່ຝັ່ງດຽວກັນ',
     'posting.account_missing': 'ມີພະນັກງານທີ່ບໍ່ມີບັນຊີໃນສະກຸນເງິນທີ່ຈະຈ່າຍ',
     'payments.bills_missing': 'ມີຄືນຕັ້ງແຕ່ມື້ທີ 8 ທີ່ບໍ່ມີໃບບິນ; ໃສ່ 0 ຖ້າບໍ່ມີ',
+    'payments.no_branch': 'ຂໍ້ມູນ HRM ຂອງທ່ານບໍ່ມີສາຂາ ເຊິ່ງໄຟລ໌ອັບໂຫຼດຕ້ອງໃຊ້ສຳລັບບັນຊີ GL',
+    'posting.batch_exists': 'ສັນຍານີ້ມີຊຸດລົງບັນຊີປະເພດນີ້ແລ້ວ',
+    'posting.unbalanced': 'ຍອດ DR ແລະ CR ຂອງຊຸດລົງບັນຊີບໍ່ເທົ່າກັນໃນສະກຸນເງິນໃດໜຶ່ງ',
     'notify.payments.approved.title': 'ການຈ່າຍເງິນ {ref} ໄດ້ຮັບອະນຸມັດແລ້ວ',
     'notify.payments.approved.body': 'ພ້ອມສຳລັບໄຟລ໌ອັບໂຫຼດ.',
   },
@@ -62,6 +68,7 @@ export const paymentsModule = defineModule({
   approvalEntities: [paymentApproval(ctx)],
   approvalResolvers: paymentResolvers,
   notificationTypes: { 'payments.approved': {} },
+  auditActions: ['payments.exported', 'payments.downloaded', 'payments.posted'],
   messages,
   setup(c) {
     moduleCtx = c

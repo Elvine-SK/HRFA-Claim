@@ -174,6 +174,30 @@ export interface PaymentBillsTable {
   night: number
   amount: string
 }
+export interface PostingBatchesTable {
+  id: string
+  agreementId: string
+  kind: 'payment' | 'settlement'
+  sourceId: string
+  branchCode: string
+  fileName: string
+  createdAt: Date
+  createdBy: string | null
+  cancelledAfterExportAt: Date | null
+}
+export interface PostingLinesTable {
+  batchId: string
+  lineNo: number
+  account: string
+  branch: string
+  name: string
+  ccy: 'LAK' | 'USD'
+  chequeNo: string
+  amount: string
+  rvsNo: string
+  side: 'DR' | 'CR'
+  remark: string
+}
 // Platform tables the app reads directly.
 export interface RolesTable {
   id: string
@@ -228,6 +252,8 @@ export interface AppTables {
   payments: PaymentsTable
   paymentItems: PaymentItemsTable
   paymentBills: PaymentBillsTable
+  postingBatches: PostingBatchesTable
+  postingLines: PostingLinesTable
   roles: RolesTable
   rolePermissions: RolePermissionsTable
   userRoles: UserRolesTable

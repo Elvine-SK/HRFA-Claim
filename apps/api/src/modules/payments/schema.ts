@@ -86,6 +86,24 @@ export const PaymentListItemSchema = z
   })
   .openapi('PaymentListItem')
 
+/** The posting batch of an exported payment (spec §11); its file is `GET /posting-batches/{id}/file`. */
+export const PostingBatchSchema = z
+  .object({
+    id: z.string().uuid(),
+    kind: z.enum(['payment', 'settlement']),
+    /** The HRM branch of the Finance user who exported it (the GL accounts' prefix). */
+    branchCode: z.string(),
+    fileName: z.string(),
+    createdAt: IsoDateTime,
+    createdBy: z.string().uuid().nullable(),
+    cancelledAfterExportAt: IsoDateTime.nullable(),
+  })
+  .openapi('PostingBatch')
+
+export const PostedSchema = z
+  .object({ version: z.number().int().min(1), coreRef: z.string().trim().max(50).optional() })
+  .openapi('PaymentPosted')
+
 /** The checking table (spec §9). */
 export const PaymentSchema = PaymentListItemSchema.extend({
   members: z.array(PaymentMemberSchema),
@@ -94,6 +112,7 @@ export const PaymentSchema = PaymentListItemSchema.extend({
   /** Sum of the items per currency. */
   totals: z.record(z.string(), StoredAmount),
   bills: z.array(z.object({ eid: z.string(), night: z.number().int(), amount: StoredAmount })),
+  batch: PostingBatchSchema.nullable(),
 }).openapi('Payment')
 
 export const PaymentLookupQuery = z.object({ number: z.string().trim().min(1).max(40) })

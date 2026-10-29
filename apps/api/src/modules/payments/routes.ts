@@ -1,4 +1,5 @@
 import { APPROVAL } from '@elvine-sk/platform-approval'
+import { getAudit } from '@elvine-sk/platform-audit'
 import { SubmitBody } from '@elvine-sk/platform-approval/schemas'
 import { requireUser } from '@elvine-sk/platform-auth'
 import { AppError } from '@elvine-sk/platform-core'
@@ -15,9 +16,12 @@ import {
   ListQueryParams,
   type ApiRouter,
   type ModuleContext,
+  z,
 } from '@elvine-sk/platform-server'
 import { findAgreement, findByNumber } from '../agreements/queries.ts'
-import type { C } from '../agreements/scope.ts'
+import { caller, type C } from '../agreements/scope.ts'
+import { exportPayment, findBatch, linesOf } from './batches.ts'
+import { transition } from './procedures.ts'
 import {
   assertBillsComplete,
   createPayment,
@@ -39,9 +43,11 @@ import {
   PaymentLookupQuery,
   PaymentLookupSchema,
   PaymentSchema,
+  PostedSchema,
   VersionSchema,
 } from './schema.ts'
-import { mayReadPayment, requireCalculate, scopedPayments } from './scope.ts'
+import { mayReadPayment, requireCalculate, requireExport, scopedPayments } from './scope.ts'
+import { xlsxWriter } from './xlsx.ts'
 
 const tags = ['Payments']
 
@@ -190,6 +196,105 @@ export function paymentRoutes(api: ApiRouter, ctx: ModuleContext) {
         const open = await approval.openRequestOf('payment', id)
         if (open?.status === 'returned') await approval.resubmit(open.id, user.id)
         else await approval.submit('payment', id, user.id, { workflow: c.req.valid('json').workflow })
+      })
+      return c.json({ data: await loadPayment(id, lang(c)) }, 200)
+    },
+  )
+
+  api.openapi(
+    createRoute({
+      method: 'post',
+      path: '/payments/{id}/export',
+      tags,
+      summary:
+        "Create the approved payment's posting batch (the upload file for CORE, spec §11) and mark it exported",
+      request: { params: IdParam, ...jsonBody(VersionSchema) },
+      responses: { 200: jsonContent(dataOf(PaymentSchema), 'Exported'), ...errorResponses(401, 403, 404, 409, 422) },
+    }),
+    async (c) => {
+      requireUser(c)
+      const id = c.req.valid('param').id
+      const row = await readable(ctx, c, id)
+      await requireExport(ctx, c, row.branchCode)
+      // GL accounts carry the exporting Finance user's branch (spec §11).
+      const { branch } = await caller(ctx, c)
+      if (!branch)
+        throw new AppError('payments.no_branch', 'Your HRM record has no branch, which the upload file needs', {
+          status: 422,
+        })
+      await inTransaction(async () => {
+        const { batchId, lines } = await exportPayment(id, c.req.valid('json').version, branch)
+        await getAudit(ctx).record({
+          action: 'payments.exported',
+          targetType: 'payment',
+          targetId: id,
+          details: { ref: row.ref, batchId, lines },
+        })
+      })
+      return c.json({ data: await loadPayment(id, lang(c)) }, 200)
+    },
+  )
+
+  api.openapi(
+    createRoute({
+      method: 'get',
+      path: '/posting-batches/{id}/file',
+      tags,
+      summary: "Download a posting batch's upload file for CORE (.xlsx), written from its stored lines",
+      request: { params: IdParam },
+      responses: {
+        200: {
+          description: 'Upload file',
+          content: { [xlsxWriter.contentType]: { schema: z.string().openapi({ format: 'binary' }) } },
+        },
+        ...errorResponses(401, 404),
+      },
+    }),
+    async (c) => {
+      requireUser(c)
+      const id = c.req.valid('param').id
+      const batch = await findBatch(id)
+      if (!batch || !(await mayReadPayment(ctx, c, { branchCode: batch.documentBranch }))) throw AppError.notFound()
+      const file = await xlsxWriter.write(await linesOf(id))
+      await getAudit(ctx).record({
+        action: 'payments.downloaded',
+        targetType: 'payment',
+        targetId: batch.sourceId,
+        details: { ref: batch.ref, batchId: id },
+      })
+      return c.body(file as Uint8Array<ArrayBuffer>, 200, {
+        'content-type': xlsxWriter.contentType,
+        'content-disposition': `attachment; filename="${batch.fileName.replace(/[^\w.-]/g, '_')}"`,
+        'content-length': String(file.byteLength),
+        'cache-control': 'private, no-store',
+        'x-content-type-options': 'nosniff',
+      })
+    },
+  )
+
+  api.openapi(
+    createRoute({
+      method: 'post',
+      path: '/payments/{id}/posted',
+      tags,
+      summary: 'Confirm that the exported payment was posted in CORE, with its CORE reference if known',
+      request: { params: IdParam, ...jsonBody(PostedSchema) },
+      responses: { 200: jsonContent(dataOf(PaymentSchema), 'Posted'), ...errorResponses(401, 403, 404, 409, 422) },
+    }),
+    async (c) => {
+      requireUser(c)
+      const id = c.req.valid('param').id
+      const row = await readable(ctx, c, id)
+      await requireExport(ctx, c, row.branchCode)
+      const { version, coreRef } = c.req.valid('json')
+      await inTransaction(async () => {
+        await transition(id, version, 'posted', coreRef ?? null)
+        await getAudit(ctx).record({
+          action: 'payments.posted',
+          targetType: 'payment',
+          targetId: id,
+          details: { ref: row.ref, coreRef: coreRef || null },
+        })
       })
       return c.json({ data: await loadPayment(id, lang(c)) }, 200)
     },
