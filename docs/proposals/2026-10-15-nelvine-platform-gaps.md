@@ -1,6 +1,6 @@
 # nelvine-platform: Gaps and Proposed Modules
 
-Date: 2026-10-15, updated 2026-10-29 (C3 hook in generated apps, C5 date fields). Status: proposal for the
+Date: 2026-10-15, updated 2026-10-29 (C3 hook in generated apps, C5 date fields, C6 workflows shipped with an app). Status: proposal for the
 platform team.
 Shared copy: https://claude.ai/code/artifact/8abaea3e-cf9e-4ade-ad08-8b2de8493a84
 
@@ -23,6 +23,7 @@ platform, not for that one.
 | C3  | Organisation scope distinct from tenancy     | Core improvement | `authorization` docs + helper     | Every multi-branch or multi-department organisation                                |
 | C4  | Money and decimal helpers                    | Core improvement | `core`                            | Every app that handles amounts                                                     |
 | C5  | Date fields in the organisation's format     | Core improvement | `nuxt` (web template)             | Every app whose users write dates day first (dd/mm/yyyy)                           |
+| C6  | Approval workflows shipped with an app       | Core improvement | `approval` + `nelv` generator     | Every app that submits records for approval                                        |
 | N1  | Business calendar                            | Nice to have     | New package `calendar`            | Deadlines, SLAs, approval due times in working days                                |
 | N2  | Posting batches (ledger lines and export)    | Nice to have     | New package `posting`             | Every app that pays, charges or books entries                                      |
 | N3  | Printable documents and PDF                  | Nice to have     | New package `documents`           | Every app with paper forms, letters or receipts                                    |
@@ -171,6 +172,29 @@ package the app cannot add because the generated `package.json` files must not b
 Until then the first app has its own small field (typed dd/mm/yyyy, with the browser's calendar behind a button),
 with the same `YYYY-MM-DD` model, so moving to the platform field is a component swap.
 
+### C6. Approval workflows shipped with an app
+
+`approval` keeps workflows as data, created through `POST /api/v1/approval/workflows` and `.../{id}/versions`
+with `activate: true`. That suits workflows administrators design, but an app that registers an approval entity
+and its resolvers also has a workflow it cannot work without: until someone creates it, every submit fails. There
+is no supported way for the app to ship it:
+
+- A migration that inserts into the approval tables couples the app to the platform's internal schema, which
+  `nelv update` may change, and a migration that has run cannot be edited afterwards.
+- So the first app keeps its workflow in a JSON file and lists a manual step for each install (create it in
+  Administration → Approvals from that file, publish it, make it the default). The tests post the same file through
+  the API. Each further workflow (payment checking, settlement) adds another manual step.
+
+Proposed: let a module declare its workflows, for example `approvalWorkflows: [{ key, entityType, name,
+definition, default: true }]` on `defineModule` (or a JSON file the module points to). On start, or in
+`migrate`, the platform creates each declared workflow that does not exist yet, through its own service, and makes
+it the default when asked. It never overwrites a workflow that exists: from then on administrators own it, edit
+it and publish new versions as today. A `nelv` or `platform` command that re-applies a declared workflow on
+request (new version, activated) covers the case where the app changes its shipped definition.
+
+Until then the first app can add its own idempotent set-up command that calls the approval service, so the install
+step is one command instead of a manual form.
+
 ## Nice to have
 
 An app can build these locally first. They should move into the platform once a second app needs them.
@@ -203,8 +227,9 @@ fields, stores the source version, and shows a "source changed since submit" war
 
 1. M1 external data sources and M2 sign-in handoff: an app cannot show a screen without them.
 2. M3 document numbering and M4 reference data: needed for the first forms and the first calculation.
-3. C1 approval routing, C3 subject attributes in generated apps, C4 money helpers and C5 date fields: apps can
-   bridge with a custom resolver, their own scope code and local helpers until then.
+3. C1 approval routing, C3 subject attributes in generated apps, C4 money helpers, C5 date fields and C6
+   workflows shipped with an app: apps can bridge with a custom resolver, their own scope code, local helpers and
+   a set-up step until then.
 4. C2 file writers, N1 calendar, N2 posting batches: built inside the first app, moved up when a second app needs
    them.
 5. C3 unit-tree helper and docs, N3 PDF, N4 snapshot helper: as demand appears.
@@ -218,5 +243,6 @@ moving them into the platform is a package swap rather than a rewrite.
 - M2: one-time code, signed token, or both? Who owns the host-side part (table and redirect) for each host?
 - M3: are gaps in a sequence acceptable by default, or must every number be used?
 - M4: one generic `refdata` package, or a pattern each module follows with shared helpers?
+- C6: should declared workflows be created on start, in `migrate`, or only by an explicit command?
 - C1: should the organisation tree come from a data source (M1) or be kept in the platform?
 - N2: does the platform want to own an accounting model at all, or only the batch and export lifecycle?
