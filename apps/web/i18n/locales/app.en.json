@@ -262,7 +262,7 @@
     }
   },
   "errors": {
-    "agreements_doc_no_invalid": "Doc.no reads NNNN.BCEL.<branch>.YYYY (or ທຄຕລ, or with /)",
+    "agreements_doc_no_invalid": "Doc.no reads NNNN.BCEL.BRANCH.YYYY (or ທຄຕລ, or with /)",
     "agreements_doc_no_year": "The Doc.no year is the year of the document date",
     "agreements_doc_no_taken": "Another agreement that is not cancelled has this Doc.no",
     "agreements_dates_invalid": "The dates do not fit",

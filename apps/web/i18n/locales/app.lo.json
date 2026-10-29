@@ -262,7 +262,7 @@
     }
   },
   "errors": {
-    "agreements_doc_no_invalid": "ເລກທີເອກະສານຕ້ອງເປັນ NNNN.ທຄຕລ.<ສາຂາ>.YYYY (ຫຼື BCEL, ຫຼື ໃຊ້ /)",
+    "agreements_doc_no_invalid": "ເລກທີເອກະສານຕ້ອງເປັນ NNNN.ທຄຕລ.ສາຂາ.YYYY (ຫຼື BCEL, ຫຼື ໃຊ້ /)",
     "agreements_doc_no_year": "ປີຂອງເລກທີເອກະສານ ຕ້ອງແມ່ນປີຂອງວັນທີເອກະສານ",
     "agreements_doc_no_taken": "ມີສັນຍາອື່ນທີ່ຍັງບໍ່ຖືກຍົກເລີກ ໃຊ້ເລກທີເອກະສານນີ້ແລ້ວ",
     "agreements_dates_invalid": "ວັນທີບໍ່ຖືກຕ້ອງ",
