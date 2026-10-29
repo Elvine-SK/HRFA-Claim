@@ -88,4 +88,4 @@ docker exec -i hr-fam-mariadb-1 mariadb -uroot -proot_dev hr_fam_src_hrm < apps/
 docker exec -i hr-fam-mariadb-1 mariadb -uroot -proot_dev hr_fam_src_hrm < apps/api/test/sources/hrm.fixtures.sql
 ```
 
-Then `http://localhost:3001/api/v1/auth/hrm?code=valid-10001` signs in as the fixture employee `10001` (once per load).
+Then `http://localhost:3335/api/v1/auth/hrm?code=valid-10001` signs in as the fixture employee `10001` (once per load).

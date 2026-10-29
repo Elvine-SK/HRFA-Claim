@@ -14,8 +14,8 @@ current) and describe the recommended way to build on it. Follow them unless thi
 ```sh
 podman compose up -d                  # MariaDB on :3306 (docker compose works too)
 pnpm run migrate
-pnpm run dev:api        # API on :3001
-pnpm run dev:web        # web on :3000
+pnpm run dev:api        # API on :3335
+pnpm run dev:web        # web on :3336
 pnpm run typecheck
 RUN_DB_TESTS=1 pnpm run test   # TEST_DATABASE_URL: see docs/platform/testing.md
 pnpm run openapi        # after changing routes; then: cd apps/web && pnpm run api:types

@@ -24,12 +24,16 @@ const areas = [
 export default defineNuxtConfig({
   modules: ['@nuxt/ui', '@nuxtjs/i18n', '@elvine-sk/platform-nuxt'],
 
-  // The web app is a static SPA (spec §2); in dev, Nitro forwards /api to the API on :3001 (its PORT).
+  // The web app is a static SPA (spec §2); in dev, Nitro forwards /api to the API on :3335 (its PORT); the dev server runs on :3336.
   ssr: false,
   compatibilityDate: '2026-10-01',
-  devtools: { enabled: false },
+  devtools: { enabled: true },
   nitro: {
-    devProxy: { '/api': { target: 'http://localhost:3001/api', changeOrigin: true } },
+    devProxy: { '/api': { target: 'http://localhost:3335/api', changeOrigin: true } },
+  },
+
+  devServer: {
+    port: 3336,
   },
 
   // HRM's login page (NUXT_PUBLIC_HRM_LOGIN_URL): where the sign-in page sends users (middleware/hrm-sign-in.global.ts).

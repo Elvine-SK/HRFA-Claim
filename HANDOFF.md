@@ -23,13 +23,13 @@ HRM; plan 2 the master data and the PM2 bundle. Next: plan 3 (agreements).
 docker compose up -d                 # MariaDB on localhost:3308 (3306 is taken on this machine)
 pnpm install && pnpm migrate
 # local HRM copy (fixture employees), see docs/hrm-handoff.md "Local copy"
-pnpm dev:api                         # :3001
-pnpm dev:web                         # :3000
+pnpm dev:api                         # :3335
+pnpm dev:web                         # :3336
 tooling/deploy/bundle.sh --hrm-login-url <URL>   # build/hr-fam-<sha>.tar.gz for the testing server
 RUN_DB_TESTS=1 pnpm test             # 89 tests; the test DBs are built on :3308 by global-setup
 ```
 
-`http://localhost:3001/api/v1/auth/hrm?code=valid-10001` signs in as fixture employee `10001` once per load of the
+`http://localhost:3335/api/v1/auth/hrm?code=valid-10001` signs in as fixture employee `10001` once per load of the
 local HRM copy. `/auth/sign-in?local=1` is the platform sign-in for the bootstrap administrator
 (`pnpm --filter ./apps/api platform admin:create`).
 
