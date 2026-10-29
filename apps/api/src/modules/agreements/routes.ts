@@ -1,3 +1,5 @@
+import { APPROVAL } from '@elvine-sk/platform-approval'
+import { SubmitBody } from '@elvine-sk/platform-approval/schemas'
 import { requireUser } from '@elvine-sk/platform-auth'
 import { AppError } from '@elvine-sk/platform-core'
 import { paginate } from '@elvine-sk/platform-db'
@@ -24,6 +26,7 @@ import {
   historyOfAgreement,
   loadAgreement,
   membersOf,
+  notDraft,
   toAgreement,
   toListItem,
   updateDraft,
@@ -190,6 +193,34 @@ export function agreementRoutes(api: ApiRouter, ctx: ModuleContext) {
       const id = c.req.valid('param').id
       await readable(ctx, c, id)
       return c.json({ data: await historyOfAgreement(id) }, 200)
+    },
+  )
+
+  api.openapi(
+    createRoute({
+      method: 'post',
+      path: '/agreements/{id}/submit',
+      tags,
+      summary: 'Submit a draft for approval (or resubmit one a reviewer returned); checks it and snapshots HRM data',
+      request: { params: IdParam, ...jsonBody(SubmitBody) },
+      responses: {
+        200: jsonContent(dataOf(AgreementSchema), 'Submitted'),
+        ...errorResponses(401, 403, 404, 409, 422),
+        ...unavailable,
+      },
+    }),
+    async (c) => {
+      const { user } = requireUser(c)
+      const id = c.req.valid('param').id
+      const { row } = await readable(ctx, c, id)
+      if (!(await mayEdit(ctx, c, row))) throw AppError.forbidden()
+      if (row.status !== 'draft') throw notDraft()
+      const approval = ctx.services.get(APPROVAL)
+      const open = await approval.openRequestOf('agreement', id)
+      if (open?.status === 'returned') await approval.resubmit(open.id, user.id)
+      else await approval.submit('agreement', id, user.id, { workflow: c.req.valid('json').workflow })
+      const saved = await loadAgreement(id)
+      return c.json({ data: toAgreement(saved.row, saved.members, lang(c)) }, 200)
     },
   )
 }

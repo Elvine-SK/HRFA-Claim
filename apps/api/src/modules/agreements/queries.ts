@@ -110,7 +110,7 @@ const invalid = (path: string, code: string, message: string): FieldError => ({ 
 type Snapshot = Omit<MemberRow, 'id' | 'agreementId' | 'sortOrder'>
 
 /** A member row filled from HRM (spec §5): names, organisation, position, rank and accounts. */
-async function snapshotMember(m: MemberInput, from: string, to: string, n: number, errors: FieldError[]) {
+export async function snapshotMember(m: MemberInput, from: string, to: string, n: number, errors: FieldError[]) {
   const at = (field: string) => `members.${n}.${field}`
   const employee = await findEmployee(m.eid)
   if (!employee) {
@@ -429,4 +429,69 @@ export async function historyOfAgreement(id: string) {
     changes: fromJson<Record<string, [unknown, unknown]>>(r.changes),
     changedAt: toIso(r.changedAt),
   }))
+}
+
+// Submission (spec §5, §8)
+
+const fromRow = (m: MemberRow): MemberInput => ({
+  eid: m.eid,
+  departureDate: m.departureDate,
+  returnDate: m.returnDate,
+  daysSubtracted: m.daysSubtracted,
+  isLeader: m.isLeader,
+  isDeputy: m.isDeputy,
+  isAdvanceHolder: m.isAdvanceHolder,
+  hostMeals: m.hostMeals,
+  privateCarKm: m.privateCarKm,
+  actingPositionCode: m.actingPositionCode,
+})
+
+async function zoneOfAgreement(row: AgreementRow): Promise<string | null> {
+  if (row.formType === 'domestic' || row.formType === 'district') return 'D'
+  if (row.formType === 'border') return 'OB1'
+  return (await countryByIso2(row.countryIso2!))?.zoneCode ?? null
+}
+
+/**
+ * Refreshes every member's HRM snapshot and the agreement's zone, then checks what a submission needs: one
+ * leader, one advance holder when there is an advance, a rank for every member, the accounts the payment will use,
+ * and a signed copy. Throws 422 with every problem; on success the refreshed rows are stored.
+ */
+export async function prepareSubmission(id: string): Promise<void> {
+  const { row, members } = await loadAgreement(id)
+  const errors: FieldError[] = []
+  const fresh: Snapshot[] = []
+  for (const [n, m] of members.entries()) {
+    const s = await snapshotMember(fromRow(m), row.travelFrom, row.travelTo, n, errors)
+    if (s) fresh.push(s)
+  }
+  if (fresh.filter((m) => m.isLeader).length !== 1)
+    errors.push(invalid('members', 'agreements.leader_required', 'Mark exactly one team leader'))
+  if (row.hasAdvance && fresh.filter((m) => m.isAdvanceHolder).length !== 1)
+    errors.push(invalid('members', 'agreements.holder_required', 'Mark the member who holds the advance'))
+  const overseas = row.formType === 'overseas'
+  for (const [n, m] of fresh.entries()) {
+    const at = (field: string) => `members.${n}.${field}`
+    if (!m.rankCode)
+      errors.push(invalid(at('eid'), 'agreements.rank_unmapped', `PostType ${m.postType ?? '-'} has no rank yet`))
+    const missing = (field: 'accountLak' | 'accountUsd', ccy: string) =>
+      errors.push(invalid(at(field), 'agreements.account_missing', `No ${ccy} account in HRM`))
+    if (!overseas && !m.accountLak) missing('accountLak', 'LAK')
+    if (overseas && !m.accountUsd) missing('accountUsd', 'USD')
+    else if (row.formType === 'border' && row.hasAdvance && m.isAdvanceHolder && !m.accountUsd)
+      missing('accountUsd', 'USD')
+  }
+  const files = await appDb()
+    .selectFrom('files')
+    .select('id')
+    .where('entityType', '=', 'agreement')
+    .where('entityId', '=', uuidBin(id))
+    .where('deletedAt', 'is', null)
+    .executeTakeFirst()
+  if (!files) errors.push(invalid('files', 'agreements.signed_copy_required', 'Attach the signed agreement'))
+  const zoneCode = await zoneOfAgreement(row)
+  if (!zoneCode) errors.push(invalid('countryIso2', 'agreements.unknown_place', 'Not a known place'))
+  if (errors.length) throw AppError.validation(errors)
+  await writeMembers(id, fresh)
+  await appDb().updateTable('agreements').set({ zoneCode }).where('id', '=', uuidBin(id)).execute()
 }

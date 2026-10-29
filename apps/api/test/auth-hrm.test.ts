@@ -192,7 +192,8 @@ describe.skipIf(!dbTestsEnabled)('auth-hrm logout sync', () => {
     const sessions = platform.ctx.services.get(AUTH).sessions
     const id = await sessionFor('10002') // missing from tb_current_login; 10001 is present
     await expect(
-      runWithContext(SYSTEM_CONTEXT, () => syncHrmSessions(sessions, { guard: { minUsers: 1, maxMissingShare: 0.3 } })),
+      // Share 0: one missing user is too many, however many sessions other test files left in the shared database.
+      runWithContext(SYSTEM_CONTEXT, () => syncHrmSessions(sessions, { guard: { minUsers: 1, maxMissingShare: 0 } })),
     ).rejects.toThrow(/refusing/i)
     expect(await runWithContext(SYSTEM_CONTEXT, () => sessions.isActive(id))).toBe(true)
     expect(await runWithContext(SYSTEM_CONTEXT, () => syncHrmSessions(sessions))).toBe(1)

@@ -139,6 +139,33 @@ export interface RolePermissionsTable {
   roleId: string
   permissionKey: string
 }
+export interface UserRolesTable {
+  userId: string
+  roleId: string
+}
+export interface GroupMembersTable {
+  groupId: string
+  userId: string
+}
+export interface GroupRolesTable {
+  groupId: string
+  roleId: string
+}
+export interface UsersTable {
+  id: string
+  status: string
+  deletedAt: Date | null
+}
+export interface HrmUserLinksTable {
+  eid: string
+  userId: string
+}
+export interface FilesTable {
+  id: string
+  entityType: string | null
+  entityId: string | null
+  deletedAt: Date | null
+}
 
 export interface AppTables {
   travelRanks: TravelRanksTable
@@ -155,6 +182,12 @@ export interface AppTables {
   agreementRefCounters: AgreementRefCountersTable
   roles: RolesTable
   rolePermissions: RolePermissionsTable
+  userRoles: UserRolesTable
+  groupMembers: GroupMembersTable
+  groupRoles: GroupRolesTable
+  users: UsersTable
+  hrmUserLinks: HrmUserLinksTable
+  files: FilesTable
 }
 
 /** `currentDb()` typed with the app's tables. */

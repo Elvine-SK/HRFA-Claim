@@ -1,0 +1,24 @@
+{
+  "key": "agreement",
+  "entityType": "agreement",
+  "name": "Travel agreement (spec §8)",
+  "definition": {
+    "stages": [
+      {
+        "key": "section_head",
+        "steps": [{ "key": "section_head", "approvers": { "resolver": "agreement.section_head" }, "completion": "any" }]
+      },
+      {
+        "key": "department_head",
+        "steps": [
+          { "key": "department_head", "approvers": { "resolver": "agreement.department_head" }, "completion": "any" }
+        ]
+      },
+      {
+        "key": "management",
+        "steps": [{ "key": "management", "approvers": { "resolver": "agreement.management" }, "completion": "any" }]
+      }
+    ],
+    "rules": { "allowSelfApproval": false, "rejectEndsRequest": true }
+  }
+}

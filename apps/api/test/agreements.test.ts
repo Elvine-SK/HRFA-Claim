@@ -4,40 +4,13 @@ import type { PlatformApp } from '@elvine-sk/platform-server'
 import type { TestClient } from '@elvine-sk/platform-server/testing'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { transition } from '../src/modules/agreements/procedures.ts'
-import { appDb } from '../src/shared/db.ts'
+import { domesticBodies, roleIds } from './agreement-fixtures.ts'
 import { adminClient, API, bootApp, hrmClient } from './helpers.ts'
 
 const url = (p = '') => `${API}/agreements${p}`
 
-/** Role ids by key, as the migration seeded them. */
-export async function roleIds(...keys: string[]) {
-  const rows = await runWithContext(SYSTEM_CONTEXT, () =>
-    appDb().selectFrom('roles').select(['id', 'key']).where('key', 'in', keys).execute(),
-  )
-  return keys.map((k) => rows.find((r) => r.key === k)!.id)
-}
-
-let seq = 100
-/** A form 1 body with a fresh Doc.no; `over` replaces header fields. */
-export function domestic(over: Record<string, unknown> = {}) {
-  seq += 1
-  return {
-    formType: 'domestic',
-    subject: 'Branch audit',
-    title: 'Audit of the Luang Prabang branch',
-    reference: null,
-    docNo: `${seq}.BCEL.888010.2026`,
-    docDate: '2026-10-29',
-    travelFrom: '2026-11-02',
-    travelTo: '2026-11-05',
-    fromProvinceCode: '01',
-    toProvinceCode: '06',
-    policyOption: 'bcel_all',
-    hasAdvance: false,
-    members: [{ eid: '10010', isLeader: true }],
-    ...over,
-  }
-}
+const domestic = domesticBodies(2026)
+let seq = 500 // Doc.nos this file builds by hand
 
 describe.skipIf(!dbTestsEnabled)('agreements (drafts)', () => {
   let platform: PlatformApp

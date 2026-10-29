@@ -56,7 +56,21 @@ INSERT INTO hrm_employee
   ('10020', 'ແກ້ວ', 'ພູມີ', 'Keo', 'Phoumy', '888020', '0101', NULL, NULL, '00', '30', 1, 'N', 'A'),
   ('10021', 'ບົວ', 'ລະພາ', 'Boua', 'Lapha', '888020', '0101', NULL, NULL, '00', '40', 1, 'N', 'A'),
   ('10022', 'ສີ', 'ວົງໄຊ', 'Sy', 'Vongxay', '888020', '0101', NULL, NULL, '00', '12', 1, 'N', 'A'),
-  ('10023', 'ຄຳ', 'ແສງ', 'Kham', 'Saeng', '888020', '0101', NULL, NULL, '00', '12', 1, 'N', 'A');
+  ('10023', 'ຄຳ', 'ແສງ', 'Kham', 'Saeng', '888020', '0101', NULL, NULL, '00', '12', 1, 'N', 'A'),
+  -- Approval tests (their own people, so roles granted there do not reach other test files).
+  -- Head office: HR officer, section head (unmapped PostType 3), department head, management, finance, an officer.
+  ('10030', 'ວັນ', 'ໄຊ', 'Vanh', 'Xay', '888010', '0101', NULL, NULL, '00', '12', 1, 'N', 'A'),
+  ('10031', 'ລີ', 'ພອນ', 'Ly', 'Phone', '888010', '0101', NULL, NULL, '00', '40', 1, 'N', 'A'),
+  ('10032', 'ນາງ', 'ຄຳ', 'Nang', 'Kham', '888010', '0101', NULL, NULL, '00', '12', 1, 'N', 'A'),
+  ('10033', 'ທອງ', 'ດີ', 'Thong', 'Dee', '888010', '0101', NULL, NULL, '00', '12', 1, 'N', 'A'),
+  ('10034', 'ເພັດ', 'ສະໄໝ', 'Phet', 'Samai', '888010', '0101', NULL, NULL, '00', '12', 1, 'N', 'A'),
+  ('10035', 'ອ່ອນ', 'ຈັນ', 'On', 'Chanh', '888010', '0101', NULL, NULL, '00', '30', 1, 'N', 'A'),
+  -- Branch 888020: HR officer (LAK account only), section head, department head, management, finance.
+  ('10040', 'ຫຼ້າ', 'ວົງ', 'La', 'Vong', '888020', '0101', NULL, NULL, '00', '12', 1, 'N', 'A'),
+  ('10041', 'ແພງ', 'ສີ', 'Phaeng', 'Sy', '888020', '0101', NULL, NULL, '00', '12', 1, 'N', 'A'),
+  ('10042', 'ຕຸ້ຍ', 'ມີ', 'Tui', 'Mee', '888020', '0101', NULL, NULL, '00', '12', 1, 'N', 'A'),
+  ('10043', 'ບຸນ', 'ຕາ', 'Boun', 'Ta', '888020', '0101', NULL, NULL, '00', '12', 1, 'N', 'A'),
+  ('10044', 'ສອນ', 'ໄຊ', 'Sone', 'Xay', '888020', '0101', NULL, NULL, '00', '12', 1, 'N', 'A');
 
 INSERT INTO hrm_employee_account_currency (eid, ccy, account_no, account_name, is_deleted, created_at) VALUES
   ('10001', 'LAK', '0101-OLD', 'SOMPHONE KEOMANY', 0, '2025-01-01 09:00:00'),
@@ -72,7 +86,14 @@ INSERT INTO hrm_employee_account_currency (eid, ccy, account_no, account_name, i
   ('10012', 'USD', '1012-USD', 'CHANH THAVY', 0, '2026-01-01 09:00:00'),
   ('10013', 'LAK', '1013-LAK', 'SOUK MALA', 0, '2026-01-01 09:00:00'),
   ('10013', 'USD', '1013-USD', 'SOUK MALA', 0, '2026-01-01 09:00:00'),
-  ('10020', 'LAK', '2020-LAK', 'KEO PHOUMY', 0, '2026-01-01 09:00:00');
+  ('10020', 'LAK', '2020-LAK', 'KEO PHOUMY', 0, '2026-01-01 09:00:00'),
+  ('10030', 'LAK', '1030-LAK', 'VANH XAY', 0, '2026-01-01 09:00:00'),
+  ('10030', 'USD', '1030-USD', 'VANH XAY', 0, '2026-01-01 09:00:00'),
+  ('10031', 'LAK', '1031-LAK', 'LY PHONE', 0, '2026-01-01 09:00:00'),
+  ('10032', 'LAK', '1032-LAK', 'NANG KHAM', 0, '2026-01-01 09:00:00'),
+  ('10032', 'USD', '1032-USD', 'NANG KHAM', 0, '2026-01-01 09:00:00'),
+  ('10035', 'LAK', '1035-LAK', 'ON CHANH', 0, '2026-01-01 09:00:00'),
+  ('10040', 'LAK', '2040-LAK', 'LA VONG', 0, '2026-01-01 09:00:00');
 
 INSERT INTO tb_current_login (eid, session_token, start_time, last_act) VALUES
   ('10001', 'fixture-session-10001', NOW(), NOW()),

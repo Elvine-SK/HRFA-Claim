@@ -1,4 +1,6 @@
-import { defineModule } from '@elvine-sk/platform-server'
+import { defineModule, type ModuleContext } from '@elvine-sk/platform-server'
+import { agreementApproval, agreementResolvers } from './approval.ts'
+import { agreementFiles } from './files.ts'
 import { agreementsMigrations } from './migrations.ts'
 import { agreementRoutes } from './routes.ts'
 import { agreementFields } from './schema.ts'
@@ -9,13 +11,27 @@ const messages = {
     'agreements.reason_required': 'Give the reason for the cancellation',
     'agreements.doc_no_taken': 'Another agreement that is not cancelled has this Doc.no',
     'agreements.not_draft': 'Only a draft agreement can be changed',
+    'notify.agreements.approved.title': 'Agreement {ref} is approved',
+    'notify.agreements.approved.body': 'Calculate its payment.',
+    'notify.agreements.cancelled.title': 'Agreement {ref} is cancelled',
+    'notify.agreements.cancelled.body': 'Reason: {reason}. File a new agreement if the trip goes ahead.',
   },
   lo: {
     'agreements.bad_transition': 'ສັນຍາບໍ່ສາມາດປ່ຽນໄປເປັນສະຖານະນີ້ຈາກສະຖານະປັດຈຸບັນໄດ້',
     'agreements.reason_required': 'ກະລຸນາລະບຸເຫດຜົນຂອງການຍົກເລີກ',
     'agreements.doc_no_taken': 'ມີສັນຍາອື່ນທີ່ຍັງບໍ່ຖືກຍົກເລີກ ໃຊ້ເລກທີເອກະສານນີ້ແລ້ວ',
     'agreements.not_draft': 'ແກ້ໄຂໄດ້ສະເພາະສັນຍາທີ່ເປັນສະບັບຮ່າງ',
+    'notify.agreements.approved.title': 'ສັນຍາ {ref} ໄດ້ຮັບອະນຸມັດແລ້ວ',
+    'notify.agreements.approved.body': 'ກະລຸນາຄິດໄລ່ການຈ່າຍເງິນ.',
+    'notify.agreements.cancelled.title': 'ສັນຍາ {ref} ຖືກຍົກເລີກ',
+    'notify.agreements.cancelled.body': 'ເຫດຜົນ: {reason}. ຖ້າຍັງເດີນທາງ ໃຫ້ສ້າງສັນຍາໃໝ່.',
   },
+}
+
+let moduleCtx: ModuleContext | undefined
+const ctx = () => {
+  if (!moduleCtx) throw new Error('agreements module is not set up')
+  return moduleCtx
 }
 
 /**
@@ -28,6 +44,13 @@ export const agreementsModule = defineModule({
   migrations: agreementsMigrations,
   permissions: { agreement: ['read', 'create', 'cancel'] },
   lists: { agreements: { fields: agreementFields } },
+  approvalEntities: [agreementApproval(ctx)],
+  approvalResolvers: agreementResolvers,
+  fileEntities: [agreementFiles(ctx)],
+  notificationTypes: { 'agreements.approved': {}, 'agreements.cancelled': {} },
   messages,
+  setup(c) {
+    moduleCtx = c
+  },
   routes: (api, c) => agreementRoutes(api, c),
 })
