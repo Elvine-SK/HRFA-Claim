@@ -42,6 +42,14 @@ function tooLarge(total: bigint): AppError {
   })
 }
 
+function entryInvalid(component: string): AppError {
+  const message = `The posting entries of "${component}" are missing, duplicated or on the same side`
+  return new AppError('posting.entry_missing', message, {
+    status: 422,
+    details: [{ path: 'entries', code: 'posting.entry_missing', message }],
+  })
+}
+
 function accountMissing(eid: string, ccy: Currency): AppError {
   const message = `Member ${eid} has no ${ccy} account to post to`
   return new AppError('posting.account_missing', message, {
@@ -74,64 +82,62 @@ export function buildPaymentLines(input: {
   const memberOf = new Map(members.map((m) => [m.eid, m]))
   const eids = [...new Set([...members.map((m) => m.eid), ...items.map((i) => i.eid)])]
 
-  const memberLines = new Map<string, { line: UploadLine; total: bigint }>()
-  const memberOrder: string[] = []
 
-  const out: Record<'DR' | 'CR', UploadLine[]> = { DR: [], CR: [] }
+  // Every component with money needs exactly one GL entry and one member entry, on opposite sides.
+  for (const component of new Set([...byComponent].filter(([, t]) => t !== 0n).map(([k]) => k.split('|')[0]!))) {
+    const gl = entries.filter((e) => e.component === component && e.accountKind === 'gl')
+    const mem = entries.filter((e) => e.component === component && e.accountKind === 'member')
+    if (gl.length !== 1 || mem.length !== 1 || gl[0]!.side === mem[0]!.side) throw entryInvalid(component)
+  }
+
+  const glLines: Record<'DR' | 'CR', UploadLine[]> = { DR: [], CR: [] }
   for (const e of entries) {
+    if (e.accountKind !== 'gl') continue
     for (const ccy of CURRENCIES) {
-      if (e.accountKind === 'gl') {
-        const total = byComponent.get(`${e.component}|${ccy}`) ?? 0n
+      const total = byComponent.get(`${e.component}|${ccy}`) ?? 0n
+      if (total === 0n) continue
+      if (total < 0n || !fitsAmount(fromCents(total))) throw tooLarge(total)
+      glLines[e.side].push({
+        account: `${branch}${ccy}${e.gl ?? ''}${e.seq ?? ''}`,
+        branch,
+        name: e.glNameEn ?? '',
+        ccy,
+        chequeNo: '',
+        amount: fromCents(total),
+        rvsNo: '',
+        side: e.side,
+        remark,
+      })
+    }
+  }
+
+  // Member lines: per side, in member order, currencies inside each member.
+  const memberLines: Record<'DR' | 'CR', UploadLine[]> = { DR: [], CR: [] }
+  for (const side of ['DR', 'CR'] as const) {
+    const components = entries.filter((e) => e.accountKind === 'member' && e.side === side).map((e) => e.component)
+    for (const eid of eids) {
+      for (const ccy of CURRENCIES) {
+        const total = components.reduce((s, c) => s + (byMember.get(`${c}|${ccy}|${eid}`) ?? 0n), 0n)
         if (total === 0n) continue
         if (total < 0n || !fitsAmount(fromCents(total))) throw tooLarge(total)
-        out[e.side].push({
-          account: `${branch}${ccy}${e.gl ?? ''}${e.seq ?? ''}`,
-          branch,
-          name: e.glNameEn ?? '',
+        const m = memberOf.get(eid)
+        const account = ccy === 'LAK' ? m?.accountLak : m?.accountUsd
+        if (!m || !account) throw accountMissing(eid, ccy)
+        memberLines[side].push({
+          account,
+          branch: m.branchCode,
+          name: m.name,
           ccy,
           chequeNo: '',
           amount: fromCents(total),
           rvsNo: '',
-          side: e.side,
+          side,
           remark,
         })
-      } else {
-        for (const eid of eids) {
-          const total = byMember.get(`${e.component}|${ccy}|${eid}`) ?? 0n
-          if (total === 0n) continue
-          const key = `${e.side}|${ccy}|${eid}`
-          const prev = memberLines.get(key)
-          if (prev) {
-            prev.total += total
-            continue
-          }
-          const m = memberOf.get(eid)
-          const account = ccy === 'LAK' ? m?.accountLak : m?.accountUsd
-          if (!m || !account) throw accountMissing(eid, ccy)
-          const line: UploadLine = {
-            account,
-            branch: m.branchCode,
-            name: m.name,
-            ccy,
-            chequeNo: '',
-            amount: '0.00',
-            rvsNo: '',
-            side: e.side,
-            remark,
-          }
-          memberLines.set(key, { line, total })
-          memberOrder.push(key)
-          out[e.side].push(line)
-        }
       }
     }
   }
-  for (const key of memberOrder) {
-    const { line, total } = memberLines.get(key)!
-    if (total < 0n || !fitsAmount(fromCents(total))) throw tooLarge(total)
-    line.amount = fromCents(total)
-  }
-  return [...out.DR, ...out.CR]
+  return [...glLines.DR, ...memberLines.DR, ...glLines.CR, ...memberLines.CR]
 }
 
 /** dd/mm/yyyy of a YYYY-MM-DD date. */

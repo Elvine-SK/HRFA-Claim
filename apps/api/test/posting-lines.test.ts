@@ -78,6 +78,22 @@ describe('buildPaymentLines', () => {
     )
   })
 
+  it('CR lines follow member order, not entry order', () => {
+    const lines = build([item('E2', 'daily', 'LAK', '10'), item('E1', 'accommodation', 'LAK', '20'), item('E2', 'accommodation', 'LAK', '5')])
+    expect(lines.filter((l) => l.side === 'CR').map((l) => l.account)).toEqual(['L1', 'L2'])
+  })
+
+  it('an item without its posting entries is refused', () => {
+    const bad = (es: PostingEntry[]) => () =>
+      buildPaymentLines({ items: [item('E1', 'fuel', 'LAK', '10')], entries: es, members, branch: '888010', remark: 'R' })
+    const fuel = entries.filter((e) => e.component === 'fuel')
+    const code = { code: 'posting.entry_missing', status: 422, message: expect.stringContaining('fuel') }
+    expect(bad(entries.filter((e) => e.component !== 'fuel'))).toThrowError(expect.objectContaining(code))
+    expect(bad(fuel.filter((e) => e.accountKind === 'gl'))).toThrowError(expect.objectContaining(code))
+    expect(bad([...fuel, fuel[0]!])).toThrowError(expect.objectContaining(code))
+    expect(bad(fuel.map((e) => ({ ...e, side: 'DR' as const })))).toThrowError(expect.objectContaining(code))
+  })
+
   it('a total over 13 digits is refused', () => {
     expect(() => build([item('E1', 'daily', 'LAK', '9999999999999'), item('E2', 'daily', 'LAK', '1')])).toThrowError(
       expect.objectContaining({ code: 'payments.amount_too_large', status: 422 }),
