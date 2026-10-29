@@ -506,7 +506,8 @@ Assumptions the build follows unless corrected:
 6. All countries of the Americas and Africa are `OE1` (ກ11, code file 4.3).
 7. `AMT` is a number cell formatted `#,##0.00`, which shows as `1,000,000.00`.
 
-Needed from the business:
+Needed from the business (working answers for questions 3, 4, 6, 7, 9 and 14, given by the project owner on
+2026-10-29 for plan 4 and still to confirm with Finance, are in `HANDOFF.md` "Plan 4 working answers"):
 
 1. ~~Doc.no branch part: three digits or six (ກ12)?~~ Answered 2026-10-29: six digits (`0001.BCEL.888010.2026`).
 2. Regulation 4.2, Europe group 1: which country is "ອຽກລັງ" (code file "ອັງກະລັງ")? If it is Italy, Italy moves

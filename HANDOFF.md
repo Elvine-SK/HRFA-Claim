@@ -165,6 +165,24 @@ Plan 4 is next. Write each plan when the previous one is done, so it can use the
   bundle stores it in `apps/web/hrm-login-url.txt` and `ecosystem.config.cjs` passes it on.
 - `/me` says "not linked" for any error, also when HRM is down.
 
+Plan 4 working answers (user, 2026-10-29; to confirm with Finance later, all kept as data where possible):
+
+- Q4 overseas currency: payment entries all in USD on both sides (GL account string with `USD`); the app does no
+  conversion.
+- Q3: the second payment debit is 4408730001 (accommodation).
+- Q6: private-car fuel at payment is DR 4405100001 / CR member CASA.
+- Q7 border (form 4): domestic entries in LAK for the allowances; group advance DR 1362220001 / CR holder's CASA in
+  USD; settlement does not pass through 2361800001.
+- Q9 REMARK: "HR code" = the agreement's zone code (`D`, `OB1`, `OA1`, ...), my reading, to confirm; bill number =
+  the agreement REF.
+- Q14: `BRANCH` of a member line = the member's HRM branch from the submit snapshot, written like the GL lines'
+  branch (`888010`), my call.
+- Fuel = km ÷ 7 × fuel price on the departure date, rounded up to a whole kip.
+- Plan 4 scope: checking table, payment approval (finance officer → finance section head, new role
+  `finance_section_head`), `.xlsx` export, mark `posted` with an optional CORE reference, "cancelled after export"
+  on agreement cancel, and an idempotent set-up command for the agreement and payment workflows (bridge for
+  proposal C6).
+
 Carry into plan 4:
 
 - Fuel = distance ÷ `km_per_litre` (an Amount, `"7.00"`) needs a helper that divides by an Amount and a rounding
