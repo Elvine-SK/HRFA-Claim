@@ -123,6 +123,20 @@ Once, after the first migration that includes plan 3:
 3. Travel master data → Rank map: map every PostType of the members (only PostType 7 → P3 is seeded, ຂ1). A member
    whose PostType has no rank blocks submission.
 
+## Payment approval
+
+Once, after the first migration that includes plan 4:
+
+1. Administration → Approvals → New workflow: key `payment`, record type "Payment", name as in
+   `apps/api/src/modules/payments/workflow.json`. Add the one stage of that file (finance section head; one step
+   whose approvers are the resolver `payment.finance_section_head`), publish it and make it the default. The same
+   file can be posted to `POST /api/v1/approval/workflows` and `.../{id}/versions` with `activate: true`.
+2. Administration → Users: give Finance users their roles per HRM branch: `finance_officer` (calculates, enters
+   bills, submits, exports the upload file, confirms posted) and `finance_section_head` (approves the payments of
+   their branch). A branch without a `finance_section_head` user cannot submit a payment (`no eligible approver`).
+3. Travel master data → Flat rates: enter the fuel price before calculating a trip with a private car. Without a
+   price on the departure date the payment answers `payments.fuel_price_missing`.
+
 ## Upgrade
 
 1. Unpack the new bundle (keep `apps/api/.env` and the files folder).

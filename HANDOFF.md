@@ -1,9 +1,10 @@
 # Handoff — hr-fam (2026-10-29)
 
 Travel payment app for BCEL on nelvine-platform. Working name "HR-FAM" until the business names it (ຂ9).
-**Plans 1–3 are built** (local git only): plan 1 the app scaffold, the HRM read layer and sign-in from HRM;
-plan 2 the master data and the PM2 bundle; plan 3 the agreements (forms 1–4, REF, Doc.no, approval, cancel).
-Next: plan 4 (payment calculation, checking table, upload file).
+**Plans 1–4 are built** (local git only): plan 1 the app scaffold, the HRM read layer and sign-in from HRM;
+plan 2 the master data and the PM2 bundle; plan 3 the agreements (forms 1–4, REF, Doc.no, approval, cancel);
+plan 4 the payments (calculation, checking table, approval, posting batch and upload file).
+Next: plan 5 (settlement, approval chain, posting of settlements).
 
 ## Start here
 
@@ -16,7 +17,8 @@ Next: plan 4 (payment calculation, checking table, upload file).
   is six digits (`888010`, decided 2026-10-29).
 - **Done:** [plan 1](docs/superpowers/plans/2026-10-20-plan-1-foundation.md),
   [plan 2](docs/superpowers/plans/2026-10-21-plan-2-master-data.md),
-  [plan 3](docs/superpowers/plans/2026-10-29-plan-3-agreements.md). **Next:** write plan 4.
+  [plan 3](docs/superpowers/plans/2026-10-29-plan-3-agreements.md),
+  [plan 4](docs/superpowers/plans/2026-10-29-plan-4-payments.md). **Next:** write plan 5.
 - **HRM team kit:** [`docs/hrm-handoff.md`](docs/hrm-handoff.md) (handoff table, redirect script, grants, errors).
 
 ## Run it
@@ -28,7 +30,7 @@ pnpm install && pnpm migrate
 pnpm dev:api                         # :3335
 pnpm dev:web                         # :3336
 tooling/deploy/bundle.sh --hrm-login-url <URL>   # build/hr-fam-<sha>.tar.gz for the testing server
-RUN_DB_TESTS=1 pnpm test             # 135 tests; the test DBs are built on :3308 by global-setup
+RUN_DB_TESTS=1 pnpm test             # 217 tests; the test DBs are built on :3308 by global-setup
 ```
 
 `http://localhost:3335/api/v1/auth/hrm?code=valid-10001` signs in as fixture employee `10001` once per load of the
@@ -91,6 +93,60 @@ Reviews: a security review of the sign-in (0 Critical, 5 Important, all fixed) a
 - Set-up on a server: [`docs/deploy-testing.md`](docs/deploy-testing.md) "Agreement approval and roles".
 - Not checked in a browser yet (no browser tool in the build session): try each form in en and lo.
 
+## What plan 4 built
+
+- `payments` module: tables `payments`, `payment_items`, `payment_bills`, `posting_batches`, `posting_lines`;
+  procedures `payments_transition` (status changes, history row, optional CORE reference) and
+  `posting_create_batch`. One live payment per agreement (live = not `void`).
+- Statuses: `calculated`, `in_approval`, `approved`, `exported`, `posted`, `void`, `cancelled_after_export`. Only
+  `calculated` can be changed (bills, recalculate). A rejected payment becomes `void` and a new one can be
+  calculated for the same agreement.
+- Roles and permissions: `finance_officer` (seeded in plan 3) gets `payment.read`, `payment.calculate`,
+  `payment.export`; the new role `finance_section_head` gets `payment.read` and `agreement.read` and approves.
+  Own-scope callers see no payments; head office sees all, a branch sees the payments of its own agreements.
+- Routes under `/api/v1/payments`: create (calculate an approved agreement), list, get, `lookup`, `recalculate`,
+  `bills`, `submit`, `export`, `posted`, and `GET /posting-batches/{id}/file`.
+- Calculation (`calculate.ts`), rules worth knowing:
+  - Rates are the rows effective on the member's departure date; the group advance uses the agreement's `travelFrom`.
+  - Day 8 onward (form 1, between provinces): nights 1–7 are paid at the rate, night 8 onward from Finance's bill
+    for that night, capped at the rate. A billed night with no amount blocks submission (`payments.bills_missing`);
+    Finance may enter `0`. Calculate leaves unbilled nights at 0.
+  - Meal deduction = per meal (daily total ÷ 3, rounded up to a whole unit) × host meals, capped at the member's
+    daily total. A same-day trip (form 2, 50 km or more) has no meal deduction.
+  - Fuel = `ceil(private-car km × fuel price ÷ km per litre)` in whole kip, on forms 1, 2 and 4 only; overseas
+    answers `payments.fuel_not_overseas`. No fuel price on the date answers `payments.fuel_price_missing`.
+  - `rate_missing` is raised only when the member would get a rate-based item; `advance_band_missing` when the
+    agreement has an advance and no band matches. A total beyond 13 whole digits answers 422
+    `payments.amount_too_large` and nothing is saved.
+  - `payment_items.amount` is signed (the meal deduction is negative).
+- Posting entries are data: table `travel_posting_entries` (seeded, migration `202610300100`), read-only screen
+  `/master/posting-entries` (`GET /travel-master/posting-entries?zoneKind=`). A change is a new migration until a
+  second case needs editing on screen. An item with no posting entry is refused, not dropped.
+- Approval: workflow `apps/api/src/modules/payments/workflow.json` (one stage, `finance_section_head`, resolver
+  `payment.finance_section_head`: role holders of the payment's HRM branch). Submit needs all bills complete.
+- Posting batch (`batches.ts`): `POST /payments/{id}/export` on an approved payment writes one batch and its lines
+  (debit lines from the posting entries, credit lines per member in member order) and sets `exported`. The batch
+  branch is the HRM branch of the exporting Finance user. A second export answers 409 (an existing batch, or
+  `resource.conflict` when two exports race). Export refuses an unbalanced batch.
+- Upload file (`xlsx.ts`, exceljs 4.4.0, behind a small writer interface for proposal C2): columns `ACCOUNT, BRANCH,
+  NAME, CCY, CHEQUE_NO, AMT, RVS_NO, DR_CR, REMARK`; `AMT` is a number cell formatted `#,##0.00`; `CHEQUE_NO` and
+  `RVS_NO` empty. Account string = 6-digit branch + CCY + 10-digit GL + 4-digit SEQ, 23 characters, e.g.
+  `888010LAK44087200010001`. `BRANCH` of a GL line is the batch branch; of a member line the member's snapshot
+  branch.
+- `REMARK`: `<zone code> <leader name and surname> <header days> <place> <Doc.no> <dd/mm/yyyy>-<dd/mm/yyyy> <REF>`.
+  Place = HRM's province name as stored, including the prefix `ແຂວງ` (form 1 `to_province`, form 2 `province`), the
+  country's Lao name (form 3), the border route's Lao name or the "other" text (form 4). Leader name is the
+  snapshot `name_lao` + `sname_lao`. If Finance objects to the prefix, strip it in the remark builder.
+- `POST /payments/{id}/posted`: Finance marks the batch posted, with an optional CORE reference (no direct posting
+  to CORE in version 1; the process stops at the upload file).
+- Cancel after export: cancelling an agreement marks its exported payment `cancelled_after_export` and the batch
+  `cancelled_after_export_at` (spec §8, ກ16). The app produces no reversal file; Finance corrects in CORE.
+- Web: `/payments` (list, REF/Doc.no box), `/payments/{id}` (checking table with nights and the day-8 marker, bills,
+  recalculate, submit, approval card, export and download, posted confirmation, history), `/master/posting-entries`.
+- Set-up on a server: [`docs/deploy-testing.md`](docs/deploy-testing.md) "Payment approval".
+- Not checked in a browser yet (no browser tool in the build session; the chrome-devtools connection failed):
+  typecheck and the locale test only. Try the payment screens in en and lo.
+
 ## Approach: app first, platform later
 
 nelvine-platform is at `1.0.0` and has none of the proposal's items released
@@ -105,9 +161,9 @@ the platform package once released.
 | M3 document numbering       | Not started                                                      | REF counter and Doc.no parser in `agreements` (plan 3, built)   |
 | M4 reference data           | Not started                                                      | Effective-dated tables in `travel-master` (plan 2)              |
 | C1 org approval routing     | Not started                                                      | Approval resolvers in the app (plans 3–5)                       |
-| C2 XLSX writer              | Not started                                                      | App writer behind an interface (plan 4)                         |
-| C4 money helpers            | Not started                                                      | App helper for decimals and rounding (plan 2)                   |
-| N1 calendar, N2 posting     | Not started                                                      | App code (plans 4–5)                                            |
+| C2 XLSX writer              | Not started                                                      | App writer behind an interface (`payments/xlsx.ts`, plan 4, built) |
+| C4 money helpers            | Not started                                                      | App helper for decimals, rounding and the 13-digit guard (plans 2, 4) |
+| N1 calendar, N2 posting     | Not started                                                      | App code (posting batch built in plan 4; settlement in plan 5)  |
 | C5 date fields (2026-10-29) | Proposed                                                         | `AppDateInput.vue` (dd/mm/yyyy, model `YYYY-MM-DD`); swap later  |
 
 The app depends on the platform checkout by absolute `link:` paths (`.nelvrc.json`, `apps/*/package.json`). When
@@ -124,11 +180,11 @@ PascalCase upstream columns do not survive `CamelCasePlugin`.
 | 1    | Scaffold, HRM read layer, sign-in handoff                | Done         |
 | 2    | Master data with seed (ranks, zones, rates, bands, fuel, GL), PM2 bundle | Done |
 | 3    | Agreements: forms 1–4, REF, Doc.no, approval             | Done         |
-| 4    | Payment calculation, checking table, upload file         | To write     |
+| 4    | Payment calculation, checking table, upload file         | Done         |
 | 5    | Settlement, approval chain, posting batch                | To write     |
 | 6    | Dashboard, reminders, printable views, transit form      | To write     |
 
-Plan 4 is next. Write each plan when the previous one is done, so it can use the real code.
+Plan 5 is next. Write each plan when the previous one is done, so it can use the real code.
 
 ## Decisions
 
@@ -165,7 +221,7 @@ Plan 4 is next. Write each plan when the previous one is done, so it can use the
   bundle stores it in `apps/web/hrm-login-url.txt` and `ecosystem.config.cjs` passes it on.
 - `/me` says "not linked" for any error, also when HRM is down.
 
-Plan 4 working answers (user, 2026-10-29; to confirm with Finance later, all kept as data where possible):
+Plan 4 working answers (user, 2026-10-29; built in plan 4, still to confirm with Finance, all kept as data where possible):
 
 - Q4 overseas currency: payment entries all in USD on both sides (GL account string with `USD`); the app does no
   conversion.
@@ -180,18 +236,37 @@ Plan 4 working answers (user, 2026-10-29; to confirm with Finance later, all kep
 - Fuel = km ÷ 7 × fuel price on the departure date, rounded up to a whole kip.
 - Plan 4 scope: checking table, payment approval (finance officer → finance section head, new role
   `finance_section_head`), `.xlsx` export, mark `posted` with an optional CORE reference, "cancelled after export"
-  on agreement cancel, and an idempotent set-up command for the agreement and payment workflows (bridge for
-  proposal C6).
+  on agreement cancel. (The idempotent set-up command planned for the workflows was dropped: see "Carry into plan 5".)
 
-Carry into plan 4:
+Carry into plan 5:
 
-- Fuel = distance ÷ `km_per_litre` (an Amount, `"7.00"`) needs a helper that divides by an Amount and a rounding
-  rule the spec does not give yet; validate totals fit 13 digits before writing; test the money guards.
-  `flatRateOn('fuel_price')` is `null` until a price is entered: treat it as "cannot calculate".
+- Deferred minors of plan 4, grouped:
+  - Calculation: `compareAmounts` in the meal cap can throw before the `amount_too_large` guard (unreachable with real
+    rates); `signedCents` repeats `toCents` parsing and belongs in `money.ts`; a capped meal deduction's basis does not
+    say "capped" and the fuel row's rate × count differs from its amount; the per-item `amount_too_large` path names
+    the departure date; `CALC_MESSAGES` repeats the English strings of `module.ts`, and field-error details are
+    English only; a no-op recalculate bumps the version without a history row; `GET /payments/{id}` reads the payment
+    twice; a missing zone in `rates.ts` throws a plain `Error` (500).
+  - Posting lines: a negative GL total reports `amount_too_large`; a null GL or SEQ, or an unknown GL, writes a
+    malformed account or empty NAME; REMARK gets a double space when a part is empty or the agreement has no leader; a
+    payment netting to zero would export an empty batch; a blank CORE reference is stored as `''` but audited as null;
+    the batch insert has an audit entry but no `writeHistory` row.
+  - Cancel and approval: the cancel listener closes over the setup context (use the module `ctx()` accessor); the
+    cancel paths from `in_approval`, `calculated` and `posted`, the no-op, and a listener error rolling back are
+    untested, as are the bills re-check on `onStatusChange('pending')` and cancelled to void.
+  - Web: no leader, holder or account markers in the checking table; "posted" uses its own modal, not `useConfirm`;
+    an invalid bill has no field highlight; the lookup's "no payment" answer uses `notify.error`.
+  - Tests and housekeeping: `mulDivCeilWhole` repeats a count check and has no test for fractional input; the
+    `seed.ts` header still says "frozen after 202610220110" but `SEED_POSTING_ENTRIES` belongs to `202610300100`; the
+    posting-entries test pins only the domestic accommodation GL; `caseKey` is an unbounded `z.string()`.
+- Settlement and its posting cases, `RVS_NO` (the suspense reference) and the holding-account timing (spec §17).
+- The set-up command for the agreement and payment workflows is not built: the approval module creates workflows
+  only through its HTTP routes, so both are created by hand ([`docs/deploy-testing.md`](docs/deploy-testing.md))
+  until proposal C6.
+- Finance confirming the plan 4 working answers (above), the Europe group 1 word (question 2) and the `PostType` map
+  (ຂ1).
 - The seed migration imports `RANK_CODES` from `lookups.ts`; keep that constant unchanged (the seed is frozen).
-- Cancel after the payment batch is exported must mark the batch "cancelled after export" (spec §8, ກ16): hook it
-  into `POST /agreements/{id}/cancel`.
-- `shared/db.ts` types the app's tables; new plan 4 tables go there too.
+- `shared/db.ts` types the app's tables; new tables go there too.
 - Test files share one database per run: give each file its own people (fixture EIDs), Doc.no year
   (`domesticBodies(year)`) and REF year when it counts them.
 
@@ -204,6 +279,5 @@ Carry into plan 4:
   Brazil depend on it), the `PostType` → `P1`–`P9` map (ຂ1), the Lao spelling of AE to confirm, and the
   Caucasus countries (AM, AZ, GE) seeded in zone group OA2. The visual browser checks of the `/master` pages
   are still to do.
-- Later plans: the overseas LAK/USD entries, fuel and border entries, `REMARK` (plan 4), the holding-account timing and `RVS_NO`
-  (plan 5). The full list, with the build step each blocks, is spec v3 §17–18.
+- Later plans: the holding-account timing and `RVS_NO` (plan 5). The full list, with the build step each blocks, is spec v3 §17–18.
 - Deployment: PM2 bundle built (see above); not yet installed on the testing server.

@@ -505,6 +505,15 @@ Assumptions the build follows unless corrected:
 5. The filer of a domestic settlement chooses the expense type per line (fuel or fare); Finance rejects a wrong one.
 6. All countries of the Americas and Africa are `OE1` (ກ11, code file 4.3).
 7. `AMT` is a number cell formatted `#,##0.00`, which shows as `1,000,000.00`.
+8. Day 8 onward (form 1): nights 1–7 are paid at the rate and night 8 onward from Finance's bill, capped at the rate
+   (assumption 2 stays the input rule).
+9. The meal deduction (per meal = daily total ÷ 3, rounded up, × host meals) is capped at the member's daily total.
+10. A same-day trip (form 2, 50 km or more) has no meal deduction: its flat rate is not a daily meal allowance.
+11. Private-car fuel is paid on forms 1, 2 and 4 only, in LAK; overseas trips get none.
+12. `REMARK` follows `<zone code> <leader name> <header days> <place> <Doc.no> <dates> <REF>`; the place is HRM's
+    province name as stored, including `ແຂວງ`, the country's Lao name, or the border route's name.
+13. A rejected payment is void; a new one can be calculated for the agreement.
+14. The branch of a posting batch is the HRM branch of the Finance user who exports it.
 
 Needed from the business (working answers for questions 3, 4, 6, 7, 9 and 14, given by the project owner on
 2026-10-29 for plan 4 and still to confirm with Finance, are in `HANDOFF.md` "Plan 4 working answers"):
