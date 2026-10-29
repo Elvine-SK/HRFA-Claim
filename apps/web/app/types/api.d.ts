@@ -10203,6 +10203,404 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/agreements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Agreements the caller may see (filters: status, formType, branchCode; search: REF, Doc.no, subject) */
+        get: {
+            parameters: {
+                query?: {
+                    page?: string;
+                    pageSize?: string;
+                    sort?: string;
+                    q?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Agreements */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["AgreementListItem"][];
+                            meta: components["schemas"]["PageMeta"];
+                        };
+                    };
+                };
+                /** @description Not authenticated */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Validation failed */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /** Save a new draft agreement (forms 1–4); the system issues its REF */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AgreementInput"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["Agreement"];
+                        };
+                    };
+                };
+                /** @description Not authenticated */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Validation failed */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description HRM is unavailable */
+                503: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/agreements/lookup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Find an agreement by REF or Doc.no (either script, . or /) */
+        get: {
+            parameters: {
+                query: {
+                    number: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Agreement */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["Agreement"];
+                        };
+                    };
+                };
+                /** @description Not authenticated */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Validation failed */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/agreements/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** An agreement with its members */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Agreement */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["Agreement"];
+                        };
+                    };
+                };
+                /** @description Not authenticated */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        /** Replace a draft agreement, members included (optimistic locking) */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AgreementUpdate"];
+                };
+            };
+            responses: {
+                /** @description Updated */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["Agreement"];
+                        };
+                    };
+                };
+                /** @description Not authenticated */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Validation failed */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description HRM is unavailable */
+                503: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/agreements/{id}/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Record history of an agreement */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description History */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["AgreementHistoryEntry"][];
+                        };
+                    };
+                };
+                /** @description Not authenticated */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/platform/manifest": {
         parameters: {
             query?: never;
@@ -11121,6 +11519,241 @@ export interface components {
                 maxCount: number | null;
                 amount: string;
             }[];
+        };
+        Agreement: {
+            /** Format: uuid */
+            id: string;
+            ref: string;
+            /** @enum {string} */
+            formType: "domestic" | "district" | "overseas" | "border";
+            /** @enum {string} */
+            status: "draft" | "in_approval" | "approved" | "cancelled";
+            subject: string;
+            title: string;
+            reference: string | null;
+            docNo: string;
+            docDate: string;
+            branchCode: string;
+            travelFrom: string;
+            travelTo: string;
+            fromProvinceCode: string | null;
+            toProvinceCode: string | null;
+            provinceCode: string | null;
+            fromDistrictCode: string | null;
+            toDistrictCode: string | null;
+            overnight: boolean | null;
+            sameDayOver50km: boolean | null;
+            countryIso2: string | null;
+            zoneCode: string | null;
+            /** Format: uuid */
+            borderRouteId: string | null;
+            borderRouteOther: string | null;
+            /** @enum {string} */
+            policyOption: "bcel_all" | "host_travel" | "host_accommodation" | "host_meals" | "host_meals_accommodation";
+            hasAdvance: boolean;
+            /** Format: date-time */
+            submittedAt: string | null;
+            cancelReason: string | null;
+            /** Format: date-time */
+            cancelledAt: string | null;
+            /** Format: uuid */
+            createdBy: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+            members: components["schemas"]["AgreementMember"][];
+        };
+        AgreementMember: {
+            /** Format: uuid */
+            id: string;
+            eid: string;
+            departureDate: string;
+            returnDate: string;
+            daysSubtracted: number;
+            calculatedDays: number;
+            paidDays: number;
+            isLeader: boolean;
+            isDeputy: boolean;
+            isAdvanceHolder: boolean;
+            hostMeals: number;
+            privateCarKm: number | null;
+            actingPositionCode: string | null;
+            nameLao: string;
+            snameLao: string;
+            nameEng: string | null;
+            snameEng: string | null;
+            branchCode: string;
+            departmentName: string | null;
+            sectionName: string | null;
+            positionCode: string | null;
+            positionName: string | null;
+            postType: number | null;
+            actingPositionName: string | null;
+            rankCode: string | null;
+            accountLak: string | null;
+            accountUsd: string | null;
+        };
+        AgreementInput: {
+            /** @enum {string} */
+            formType: "domestic";
+            subject: string;
+            title: string;
+            /** @default null */
+            reference: string | null;
+            docNo: string;
+            docDate: string;
+            travelFrom: string;
+            travelTo: string;
+            /** @enum {string} */
+            policyOption: "bcel_all" | "host_travel" | "host_accommodation" | "host_meals" | "host_meals_accommodation";
+            hasAdvance: boolean;
+            members: components["schemas"]["AgreementMemberInput"][];
+            fromProvinceCode: string;
+            toProvinceCode: string;
+        } | {
+            /** @enum {string} */
+            formType: "district";
+            subject: string;
+            title: string;
+            /** @default null */
+            reference: string | null;
+            docNo: string;
+            docDate: string;
+            travelFrom: string;
+            travelTo: string;
+            /** @enum {string} */
+            policyOption: "bcel_all" | "host_travel" | "host_accommodation" | "host_meals" | "host_meals_accommodation";
+            hasAdvance: boolean;
+            members: components["schemas"]["AgreementMemberInput"][];
+            provinceCode: string;
+            fromDistrictCode: string;
+            toDistrictCode: string;
+            overnight: boolean;
+            /** @default null */
+            sameDayOver50km: boolean | null;
+        } | {
+            /** @enum {string} */
+            formType: "overseas";
+            subject: string;
+            title: string;
+            /** @default null */
+            reference: string | null;
+            docNo: string;
+            docDate: string;
+            travelFrom: string;
+            travelTo: string;
+            /** @enum {string} */
+            policyOption: "bcel_all" | "host_travel" | "host_accommodation" | "host_meals" | "host_meals_accommodation";
+            hasAdvance: boolean;
+            members: components["schemas"]["AgreementMemberInput"][];
+            countryIso2: string;
+        } | {
+            /** @enum {string} */
+            formType: "border";
+            subject: string;
+            title: string;
+            /** @default null */
+            reference: string | null;
+            docNo: string;
+            docDate: string;
+            travelFrom: string;
+            travelTo: string;
+            /** @enum {string} */
+            policyOption: "bcel_all" | "host_travel" | "host_accommodation" | "host_meals" | "host_meals_accommodation";
+            hasAdvance: boolean;
+            members: components["schemas"]["AgreementMemberInput"][];
+            fromProvinceCode: string;
+            /**
+             * Format: uuid
+             * @default null
+             */
+            borderRouteId: string | null;
+            /** @default null */
+            borderRouteOther: string | null;
+        };
+        AgreementMemberInput: {
+            eid: string;
+            departureDate?: string;
+            returnDate?: string;
+            /** @default 0 */
+            daysSubtracted: number;
+            /** @default false */
+            isLeader: boolean;
+            /** @default false */
+            isDeputy: boolean;
+            /** @default false */
+            isAdvanceHolder: boolean;
+            /** @default 0 */
+            hostMeals: number;
+            /** @default null */
+            privateCarKm: number | null;
+            /** @default null */
+            actingPositionCode: string | null;
+        };
+        AgreementListItem: {
+            /** Format: uuid */
+            id: string;
+            ref: string;
+            /** @enum {string} */
+            formType: "domestic" | "district" | "overseas" | "border";
+            /** @enum {string} */
+            status: "draft" | "in_approval" | "approved" | "cancelled";
+            subject: string;
+            title: string;
+            reference: string | null;
+            docNo: string;
+            docDate: string;
+            branchCode: string;
+            travelFrom: string;
+            travelTo: string;
+            fromProvinceCode: string | null;
+            toProvinceCode: string | null;
+            provinceCode: string | null;
+            fromDistrictCode: string | null;
+            toDistrictCode: string | null;
+            overnight: boolean | null;
+            sameDayOver50km: boolean | null;
+            countryIso2: string | null;
+            zoneCode: string | null;
+            /** Format: uuid */
+            borderRouteId: string | null;
+            borderRouteOther: string | null;
+            /** @enum {string} */
+            policyOption: "bcel_all" | "host_travel" | "host_accommodation" | "host_meals" | "host_meals_accommodation";
+            hasAdvance: boolean;
+            /** Format: date-time */
+            submittedAt: string | null;
+            cancelReason: string | null;
+            /** Format: date-time */
+            cancelledAt: string | null;
+            /** Format: uuid */
+            createdBy: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+        };
+        AgreementUpdate: components["schemas"]["AgreementInput"] & {
+            version: number;
+        };
+        AgreementHistoryEntry: {
+            /** Format: uuid */
+            id: string;
+            version: number;
+            /** @enum {string} */
+            action: "create" | "update" | "delete" | "restore";
+            changes: {
+                [key: string]: [
+                    unknown,
+                    unknown
+                ];
+            };
+            /** Format: uuid */
+            changedBy: string | null;
+            changedAt: string;
         };
         PlatformManifest: {
             modules: string[];

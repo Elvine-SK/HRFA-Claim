@@ -3721,6 +3721,1106 @@
         ],
         "additionalProperties": false
       },
+      "Agreement": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ref": {
+            "type": "string"
+          },
+          "formType": {
+            "type": "string",
+            "enum": [
+              "domestic",
+              "district",
+              "overseas",
+              "border"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "in_approval",
+              "approved",
+              "cancelled"
+            ]
+          },
+          "subject": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "reference": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "docNo": {
+            "type": "string"
+          },
+          "docDate": {
+            "type": "string"
+          },
+          "branchCode": {
+            "type": "string"
+          },
+          "travelFrom": {
+            "type": "string"
+          },
+          "travelTo": {
+            "type": "string"
+          },
+          "fromProvinceCode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "toProvinceCode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "provinceCode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "fromDistrictCode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "toDistrictCode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "overnight": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "sameDayOver50km": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "countryIso2": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "zoneCode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "borderRouteId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "borderRouteOther": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "policyOption": {
+            "type": "string",
+            "enum": [
+              "bcel_all",
+              "host_travel",
+              "host_accommodation",
+              "host_meals",
+              "host_meals_accommodation"
+            ]
+          },
+          "hasAdvance": {
+            "type": "boolean"
+          },
+          "submittedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "cancelReason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "cancelledAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "createdBy": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AgreementMember"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "ref",
+          "formType",
+          "status",
+          "subject",
+          "title",
+          "reference",
+          "docNo",
+          "docDate",
+          "branchCode",
+          "travelFrom",
+          "travelTo",
+          "fromProvinceCode",
+          "toProvinceCode",
+          "provinceCode",
+          "fromDistrictCode",
+          "toDistrictCode",
+          "overnight",
+          "sameDayOver50km",
+          "countryIso2",
+          "zoneCode",
+          "borderRouteId",
+          "borderRouteOther",
+          "policyOption",
+          "hasAdvance",
+          "submittedAt",
+          "cancelReason",
+          "cancelledAt",
+          "createdBy",
+          "createdAt",
+          "updatedAt",
+          "version",
+          "members"
+        ]
+      },
+      "AgreementMember": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "eid": {
+            "type": "string"
+          },
+          "departureDate": {
+            "type": "string"
+          },
+          "returnDate": {
+            "type": "string"
+          },
+          "daysSubtracted": {
+            "type": "integer"
+          },
+          "calculatedDays": {
+            "type": "integer"
+          },
+          "paidDays": {
+            "type": "integer"
+          },
+          "isLeader": {
+            "type": "boolean"
+          },
+          "isDeputy": {
+            "type": "boolean"
+          },
+          "isAdvanceHolder": {
+            "type": "boolean"
+          },
+          "hostMeals": {
+            "type": "integer"
+          },
+          "privateCarKm": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "actingPositionCode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "nameLao": {
+            "type": "string"
+          },
+          "snameLao": {
+            "type": "string"
+          },
+          "nameEng": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "snameEng": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "branchCode": {
+            "type": "string"
+          },
+          "departmentName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sectionName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "positionCode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "positionName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "postType": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "actingPositionName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "rankCode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "accountLak": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "accountUsd": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "eid",
+          "departureDate",
+          "returnDate",
+          "daysSubtracted",
+          "calculatedDays",
+          "paidDays",
+          "isLeader",
+          "isDeputy",
+          "isAdvanceHolder",
+          "hostMeals",
+          "privateCarKm",
+          "actingPositionCode",
+          "nameLao",
+          "snameLao",
+          "nameEng",
+          "snameEng",
+          "branchCode",
+          "departmentName",
+          "sectionName",
+          "positionCode",
+          "positionName",
+          "postType",
+          "actingPositionName",
+          "rankCode",
+          "accountLak",
+          "accountUsd"
+        ]
+      },
+      "AgreementInput": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "formType": {
+                "type": "string",
+                "enum": [
+                  "domestic"
+                ]
+              },
+              "subject": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "reference": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 200,
+                "default": null
+              },
+              "docNo": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 40
+              },
+              "docDate": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              },
+              "travelFrom": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              },
+              "travelTo": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              },
+              "policyOption": {
+                "type": "string",
+                "enum": [
+                  "bcel_all",
+                  "host_travel",
+                  "host_accommodation",
+                  "host_meals",
+                  "host_meals_accommodation"
+                ]
+              },
+              "hasAdvance": {
+                "type": "boolean"
+              },
+              "members": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/AgreementMemberInput"
+                },
+                "minItems": 1,
+                "maxItems": 50
+              },
+              "fromProvinceCode": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 16
+              },
+              "toProvinceCode": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 16
+              }
+            },
+            "required": [
+              "formType",
+              "subject",
+              "title",
+              "docNo",
+              "docDate",
+              "travelFrom",
+              "travelTo",
+              "policyOption",
+              "hasAdvance",
+              "members",
+              "fromProvinceCode",
+              "toProvinceCode"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "formType": {
+                "type": "string",
+                "enum": [
+                  "district"
+                ]
+              },
+              "subject": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "reference": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 200,
+                "default": null
+              },
+              "docNo": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 40
+              },
+              "docDate": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              },
+              "travelFrom": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              },
+              "travelTo": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              },
+              "policyOption": {
+                "type": "string",
+                "enum": [
+                  "bcel_all",
+                  "host_travel",
+                  "host_accommodation",
+                  "host_meals",
+                  "host_meals_accommodation"
+                ]
+              },
+              "hasAdvance": {
+                "type": "boolean"
+              },
+              "members": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/AgreementMemberInput"
+                },
+                "minItems": 1,
+                "maxItems": 50
+              },
+              "provinceCode": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 16
+              },
+              "fromDistrictCode": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 16
+              },
+              "toDistrictCode": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 16
+              },
+              "overnight": {
+                "type": "boolean"
+              },
+              "sameDayOver50km": {
+                "type": [
+                  "boolean",
+                  "null"
+                ],
+                "default": null
+              }
+            },
+            "required": [
+              "formType",
+              "subject",
+              "title",
+              "docNo",
+              "docDate",
+              "travelFrom",
+              "travelTo",
+              "policyOption",
+              "hasAdvance",
+              "members",
+              "provinceCode",
+              "fromDistrictCode",
+              "toDistrictCode",
+              "overnight"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "formType": {
+                "type": "string",
+                "enum": [
+                  "overseas"
+                ]
+              },
+              "subject": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "reference": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 200,
+                "default": null
+              },
+              "docNo": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 40
+              },
+              "docDate": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              },
+              "travelFrom": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              },
+              "travelTo": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              },
+              "policyOption": {
+                "type": "string",
+                "enum": [
+                  "bcel_all",
+                  "host_travel",
+                  "host_accommodation",
+                  "host_meals",
+                  "host_meals_accommodation"
+                ]
+              },
+              "hasAdvance": {
+                "type": "boolean"
+              },
+              "members": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/AgreementMemberInput"
+                },
+                "minItems": 1,
+                "maxItems": 50
+              },
+              "countryIso2": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 2
+              }
+            },
+            "required": [
+              "formType",
+              "subject",
+              "title",
+              "docNo",
+              "docDate",
+              "travelFrom",
+              "travelTo",
+              "policyOption",
+              "hasAdvance",
+              "members",
+              "countryIso2"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "formType": {
+                "type": "string",
+                "enum": [
+                  "border"
+                ]
+              },
+              "subject": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "reference": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 200,
+                "default": null
+              },
+              "docNo": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 40
+              },
+              "docDate": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              },
+              "travelFrom": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              },
+              "travelTo": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              },
+              "policyOption": {
+                "type": "string",
+                "enum": [
+                  "bcel_all",
+                  "host_travel",
+                  "host_accommodation",
+                  "host_meals",
+                  "host_meals_accommodation"
+                ]
+              },
+              "hasAdvance": {
+                "type": "boolean"
+              },
+              "members": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/AgreementMemberInput"
+                },
+                "minItems": 1,
+                "maxItems": 50
+              },
+              "fromProvinceCode": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 16
+              },
+              "borderRouteId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "uuid",
+                "default": null
+              },
+              "borderRouteOther": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "minLength": 1,
+                "maxLength": 200,
+                "default": null
+              }
+            },
+            "required": [
+              "formType",
+              "subject",
+              "title",
+              "docNo",
+              "docDate",
+              "travelFrom",
+              "travelTo",
+              "policyOption",
+              "hasAdvance",
+              "members",
+              "fromProvinceCode"
+            ]
+          }
+        ]
+      },
+      "AgreementMemberInput": {
+        "type": "object",
+        "properties": {
+          "eid": {
+            "type": "string",
+            "pattern": "^\\d{5}$"
+          },
+          "departureDate": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "returnDate": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "daysSubtracted": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 366,
+            "default": 0
+          },
+          "isLeader": {
+            "type": "boolean",
+            "default": false
+          },
+          "isDeputy": {
+            "type": "boolean",
+            "default": false
+          },
+          "isAdvanceHolder": {
+            "type": "boolean",
+            "default": false
+          },
+          "hostMeals": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1098,
+            "default": 0
+          },
+          "privateCarKm": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 5000,
+            "default": null
+          },
+          "actingPositionCode": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1,
+            "maxLength": 16,
+            "default": null
+          }
+        },
+        "required": [
+          "eid"
+        ]
+      },
+      "AgreementListItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ref": {
+            "type": "string"
+          },
+          "formType": {
+            "type": "string",
+            "enum": [
+              "domestic",
+              "district",
+              "overseas",
+              "border"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "in_approval",
+              "approved",
+              "cancelled"
+            ]
+          },
+          "subject": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "reference": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "docNo": {
+            "type": "string"
+          },
+          "docDate": {
+            "type": "string"
+          },
+          "branchCode": {
+            "type": "string"
+          },
+          "travelFrom": {
+            "type": "string"
+          },
+          "travelTo": {
+            "type": "string"
+          },
+          "fromProvinceCode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "toProvinceCode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "provinceCode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "fromDistrictCode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "toDistrictCode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "overnight": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "sameDayOver50km": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "countryIso2": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "zoneCode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "borderRouteId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "borderRouteOther": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "policyOption": {
+            "type": "string",
+            "enum": [
+              "bcel_all",
+              "host_travel",
+              "host_accommodation",
+              "host_meals",
+              "host_meals_accommodation"
+            ]
+          },
+          "hasAdvance": {
+            "type": "boolean"
+          },
+          "submittedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "cancelReason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "cancelledAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "createdBy": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "ref",
+          "formType",
+          "status",
+          "subject",
+          "title",
+          "reference",
+          "docNo",
+          "docDate",
+          "branchCode",
+          "travelFrom",
+          "travelTo",
+          "fromProvinceCode",
+          "toProvinceCode",
+          "provinceCode",
+          "fromDistrictCode",
+          "toDistrictCode",
+          "overnight",
+          "sameDayOver50km",
+          "countryIso2",
+          "zoneCode",
+          "borderRouteId",
+          "borderRouteOther",
+          "policyOption",
+          "hasAdvance",
+          "submittedAt",
+          "cancelReason",
+          "cancelledAt",
+          "createdBy",
+          "createdAt",
+          "updatedAt",
+          "version"
+        ]
+      },
+      "AgreementUpdate": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AgreementInput"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "version"
+            ]
+          }
+        ]
+      },
+      "AgreementHistoryEntry": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "create",
+              "update",
+              "delete",
+              "restore"
+            ]
+          },
+          "changes": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "prefixItems": [
+                {},
+                {}
+              ]
+            }
+          },
+          "changedBy": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "changedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "version",
+          "action",
+          "changes",
+          "changedBy",
+          "changedAt"
+        ]
+      },
       "PlatformManifest": {
         "type": "object",
         "properties": {
@@ -15681,6 +16781,482 @@
           },
           "422": {
             "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/agreements": {
+      "post": {
+        "tags": [
+          "Agreements"
+        ],
+        "summary": "Save a new draft agreement (forms 1–4); the system issues its REF",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgreementInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Agreement"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "HRM is unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Agreements"
+        ],
+        "summary": "Agreements the caller may see (filters: status, formType, branchCode; search: REF, Doc.no, subject)",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "1"
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "example": "20"
+            },
+            "required": false,
+            "name": "pageSize",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "example": "-createdAt"
+            },
+            "required": false,
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "q",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Agreements",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AgreementListItem"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PageMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/agreements/lookup": {
+      "get": {
+        "tags": [
+          "Agreements"
+        ],
+        "summary": "Find an agreement by REF or Doc.no (either script, . or /)",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 40
+            },
+            "required": true,
+            "name": "number",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Agreement",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Agreement"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/agreements/{id}": {
+      "get": {
+        "tags": [
+          "Agreements"
+        ],
+        "summary": "An agreement with its members",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Agreement",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Agreement"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Agreements"
+        ],
+        "summary": "Replace a draft agreement, members included (optimistic locking)",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgreementUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Agreement"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "HRM is unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/agreements/{id}/history": {
+      "get": {
+        "tags": [
+          "Agreements"
+        ],
+        "summary": "Record history of an agreement",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "History",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AgreementHistoryEntry"
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
             "content": {
               "application/json": {
                 "schema": {

@@ -22,7 +22,7 @@ export const agreementHistory = {
     'fromDistrictCode',
     'toDistrictCode',
     'overnight',
-    'sameDay50Km',
+    'sameDayOver50km',
     'countryIso2',
     'borderRouteId',
     'borderRouteOther',

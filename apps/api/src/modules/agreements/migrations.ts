@@ -113,7 +113,7 @@ export const agreementsMigrations: MigrationSet = {
         .addColumn('from_district_code', sql`varchar(16)`)
         .addColumn('to_district_code', sql`varchar(16)`)
         .addColumn('overnight', sql`tinyint(1)`)
-        .addColumn('same_day_50km', sql`tinyint(1)`)
+        .addColumn('same_day_over50km', sql`tinyint(1)`)
         .addColumn('country_iso2', sql`char(2)`)
         .addColumn('zone_code', sql`varchar(4)`)
         .addColumn('border_route_id', uuidType)

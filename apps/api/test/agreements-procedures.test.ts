@@ -26,7 +26,7 @@ describe.skipIf(!dbTestsEnabled)('agreement procedures', () => {
           subject: 'Audit',
           title: 'Branch audit',
           reference: null,
-          docNo: over.docNo ?? `${String(n).padStart(4, '0')}.BCEL.888010.2026`,
+          docNo: over.docNo ?? `${String(n).padStart(4, '0')}.BCEL.888099.2026`,
           docDate: '2026-10-29',
           branchCode: '888010',
           travelFrom: '2026-11-02',
@@ -49,17 +49,18 @@ describe.skipIf(!dbTestsEnabled)('agreement procedures', () => {
   })
 
   it('issues REFs in order, per year, without gaps under concurrency', async () => {
-    setClock(() => new Date('2026-12-31T10:00:00Z'))
+    // Years no other test file issues REFs in (the test database is shared by the files of a run).
+    setClock(() => new Date('2031-12-31T10:00:00Z'))
     const refs = await Promise.all(Array.from({ length: 5 }, () => sys(() => inTransaction(nextRef))))
     expect([...refs].sort()).toEqual([
-      'TA-2026-000001',
-      'TA-2026-000002',
-      'TA-2026-000003',
-      'TA-2026-000004',
-      'TA-2026-000005',
+      'TA-2031-000001',
+      'TA-2031-000002',
+      'TA-2031-000003',
+      'TA-2031-000004',
+      'TA-2031-000005',
     ])
-    setClock(() => new Date('2026-12-31T18:00:00Z')) // 2027-01-01 in HRM time
-    expect(await sys(() => inTransaction(nextRef))).toBe('TA-2027-000001')
+    setClock(() => new Date('2031-12-31T18:00:00Z')) // 2032-01-01 in HRM time
+    expect(await sys(() => inTransaction(nextRef))).toBe('TA-2032-000001')
   })
 
   it('allows only the listed transitions', async () => {
@@ -85,10 +86,10 @@ describe.skipIf(!dbTestsEnabled)('agreement procedures', () => {
   })
 
   it('keeps one live agreement per Doc.no', async () => {
-    const a = await draftRow({ docNo: '0001.BCEL.888010.2026' })
-    await expect(draftRow({ docNo: '0001.BCEL.888010.2026' })).rejects.toThrow()
+    const a = await draftRow({ docNo: '9999.BCEL.888099.2026' })
+    await expect(draftRow({ docNo: '9999.BCEL.888099.2026' })).rejects.toThrow()
     await sys(() => transition(a, 1, 'cancelled', 'wrong dates'))
-    await expect(draftRow({ docNo: '0001.BCEL.888010.2026' })).resolves.toBeTruthy()
+    await expect(draftRow({ docNo: '9999.BCEL.888099.2026' })).resolves.toBeTruthy()
   })
 
   it('seeds the HR roles with their permissions', async () => {

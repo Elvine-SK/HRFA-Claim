@@ -53,7 +53,8 @@ export const DOWN_URL = 'mysql://app:app_dev@127.0.0.1:1/hr_fam_test_down'
 
 /**
  * An HRM employee signed in through the handoff, as HRM would send them: a fresh code is put in the fixture
- * `tb_app_handoff`, redeemed through `GET /auth/hrm`, and `roleIds` are granted afterwards.
+ * `tb_app_handoff` (with an HRM session in `tb_current_login`), redeemed through `GET /auth/hrm`, and `roleIds`
+ * are granted afterwards.
  */
 export async function hrmClient(platform: PlatformApp, admin: TestClient, eid: string, roleIds: string[] = []) {
   const code = `test-${eid}-${uuidv7()}`
@@ -62,6 +63,9 @@ export async function hrmClient(platform: PlatformApp, admin: TestClient, eid: s
   try {
     await sql`INSERT INTO tb_app_handoff (code_hash, eid, created_at, expires_at)
       VALUES (SHA2(${code}, 256), ${eid}, NOW(), '2099-01-01 00:00:00')`.execute(hrm)
+    // Signed in to HRM too, so the logout sync of other test files leaves this session alone.
+    await sql`INSERT INTO tb_current_login (eid, session_token, start_time, last_act)
+      VALUES (${eid}, ${code}, NOW(), NOW())`.execute(hrm)
   } finally {
     await hrm.destroy()
   }

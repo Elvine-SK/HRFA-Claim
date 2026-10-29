@@ -83,7 +83,7 @@ export interface AgreementsTable extends StandardColumns {
   fromDistrictCode: string | null
   toDistrictCode: string | null
   overnight: boolean | null
-  sameDay50Km: boolean | null
+  sameDayOver50km: boolean | null
   countryIso2: string | null
   zoneCode: string | null
   borderRouteId: string | null
