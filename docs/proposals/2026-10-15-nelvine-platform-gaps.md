@@ -1,6 +1,7 @@
 # nelvine-platform: Gaps and Proposed Modules
 
-Date: 2026-10-15. Status: proposal for the platform team.
+Date: 2026-10-15, updated 2026-10-29 (C3 hook in generated apps, C5 date fields). Status: proposal for the
+platform team.
 Shared copy: https://claude.ai/code/artifact/8abaea3e-cf9e-4ade-ad08-8b2de8493a84
 
 Four capabilities are missing before a business back-office app can be built on nelvine-platform: external
@@ -21,6 +22,7 @@ platform, not for that one.
 | C2  | Pluggable file writers (XLSX, fixed-width)   | Core improvement | `transfer`                        | Every app that exports to finance, auditors or another system                      |
 | C3  | Organisation scope distinct from tenancy     | Core improvement | `authorization` docs + helper     | Every multi-branch or multi-department organisation                                |
 | C4  | Money and decimal helpers                    | Core improvement | `core`                            | Every app that handles amounts                                                     |
+| C5  | Date fields in the organisation's format     | Core improvement | `nuxt` (web template)             | Every app whose users write dates day first (dd/mm/yyyy)                           |
 | N1  | Business calendar                            | Nice to have     | New package `calendar`            | Deadlines, SLAs, approval due times in working days                                |
 | N2  | Posting batches (ledger lines and export)    | Nice to have     | New package `posting`             | Every app that pays, charges or books entries                                      |
 | N3  | Printable documents and PDF                  | Nice to have     | New package `documents`           | Every app with paper forms, letters or receipts                                    |
@@ -139,12 +141,35 @@ one unit, sees their unit's records, and head office sees all. This already work
 `SubjectAttributesProvider` and policy conditions. Proposed: a documented pattern and a small helper for unit-tree
 scope ("my unit and its children"), and a note in the tenancy docs so teams do not model branches as workspaces.
 
+Found while building the first app (2026-10-29): an app created with `nelv` cannot pass `subjectAttributes`.
+The generated `platform.modules.ts` calls `authorization()` with no options, and it must not be edited by hand.
+The first app therefore scopes by branch in its own code (`scopedBy`) rather than with policies. Proposed: let an
+app declare its subject attributes in a module field (for example `subjectAttributes` on `defineModule`) or in
+`.nelvrc.json`, so the generated file wires them in. Then a branch rule becomes a policy
+(`branchCode eq subject.branchCode`) that administrators can see and change.
+
 ### C4. Money and decimal helpers in `core`
 
 MariaDB returns `DECIMAL` as a string, and JavaScript numbers are floats. Proposed: a decimal type with arithmetic,
 named rounding modes (including organisation rules such as "round up from a set digit"), currency codes with minor
 units, and a Zod schema for amounts in requests and responses. One helper avoids each app rounding the same amount
 differently.
+
+### C5. Date fields in the organisation's format
+
+The web template uses the browser's native date input (`<UInput type="date">`), whose format follows the
+browser's language: an English browser shows mm/dd/yyyy, while staff in Laos write dd/mm/yyyy. The page cannot
+change it. Nuxt UI already has `UInputDate` and `UCalendar`, but they take `@internationalized/date` values, a
+package the app cannot add because the generated `package.json` files must not be edited by hand. Proposed:
+
+- `@elvine-sk/platform-nuxt` ships a date field (`PlatformDateInput`, built on `UInputDate`) whose model is a
+  plain `YYYY-MM-DD` string, so apps and the API keep using ISO dates.
+- An app setting for the date order (`dd/mm/yyyy` by default for `lo`, configurable for `en`), used by that field
+  and by `useDates()` for displaying dates, so lists, detail pages and inputs agree.
+- `@internationalized/date` becomes a dependency of `platform-nuxt`, not of each app.
+
+Until then the first app has its own small field (typed dd/mm/yyyy, with the browser's calendar behind a button),
+with the same `YYYY-MM-DD` model, so moving to the platform field is a component swap.
 
 ## Nice to have
 
@@ -178,10 +203,11 @@ fields, stores the source version, and shows a "source changed since submit" war
 
 1. M1 external data sources and M2 sign-in handoff: an app cannot show a screen without them.
 2. M3 document numbering and M4 reference data: needed for the first forms and the first calculation.
-3. C1 approval routing and C4 money helpers: apps can bridge with a custom resolver and local helpers until then.
+3. C1 approval routing, C3 subject attributes in generated apps, C4 money helpers and C5 date fields: apps can
+   bridge with a custom resolver, their own scope code and local helpers until then.
 4. C2 file writers, N1 calendar, N2 posting batches: built inside the first app, moved up when a second app needs
    them.
-5. C3 docs, N3 PDF, N4 snapshot helper: as demand appears.
+5. C3 unit-tree helper and docs, N3 PDF, N4 snapshot helper: as demand appears.
 
 Meanwhile the first app builds items 3 to 5 in its own modules, behind interfaces that match this proposal, so
 moving them into the platform is a package swap rather than a rewrite.

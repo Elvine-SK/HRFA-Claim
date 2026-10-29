@@ -108,6 +108,7 @@ the platform package once released.
 | C2 XLSX writer              | Not started                                                      | App writer behind an interface (plan 4)                         |
 | C4 money helpers            | Not started                                                      | App helper for decimals and rounding (plan 2)                   |
 | N1 calendar, N2 posting     | Not started                                                      | App code (plans 4–5)                                            |
+| C5 date fields (2026-10-29) | Proposed                                                         | `AppDateInput.vue` (dd/mm/yyyy, model `YYYY-MM-DD`); swap later  |
 
 The app depends on the platform checkout by absolute `link:` paths (`.nelvrc.json`, `apps/*/package.json`). When
 the platform releases data sources, run `nelv upgrade` to move to the registry version.

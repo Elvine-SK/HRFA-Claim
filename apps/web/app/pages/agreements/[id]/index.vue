@@ -49,11 +49,11 @@ const rows = computed(() => {
   if (!x) return []
   const out = [
     [t('agreements.field.docNo'), x.docNo],
-    [t('agreements.field.docDate'), x.docDate],
+    [t('agreements.field.docDate'), formatDayFirst(x.docDate)],
     [t('agreements.field.subject'), x.subject],
     [t('agreements.field.title'), x.title],
     [t('agreements.field.reference'), x.reference ?? '—'],
-    [t('agreements.field.travel'), `${x.travelFrom} – ${x.travelTo}`],
+    [t('agreements.field.travel'), `${formatDayFirst(x.travelFrom)} – ${formatDayFirst(x.travelTo)}`],
     [t('agreements.field.where'), where.value],
     [t('agreements.field.policy'), t(`agreements.policy.${x.policyOption}`)],
     [t('agreements.field.hasAdvance'), x.hasAdvance ? t('agreements.form.yes') : t('agreements.form.no')],
@@ -151,7 +151,7 @@ const mayEdit = computed(() => isDraft.value && access.canSome('agreement.create
                   }}</span>
                 </td>
                 <td class="mono">{{ m.rankCode ?? '—' }}</td>
-                <td class="mono whitespace-nowrap">{{ m.departureDate }} – {{ m.returnDate }}</td>
+                <td class="mono whitespace-nowrap">{{ formatDayFirst(m.departureDate) }} – {{ formatDayFirst(m.returnDate) }}</td>
                 <td class="mt-num">
                   {{ m.paidDays }}<span v-if="m.daysSubtracted" class="text-[var(--ui-text-muted)]">
                     / {{ m.calculatedDays }}</span

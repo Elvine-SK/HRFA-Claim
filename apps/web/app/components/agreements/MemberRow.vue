@@ -76,10 +76,10 @@ const positionItems = computed(() => [
     </div>
     <div class="grid gap-3 sm:grid-cols-4">
       <UFormField :label="t('agreements.member.departure')" :error="err('departureDate')">
-        <UInput v-model="member.departureDate" type="date" class="w-full" />
+        <AppDateInput v-model="member.departureDate" />
       </UFormField>
       <UFormField :label="t('agreements.member.return')" :error="err('returnDate')">
-        <UInput v-model="member.returnDate" type="date" class="w-full" />
+        <AppDateInput v-model="member.returnDate" />
       </UFormField>
       <UFormField :label="t('agreements.member.daysSubtracted')" :error="err('daysSubtracted')">
         <UInput v-model.number="member.daysSubtracted" type="number" min="0" class="w-full" />

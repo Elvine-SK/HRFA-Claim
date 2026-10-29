@@ -285,5 +285,8 @@
     "agreements_account_missing": "ບໍ່ມີບັນຊີສະກຸນເງິນນີ້ໃນ HRM",
     "agreements_signed_copy_required": "ແນບສັນຍາທີ່ເຊັນແລ້ວກ່ອນສົ່ງ",
     "agreements_not_draft": "ແກ້ໄຂໄດ້ສະເພາະສັນຍາທີ່ເປັນສະບັບຮ່າງ"
+  },
+  "dates": {
+    "openCalendar": "ເປີດປະຕິທິນ"
   }
 }

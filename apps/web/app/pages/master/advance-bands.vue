@@ -128,7 +128,7 @@ function remove(k: AdvanceKind, from: string) {
         <form id="bands-form" class="grid gap-4" novalidate @submit.prevent="publish">
           <UAlert v-if="formError" color="error" variant="subtle" :description="formError" />
           <UFormField :label="t('master.effectiveFrom')" :hint="t('master.futureHint')" required>
-            <UInput v-model="effectiveFrom" type="date" class="w-full sm:w-56" />
+            <AppDateInput v-model="effectiveFrom" class="w-full sm:w-56" />
           </UFormField>
           <p class="text-[13px] text-muted">{{ t('master.amountsIn', { currency: ADVANCE_CURRENCY[kind] }) }}</p>
           <div class="grid gap-3">

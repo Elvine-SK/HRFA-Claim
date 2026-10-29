@@ -111,7 +111,7 @@ function remove(key: FlatRateKey, from: string) {
         <form id="flat-form" class="grid gap-4" novalidate @submit.prevent="publish">
           <UAlert v-if="formError" color="error" variant="subtle" :description="formError" />
           <UFormField :label="t('master.effectiveFrom')" :hint="t(form.key === 'fuel_price' ? 'master.todayOrLaterHint' : 'master.futureHint')" required>
-            <UInput v-model="form.effectiveFrom" type="date" :min="minDate" class="w-full" />
+            <AppDateInput v-model="form.effectiveFrom" :min="minDate" />
           </UFormField>
           <UFormField
             :label="t('master.amount')"

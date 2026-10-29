@@ -19,7 +19,7 @@ const columns = computed<DataTableColumn<AgreementListItem>[]>(() => [
   { key: 'docNo', label: t('agreements.field.docNo'), sortable: true, mono: true, card: true },
   { key: 'subject', label: t('agreements.field.subject'), card: true },
   { key: 'formType', label: t('agreements.field.formType'), card: true, value: (r) => t(`agreements.formType.${r.formType}`) },
-  { key: 'travelFrom', label: t('agreements.field.travelFrom'), sortable: true, mono: true },
+  { key: 'travelFrom', label: t('agreements.field.travelFrom'), sortable: true, mono: true, value: (r) => formatDayFirst(r.travelFrom) },
   { key: 'status', label: t('agreements.field.status'), card: true },
   { key: 'createdAt', label: t('agreements.field.createdAt'), sortable: true, align: 'end' },
 ])

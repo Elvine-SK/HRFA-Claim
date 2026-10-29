@@ -285,5 +285,8 @@
     "agreements_account_missing": "No account in this currency in HRM",
     "agreements_signed_copy_required": "Attach the signed agreement before submitting",
     "agreements_not_draft": "Only a draft agreement can be changed"
+  },
+  "dates": {
+    "openCalendar": "Open the calendar"
   }
 }

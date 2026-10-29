@@ -227,7 +227,7 @@ async function save() {
           <UInput v-model="form.docNo" class="w-full" placeholder="0001.BCEL.888010.2026" />
         </UFormField>
         <UFormField :label="t('agreements.field.docDate')" :error="errors.fields.docDate" required>
-          <UInput v-model="form.docDate" type="date" class="w-full" />
+          <AppDateInput v-model="form.docDate" />
         </UFormField>
         <UFormField :label="t('agreements.field.subject')" :error="errors.fields.subject" required class="sm:col-span-2">
           <UInput v-model="form.subject" class="w-full" maxlength="500" />
@@ -239,10 +239,10 @@ async function save() {
           <UInput v-model="form.reference" class="w-full" maxlength="200" />
         </UFormField>
         <UFormField :label="t('agreements.field.travelFrom')" :error="errors.fields.travelFrom" required>
-          <UInput v-model="form.travelFrom" type="date" class="w-full" />
+          <AppDateInput v-model="form.travelFrom" />
         </UFormField>
         <UFormField :label="t('agreements.field.travelTo')" :error="errors.fields.travelTo" required>
-          <UInput v-model="form.travelTo" type="date" class="w-full" :disabled="form.formType === 'district' && !form.overnight" />
+          <AppDateInput v-model="form.travelTo" :disabled="form.formType === 'district' && !form.overnight" />
         </UFormField>
 
         <template v-if="form.formType === 'domestic' || form.formType === 'border'">

@@ -106,7 +106,7 @@ function remove(from: string) {
               </p>
             </div>
             <div class="flex items-center gap-2">
-              <UInput v-model="on" type="date" :aria-label="t('master.seeDate')" />
+              <AppDateInput v-model="on" class="w-44" :aria-label="t('master.seeDate')" />
               <UButton v-if="on" color="neutral" variant="ghost" @click="on = ''">{{ t('master.todayButton') }}</UButton>
             </div>
           </div>
@@ -154,7 +154,7 @@ function remove(from: string) {
         <form id="rates-form" class="grid gap-4" novalidate @submit.prevent="publish">
           <UAlert v-if="formError" color="error" variant="subtle" :description="formError" />
           <UFormField :label="t('master.effectiveFrom')" :hint="t('master.futureHint')" required>
-            <UInput v-model="effectiveFrom" type="date" class="w-full sm:w-56" />
+            <AppDateInput v-model="effectiveFrom" class="w-full sm:w-56" />
           </UFormField>
           <p class="text-[13px] text-muted">{{ t('master.amountsIn', { currency: currency ?? '' }) }}</p>
           <div class="grid gap-3">
