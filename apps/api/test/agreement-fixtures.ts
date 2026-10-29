@@ -46,11 +46,12 @@ export function domesticBodies(year: number, leader = '10010') {
 
 const PDF = new TextEncoder().encode('%PDF-1.4\n1 0 obj << >> endobj\ntrailer << >>\n%%EOF\n')
 
-/** The workflow as an administrator creates it from `workflow.json`. */
-export async function createWorkflow(admin: TestClient) {
-  const file = JSON.parse(
-    readFileSync(join(import.meta.dirname, '../src/modules/agreements/workflow.json'), 'utf8'),
-  ) as { key: string; name: string; entityType: string; definition: unknown }
+/** The workflow as an administrator creates it from a `workflow.json` (default: the agreements'). */
+export async function createWorkflow(
+  admin: TestClient,
+  path: string = join(import.meta.dirname, '../src/modules/agreements/workflow.json'),
+) {
+  const file = JSON.parse(readFileSync(path, 'utf8')) as { key: string; name: string; entityType: string; definition: unknown }
   const existing = await admin.get(`${API}/approval/workflows`)
   if (existing.body.data?.some((w: any) => w.key === file.key)) return
   const wf = await admin.post(`${API}/approval/workflows`, { key: file.key, entityType: file.entityType, name: file.name })

@@ -1,6 +1,8 @@
+import { APPROVAL } from '@elvine-sk/platform-approval'
+import { SubmitBody } from '@elvine-sk/platform-approval/schemas'
 import { requireUser } from '@elvine-sk/platform-auth'
 import { AppError } from '@elvine-sk/platform-core'
-import { paginate } from '@elvine-sk/platform-db'
+import { inTransaction, paginate } from '@elvine-sk/platform-db'
 import {
   createRoute,
   dataOf,
@@ -17,10 +19,12 @@ import {
 import { findAgreement, findByNumber } from '../agreements/queries.ts'
 import type { C } from '../agreements/scope.ts'
 import {
+  assertBillsComplete,
   createPayment,
   findPayment,
   livePaymentOf,
   loadPayment,
+  notCalculated,
   paymentRows,
   recalculatePayment,
   saveBills,
@@ -160,6 +164,33 @@ export function paymentRoutes(api: ApiRouter, ctx: ModuleContext) {
       await requireCalculate(ctx, c, row.branchCode)
       const { version, bills } = c.req.valid('json')
       await saveBills(id, version, bills)
+      return c.json({ data: await loadPayment(id, lang(c)) }, 200)
+    },
+  )
+
+  api.openapi(
+    createRoute({
+      method: 'post',
+      path: '/payments/{id}/submit',
+      tags,
+      summary: 'Submit a calculated payment for approval by the finance section head (or resubmit a returned one)',
+      request: { params: IdParam, ...jsonBody(SubmitBody) },
+      responses: { 200: jsonContent(dataOf(PaymentSchema), 'Submitted'), ...errorResponses(401, 403, 404, 409, 422) },
+    }),
+    async (c) => {
+      const { user } = requireUser(c)
+      const id = c.req.valid('param').id
+      const row = await readable(ctx, c, id)
+      await requireCalculate(ctx, c, row.branchCode)
+      if (row.status !== 'calculated') throw notCalculated()
+      const approval = ctx.services.get(APPROVAL)
+      // One transaction: with no approver the submission fails and the payment stays calculated.
+      await inTransaction(async () => {
+        await assertBillsComplete(id)
+        const open = await approval.openRequestOf('payment', id)
+        if (open?.status === 'returned') await approval.resubmit(open.id, user.id)
+        else await approval.submit('payment', id, user.id, { workflow: c.req.valid('json').workflow })
+      })
       return c.json({ data: await loadPayment(id, lang(c)) }, 200)
     },
   )

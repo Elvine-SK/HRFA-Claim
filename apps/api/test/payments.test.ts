@@ -156,8 +156,10 @@ describe.skipIf(!dbTestsEnabled)('payments (calculate and checking table)', () =
     expect((await brFinance.get(url(`/${hoP.id}`))).status).toBe(404)
     expect((await brFinance.get(url(`/lookup?number=${hoA.ref}`))).status).toBe(404)
     expect((await brFinance.post(url(), { agreementId: other.id })).status).toBe(404)
-    const empty = await brFinance.get(url())
-    expect([empty.status, empty.body.meta.total]).toEqual([200, 0])
+    // Other test files share the database and may leave payments of this branch; none of head office shows.
+    const own = await brFinance.get(url('?pageSize=100'))
+    expect(own.status).toBe(200)
+    expect(own.body.data.map((p: any) => p.branchCode).filter((b: string) => b !== '888020')).toEqual([])
 
     const brA = await approvedAgreement(
       platform,
@@ -168,7 +170,8 @@ describe.skipIf(!dbTestsEnabled)('payments (calculate and checking table)', () =
     expect(brP.status, JSON.stringify(brP.body)).toBe(201)
     expect(brP.body.data.branchCode).toBe('888020')
     const brList = (await brFinance.get(url('?pageSize=100'))).body.data.map((p: any) => p.id)
-    expect(brList).toEqual([brP.body.data.id])
+    expect(brList).toContain(brP.body.data.id)
+    expect(brList).not.toContain(hoP.id)
 
     // Head office sees both.
     const hoList = (await hoFinance.get(url('?pageSize=100'))).body.data.map((p: any) => p.id)

@@ -1,4 +1,5 @@
-import { defineModule } from '@elvine-sk/platform-server'
+import { defineModule, type ModuleContext } from '@elvine-sk/platform-server'
+import { paymentApproval, paymentResolvers } from './approval.ts'
 import { paymentsMigrations } from './migrations.ts'
 import { paymentRoutes } from './routes.ts'
 import { paymentFields } from './schema.ts'
@@ -16,6 +17,9 @@ const messages = {
     'payments.fuel_not_overseas': 'Fuel is not paid on an overseas trip',
     'payments.advance_band_missing': 'No advance band covers this trip',
     'payments.amount_too_large': 'An amount has more than 13 whole digits',
+    'payments.bills_missing': 'A night from day 8 has no bill; enter 0 if there is none',
+    'notify.payments.approved.title': 'Payment {ref} is approved',
+    'notify.payments.approved.body': 'It is ready for the upload file.',
   },
   lo: {
     'payments.bad_transition': 'ການຈ່າຍເງິນບໍ່ສາມາດປ່ຽນໄປເປັນສະຖານະນີ້ຈາກສະຖານະປັດຈຸບັນໄດ້',
@@ -29,7 +33,16 @@ const messages = {
     'payments.fuel_not_overseas': 'ບໍ່ຈ່າຍຄ່ານ້ຳມັນສຳລັບການເດີນທາງໄປຕ່າງປະເທດ',
     'payments.advance_band_missing': 'ບໍ່ມີຂັ້ນເງິນລ່ວງໜ້າທີ່ກວມເອົາການເດີນທາງນີ້',
     'payments.amount_too_large': 'ມີຈຳນວນເງິນເກີນ 13 ຫຼັກ',
+    'payments.bills_missing': 'ມີຄືນຕັ້ງແຕ່ມື້ທີ 8 ທີ່ບໍ່ມີໃບບິນ; ໃສ່ 0 ຖ້າບໍ່ມີ',
+    'notify.payments.approved.title': 'ການຈ່າຍເງິນ {ref} ໄດ້ຮັບອະນຸມັດແລ້ວ',
+    'notify.payments.approved.body': 'ພ້ອມສຳລັບໄຟລ໌ອັບໂຫຼດ.',
   },
+}
+
+let moduleCtx: ModuleContext | undefined
+const ctx = () => {
+  if (!moduleCtx) throw new Error('payments module is not set up')
+  return moduleCtx
 }
 
 /**
@@ -38,10 +51,16 @@ const messages = {
  */
 export const paymentsModule = defineModule({
   name: 'payments',
-  dependsOn: ['authorization', 'auth-hrm', 'travel-master', 'agreements', 'audit'],
+  dependsOn: ['authorization', 'auth-hrm', 'travel-master', 'agreements', 'audit', 'approval', 'notifications'],
   migrations: paymentsMigrations,
   permissions: { payment: ['read', 'calculate', 'export'] },
   lists: { payments: { fields: paymentFields } },
+  approvalEntities: [paymentApproval(ctx)],
+  approvalResolvers: paymentResolvers,
+  notificationTypes: { 'payments.approved': {} },
   messages,
+  setup(c) {
+    moduleCtx = c
+  },
   routes: (api, c) => paymentRoutes(api, c),
 })

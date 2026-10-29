@@ -1,0 +1,16 @@
+{
+  "key": "payment",
+  "entityType": "payment",
+  "name": "Travel payment (spec §9)",
+  "definition": {
+    "stages": [
+      {
+        "key": "finance_section_head",
+        "steps": [
+          { "key": "finance_section_head", "approvers": { "resolver": "payment.finance_section_head" }, "completion": "any" }
+        ]
+      }
+    ],
+    "rules": { "allowSelfApproval": false, "rejectEndsRequest": true }
+  }
+}

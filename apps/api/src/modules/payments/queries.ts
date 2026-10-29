@@ -253,6 +253,24 @@ export function billedNightsOf(row: PaymentRow, members: MemberRow[]): Map<strin
   return out
 }
 
+/** 422 `payments.bills_missing` when a billed night of any member has no bill (Finance may enter `0`). */
+export async function assertBillsComplete(id: string): Promise<void> {
+  const row = await findPayment(id)
+  if (!row) throw AppError.notFound()
+  const given = new Set((await billsOf(id)).map((b) => `${b.eid}:${b.night}`))
+  const errors: FieldError[] = []
+  for (const [eid, nights] of billedNightsOf(row, await membersOf(row.agreementId)))
+    for (const night of nights)
+      if (!given.has(`${eid}:${night}`))
+        errors.push({
+          path: 'bills',
+          code: 'payments.bills_missing',
+          message: `No bill for night ${night} of ${eid}`,
+        })
+  if (errors.length)
+    throw new AppError('payments.bills_missing', 'A night from day 8 has no bill', { status: 422, details: errors })
+}
+
 /**
  * Finance's bills for nights from day 8 replace the stored ones, then the payment is calculated again. Every bill
  * must be for a night that takes one (422 `payments.night_invalid` at `bills.<n>.night`).
