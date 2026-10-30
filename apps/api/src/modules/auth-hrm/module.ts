@@ -2,7 +2,9 @@ import { AUTH } from '@elvine-sk/platform-auth'
 import { defineModule, type ModuleContext } from '@elvine-sk/platform-server'
 import { SYNC_JOB, syncHrmSessions } from './logout-sync.ts'
 import { authHrmMigrations } from './migrations.ts'
+import { HEAD_OFFICE_BRANCH } from '../agreements/types.ts'
 import { authHrmRoutes } from './routes.ts'
+import { employeeOfUser } from './users.ts'
 
 const messages = {
   en: {
@@ -53,6 +55,24 @@ export const authHrmModule = defineModule({
   ],
   // Every minute: an HRM logout ends the app session within a minute (spec §6).
   recurringJobs: [{ name: SYNC_JOB, job: SYNC_JOB, every: '1m' }],
+  // `subject.branchCode`, `subject.eid` and `subject.headOffice` for policy conditions, from the HRM employee
+  // linked to the user. The app's own branch scope stays in code (agreements/scope.ts); these let an administrator
+  // add a policy on top, e.g. deny a branch. HRM unreachable: no attributes, so conditions on them are unknown
+  // (a conditional DENY then denies, a conditional ALLOW does not allow).
+  async subjectAttributes(userId) {
+    try {
+      const employee = await employeeOfUser(userId)
+      if (!employee) return {}
+      return {
+        branchCode: employee.branchCode,
+        eid: employee.eid,
+        headOffice: employee.branchCode === HEAD_OFFICE_BRANCH,
+      }
+    } catch (err) {
+      moduleCtx?.logger.warn({ err }, 'auth-hrm: subject attributes unavailable')
+      return {}
+    }
+  },
   setup(c) {
     moduleCtx = c
   },

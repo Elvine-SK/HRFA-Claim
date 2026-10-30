@@ -10,8 +10,9 @@ import { HEAD_OFFICE_BRANCH } from './types.ts'
 export type C = Parameters<typeof requireUser>[0]
 
 /**
- * Who sees which agreements (spec §12). The branch comes from the caller's HRM employee record, which platform
- * policies cannot see (no `subjectAttributes` hook in the generated platform modules), so the rule lives here:
+ * Who sees which agreements (spec §12). The branch comes from the caller's HRM employee record. Policies can see it
+ * too since platform 1.1.0 (`subject.branchCode`, from auth-hrm), but membership and the 404 for another branch's
+ * documents cannot be policies, and routes check permissions rather than per-record policies, so the rule lives here:
  * - `all`: super administrators, and `agreement.read` holders at head office;
  * - `branch`: `agreement.read` holders elsewhere, for the agreements of their HRM branch;
  * - `own`: everyone else, for the agreements they are a member of or created.

@@ -4,6 +4,7 @@ import type { PlatformApp } from '@elvine-sk/platform-server'
 import { TEST_ORIGIN, TestClient } from '@elvine-sk/platform-server/testing'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { AUTH } from '@elvine-sk/platform-auth'
+import { AUTHORIZATION } from '@elvine-sk/platform-authorization'
 import { syncHrmSessions } from '../src/modules/auth-hrm/logout-sync.ts'
 import { API, bootApp, DOWN_URL } from './helpers.ts'
 
@@ -106,6 +107,21 @@ describe.skipIf(!dbTestsEnabled)('auth-hrm sign-in', () => {
   it('/hrm/me answers 404 for a signed-in user without an HRM link', async () => {
     const { adminClient } = await import('./helpers.ts')
     expect((await (await adminClient(platform)).get(`${API}/hrm/me`)).status).toBe(404)
+  })
+
+  it('gives policies the HRM branch, EID and head office flag as subject attributes', async () => {
+    const { adminClient, hrmClient } = await import('./helpers.ts')
+    const admin = await adminClient(platform)
+    const authz = platform.ctx.services.get(AUTHORIZATION)
+    const attributesOf = async (eid: string) => {
+      const { userId } = await hrmClient(platform, admin, eid)
+      return runWithContext(SYSTEM_CONTEXT, async () => (await authz.loadSubject(userId, { cache: false })).summary.attributes)
+    }
+    expect(await attributesOf('10013')).toEqual({ branchCode: '888010', eid: '10013', headOffice: true })
+    expect(await attributesOf('10023')).toEqual({ branchCode: '888020', eid: '10023', headOffice: false })
+    // The bootstrap administrator has no HRM link, so no attributes.
+    const me = (await admin.get(`${API}/auth/session`)).body.data.user.id
+    expect(await runWithContext(SYSTEM_CONTEXT, async () => (await authz.loadSubject(me, { cache: false })).summary.attributes)).toEqual({})
   })
 
   it('/hrm/me needs a session', async () => {
