@@ -53,6 +53,9 @@ importers:
       '@elvine-sk/platform-transfer':
         specifier: link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/transfer
         version: link:../../../nelvine-platform/packages/transfer
+      '@elvine-sk/platform-views':
+        specifier: link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/views
+        version: link:../../../nelvine-platform/packages/views
       exceljs:
         specifier: 4.4.0
         version: 4.4.0

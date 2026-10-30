@@ -8,6 +8,7 @@ import { files, filesConfigSchema } from '@elvine-sk/platform-files'
 import { jobs, jobsConfigSchema } from '@elvine-sk/platform-jobs'
 import { notifications } from '@elvine-sk/platform-notifications'
 import { transfer } from '@elvine-sk/platform-transfer'
+import { views } from '@elvine-sk/platform-views'
 
 export const APP_NAME = 'hr-fam'
 export const APP_TITLE = 'HR-FAM'
@@ -27,6 +28,7 @@ export function platformModules() {
     authorization(),
     jobs(),
     notifications(),
+    views(),
     dashboard(),
     files(),
     approval(),

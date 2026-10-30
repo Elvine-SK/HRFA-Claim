@@ -25,6 +25,7 @@
     "@elvine-sk/platform-notifications": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/notifications",
     "@elvine-sk/platform-server": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/server",
     "@elvine-sk/platform-transfer": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/transfer",
+    "@elvine-sk/platform-views": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/views",
     "exceljs": "4.4.0"
   },
   "devDependencies": {
