@@ -1,6 +1,7 @@
 import { now, uuidv7 } from '@elvine-sk/platform-core'
 import { createdStamp, currentDb, inTransaction, sql, uuidBin } from '@elvine-sk/platform-db'
 import { findEmployee, type HrmEmployee } from '../hrm/employees.ts'
+import { hrmError } from './handoff.ts'
 import { EMPLOYEE_ROLE_KEY } from './migrations.ts'
 
 /** The platform user linked to an EID, if any. */
@@ -41,6 +42,13 @@ export async function ensureHrmUser(
       .insertInto('users')
       .values({ ...createdStamp(id), username: employee.eid, email: null, displayName, status: 'active' })
       .execute()
+      .catch((err: unknown) => {
+        // A local account already uses the EID as its username. It is never taken over: an administrator links
+        // it (a `hrm_user_links` row) or renames it.
+        if ((err as { errno?: number }).errno === 1062)
+          throw hrmError('eid_taken', 'Another account already uses this EID as its username')
+        throw err
+      })
     await currentDb()
       .insertInto('hrmUserLinks')
       .values({ eid: employee.eid, userId: uuidBin(id), createdAt: now(), lastLoginAt: null })

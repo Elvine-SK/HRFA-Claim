@@ -16,6 +16,7 @@ const messages = {
     'auth_hrm.rate_limited': 'Too many sign-in attempts. Try again later',
     'auth_hrm.failed': 'Sign-in from HRM failed',
     'auth_hrm.bad_origin': 'Open this system from the HRM portal',
+    'auth_hrm.eid_taken': 'Another account in this system already uses your EID. Ask an administrator to link it',
   },
   lo: {
     'auth_hrm.code_invalid': 'ລິ້ງເຂົ້າສູ່ລະບົບໝົດອາຍຸ ຫຼື ບໍ່ຖືກຕ້ອງ. ກະລຸນາເປີດລະບົບໃໝ່ຈາກ HRM',
@@ -26,6 +27,7 @@ const messages = {
     'auth_hrm.rate_limited': 'ພະຍາຍາມເຂົ້າສູ່ລະບົບຫຼາຍເກີນໄປ. ກະລຸນາລອງໃໝ່ພາຍຫຼັງ',
     'auth_hrm.failed': 'ການເຂົ້າສູ່ລະບົບຈາກ HRM ບໍ່ສຳເລັດ',
     'auth_hrm.bad_origin': 'ກະລຸນາເປີດລະບົບນີ້ຈາກ HRM',
+    'auth_hrm.eid_taken': 'ມີບັນຊີອື່ນໃນລະບົບນີ້ໃຊ້ EID ຂອງທ່ານແລ້ວ. ກະລຸນາແຈ້ງຜູ້ດູແລລະບົບໃຫ້ເຊື່ອມບັນຊີ',
   },
 }
 

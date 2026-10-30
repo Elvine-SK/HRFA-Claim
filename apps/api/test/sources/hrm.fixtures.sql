@@ -87,7 +87,9 @@ INSERT INTO hrm_employee
   ('10080', 'ບຸນທັນ', 'ແກ້ວ', 'Bounthan', 'Keo', '888010', '0101', NULL, NULL, '00', '12', 1, 'N', 'A'),
   ('10081', 'ນາລີ', 'ສຸກ', 'Nalee', 'Souk', '888010', '0101', NULL, NULL, '00', '12', 1, 'N', 'A'),
   ('10082', 'ວັນ', 'ໄຊ', 'Vanh', 'Xay', '888010', '0101', NULL, NULL, '00', '12', 1, 'N', 'A'),
-  ('10083', 'ສີ', 'ພອນ', 'Sy', 'Phone', '888020', '0101', NULL, NULL, '00', '12', 1, 'N', 'A');
+  ('10083', 'ສີ', 'ພອນ', 'Sy', 'Phone', '888020', '0101', NULL, NULL, '00', '12', 1, 'N', 'A'),
+  -- auth-hrm: an employee whose EID a local account already uses as its username.
+  ('10090', 'ເອກ', 'ຊ້ຳ', 'Ek', 'Sam', '888010', '0101', NULL, NULL, '00', '30', 1, 'N', 'A');
 
 INSERT INTO hrm_employee_account_currency (eid, ccy, account_no, account_name, is_deleted, created_at) VALUES
   ('10001', 'LAK', '0101-OLD', 'SOMPHONE KEOMANY', 0, '2025-01-01 09:00:00'),
@@ -159,6 +161,7 @@ INSERT INTO tb_app_handoff (code_hash, eid, created_at, expires_at) VALUES
   (SHA2('origin-ok-10001', 256), '10001', NOW(), '2099-01-01 00:00:00'),
   (SHA2('origin-bad-10001', 256), '10001', NOW(), '2099-01-01 00:00:00'),
   (SHA2('valid-10003', 256), '10003', NOW(), '2099-01-01 00:00:00'),
+  (SHA2('taken-10090', 256), '10090', NOW(), '2099-01-01 00:00:00'),
   (SHA2('expired-10001', 256), '10001', '2000-01-01 00:00:00', '2000-01-01 00:01:00'),
   (SHA2('soon-10001', 256), '10001', NOW(), NOW() + INTERVAL 5 MINUTE),
   (SHA2('past-10001', 256), '10001', NOW() - INTERVAL 2 MINUTE, NOW() - INTERVAL 1 MINUTE);

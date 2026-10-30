@@ -95,6 +95,23 @@ describe.skipIf(!dbTestsEnabled)('auth-hrm sign-in', () => {
     expect((await signIn(fresh(), 'x'.repeat(300))).headers.get('location')).toBe(errorAt('code_invalid'))
   })
 
+  it('never takes over a local account whose username is the EID', async () => {
+    const users = () =>
+      runWithContext(SYSTEM_CONTEXT, () =>
+        currentDb().selectFrom('users').select(['id', 'displayName']).where('username', '=', '10090').execute(),
+      )
+    await runWithContext(SYSTEM_CONTEXT, async () => {
+      const { createdStamp } = await import('@elvine-sk/platform-db')
+      const { uuidv7 } = await import('@elvine-sk/platform-core')
+      await currentDb()
+        .insertInto('users')
+        .values({ ...createdStamp(uuidv7()), username: '10090', email: null, displayName: 'Local', status: 'active' })
+        .execute()
+    })
+    expect((await signIn(fresh(), 'taken-10090')).headers.get('location')).toBe(errorAt('eid_taken'))
+    expect((await users()).map((u) => u.displayName)).toEqual(['Local'])
+  })
+
   it('refuses an employee who is no longer selectable, even when linked', async () => {
     // 10003 is deleted in HRM: link it to a user as if it had signed in before, then try again.
     await runWithContext(SYSTEM_CONTEXT, async () => {
