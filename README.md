@@ -1,6 +1,6 @@
 # HR-FAM
 
-Built on the Nelvine platform 1.0.0.
+Built on the Nelvine platform 1.1.0.
 
 ## Develop
 
@@ -16,6 +16,7 @@ pnpm run dev:web
 ## Layout
 
 - `apps/api/src/platform.modules.ts`: platform modules, generated from `.nelvrc.json`. Change them with `nelv add <capability>`.
+- `apps/api/src/platform.options.ts`: options for the platform modules (yours; checked against the installed packages).
 - `apps/api/src/modules/`: your modules (routes, migrations, permissions). Register them in `src/modules/index.ts`.
 - `apps/web/app/pages/`: your pages. Platform components, layouts and composables are copied from the template.
 

@@ -47,7 +47,9 @@ Off unless `CAPTCHA_PROVIDER` is set:
 - Answers `429 rate_limit.exceeded` with `Retry-After`. The client IP comes from `X-Forwarded-For` only behind
   `TRUSTED_PROXIES`.
 
-The narrower limits on sign-in, 2-step codes, password reset, tokens and uploads still apply on top.
+The narrower limits on sign-in, 2-step codes, password reset, tokens and uploads still apply on top, as do the
+portal handoff's (10 codes a minute per person, 600 codes and 600 user updates a minute per host, 300 redeems
+per 10 minutes per IP, 10 wrong host secrets per 10 minutes per IP; see `handoff.md`).
 
 The live stream `GET /events` counts once per connection, so a reconnect costs one request. Like every other
 request it is counted per instance.

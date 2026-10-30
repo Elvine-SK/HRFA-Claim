@@ -38,3 +38,8 @@ pnpm run openapi        # after changing routes; then: cd apps/web && pnpm run a
 ## Team conventions
 
 <!-- Add your own: naming, review rules, branches, who to ask. -->
+
+- Exception to "never edit the generated `package.json` files": after a platform update, a copied file may import
+  a platform package the app's manifest lacks (no `nelv` command adds new web template dependencies). Add only
+  that package, in the same `link:` or version form as its neighbours, then `pnpm install`. Done once for
+  `@elvine-sk/platform-auth-handoff` in `apps/web` with 1.1.0 (reported to the platform team).

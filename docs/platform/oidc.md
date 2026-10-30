@@ -8,7 +8,8 @@ Read this before configuring single sign-on.
 - By hand: `oidc({ providers })` in the app's module list, with `providers` written out or read from the
   environment by `oidcProvidersFromEnv()`. Pass nothing to `oidcProvidersFromEnv()` to use `process.env`.
 - The module `dependsOn` `auth` and `audit`; list both before it.
-- Migrations: `pnpm run migrate` creates `user_identities` and `oidc_states`.
+- Migrations: `pnpm run migrate` creates `oidc_states`. Linked accounts live in `user_identities`, which belongs to `auth` (shared with
+  `platform-auth-handoff`).
 - The web shows nothing new until the manifest has `oidc.providers` with at least one entry. Then the sign-in
   page gets an "or" divider and a "Continue with {label}" button per provider, and the Security tab of the
   account page gets a "Single sign-on" card. An app without the module, or with no providers, shows neither

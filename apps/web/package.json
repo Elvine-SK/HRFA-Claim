@@ -22,6 +22,7 @@
     "@elvine-sk/platform-approval": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/approval",
     "@elvine-sk/platform-audit": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/audit",
     "@elvine-sk/platform-auth": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/auth",
+    "@elvine-sk/platform-auth-handoff": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/auth-handoff",
     "@elvine-sk/platform-auth-oidc": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/auth-oidc",
     "@elvine-sk/platform-authorization": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/authorization",
     "@elvine-sk/platform-dashboard": "link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/dashboard",

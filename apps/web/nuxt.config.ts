@@ -9,6 +9,7 @@ const areas = [
   'approval.',
   'dashboard.',
   'files.',
+  'handoff.',
   'lists.',
   'live.',
   'notifications.',

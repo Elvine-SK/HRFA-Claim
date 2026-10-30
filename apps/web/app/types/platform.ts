@@ -6,6 +6,7 @@ import type {
 } from '@elvine-sk/platform-authorization/schemas'
 
 export type { UserAdmin, UsersOverview, UserStatus } from '@elvine-sk/platform-auth/schemas'
+export type { HandoffHost, HandoffIdentity } from '@elvine-sk/platform-auth-handoff/schemas'
 export type { OidcIdentity, OidcProvider } from '@elvine-sk/platform-auth-oidc/schemas'
 export type {
   AccessExplanation,

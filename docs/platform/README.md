@@ -1,6 +1,6 @@
 # Building on the Nelvine platform
 
-These guides describe how HR-FAM is meant to be built on the platform (1.0.0). They are
+These guides describe how HR-FAM is meant to be built on the platform (1.1.0). They are
 recommendations, not rules the build enforces: following them keeps your code secure by default, consistent
 with the platform's own screens, and easy to upgrade. Where the platform does enforce something (a list that
 skips its scope doesn't compile, an undeclared event throws outside production), the guide says so.
@@ -18,6 +18,7 @@ conventions in `AGENTS.md` at the app root, not here: edits here are merged on u
 | [security.md](security.md)           | settings for lockout, CAPTCHA, request limits, live updates and webhooks        |
 | [data-sources.md](data-sources.md)   | reading another system's database (an HR system): config, types, lists, pickers |
 | [oidc.md](oidc.md)                   | setting up single sign-on                                                       |
+| [handoff.md](handoff.md)             | signing in from a host portal (tiles), and what the host team builds            |
 | [deployment.md](deployment.md)       | running several instances, PM2, Redis, the proxy in front of the API            |
 
 ## Where things go
@@ -27,6 +28,7 @@ conventions in `AGENTS.md` at the app root, not here: edits here are merged on u
 | `apps/api/src/modules/<name>/`                          | you             | One folder per module: `module.ts`, `migrations.ts`, `schema.ts`, `queries.ts`, `routes.ts` |
 | `apps/api/src/modules/index.ts`                         | you             | `appModules`: your modules, registered after the platform's                                 |
 | `apps/api/src/platform.modules.ts`                      | generated       | Platform modules from `.nelvrc.json`; change them with `nelv add <capability>`              |
+| `apps/api/src/platform.options.ts`                      | you             | Options for the platform modules (`notifications: { retentionDays: 180 }`), type-checked    |
 | `apps/api/test/`                                        | you             | Tests; `global-setup.ts` builds the test database from every module                         |
 | `apps/web/app/pages/`, `components/`, `plugins/`        | you (new files) | Your pages, components and plugins                                                          |
 | `apps/web/app/pages/index.vue`, `plugins/navigation.ts` | you (starters)  | The home page and your menu groups: copied once, then yours                                 |
@@ -63,7 +65,7 @@ file of your own over editing a copied one.
    writing your own, so lists, filters, empty states and phone layouts behave the same everywhere.
 9. **Test against a real database.** One test file per module through the HTTP API with `TestClient`, covering
    the allowed path and at least one refusal. See [testing.md](testing.md).
-10. **Stay upgradeable.** Don't edit `platform.modules.ts` or the generated `package.json` files by hand; don't
+10. **Stay upgradeable.** Don't edit `platform.modules.ts` (options go in `platform.options.ts`) or the generated `package.json` files by hand; don't
     import a platform package's internal paths, only what it exports.
 
 ## Done means

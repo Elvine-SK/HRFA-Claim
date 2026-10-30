@@ -1,0 +1,37 @@
+{
+  "handoff": {
+    "signedOut": {
+      "title": "You have signed out",
+      "text": "Open the app from your portal to sign in again.",
+      "portal": "Return to the portal",
+      "local": "Sign in with a password instead"
+    },
+    "admin": {
+      "add": "Add portal user",
+      "addTitle": "Add a portal user",
+      "addText": "They sign in from the portal; no password or invitation is sent. You can assign them work right away.",
+      "host": "Portal",
+      "externalId": "Portal user ID",
+      "externalIdHint": "The person's ID in the portal, exactly as the portal sends it.",
+      "created": "{name} was added",
+      "taken": "Another user already has this email or username.",
+      "identities": "Portal accounts",
+      "noIdentities": "Not linked to a portal account.",
+      "lastUsed": "Last signed in {date}",
+      "neverUsed": "Has not signed in from the portal yet",
+      "link": "Link portal account",
+      "linkTitle": "Link a portal account",
+      "linkText": "Use this when the person already had an account here before signing in from the portal.",
+      "linked": "Portal account linked",
+      "linkTaken": "This user or this portal account is already linked."
+    },
+    "errors": {
+      "code_invalid": "The sign-in link expired or was already used. Open the app from the portal again.",
+      "user_inactive": "This account is not active.",
+      "email_conflict": "Another account already has this email or username. Ask an administrator to link your portal account.",
+      "profile_incomplete": "The portal did not send an email or a username for your account.",
+      "unknown_host": "Unknown portal.",
+      "failed": "Signing in from the portal failed."
+    }
+  }
+}

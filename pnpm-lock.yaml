@@ -127,6 +127,9 @@ importers:
       '@elvine-sk/platform-auth':
         specifier: link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/auth
         version: link:../../../nelvine-platform/packages/auth
+      '@elvine-sk/platform-auth-handoff':
+        specifier: link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/auth-handoff
+        version: link:../../../nelvine-platform/packages/auth-handoff
       '@elvine-sk/platform-auth-oidc':
         specifier: link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/auth-oidc
         version: link:../../../nelvine-platform/packages/auth-oidc

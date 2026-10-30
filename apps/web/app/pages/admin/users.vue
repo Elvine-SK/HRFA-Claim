@@ -231,6 +231,7 @@ async function resetMfa(user: UserAdmin) {
   if (ok) await run(`/users/${user.id}/reset-mfa`, undefined, t('admin.users.mfaReset'))
 }
 
+const portalOpen = ref(false)
 const inviteOpen = ref(false)
 const invite = reactive({ email: '', username: '', displayName: '', locale: 'auto', mfaRequired: false })
 const inviteErrors = useFormErrors<'email' | 'username' | 'displayName'>()
@@ -298,6 +299,16 @@ async function sendInvite() {
           @click="openPassword(null)"
         >
           {{ t('admin.users.create') }}
+        </UButton>
+        <UButton
+          v-if="access.can('user.invite') && manifest.data.value?.handoff?.hosts.length"
+          color="neutral"
+          variant="outline"
+          icon="i-lucide-door-open"
+          data-testid="add-portal-user"
+          @click="portalOpen = true"
+        >
+          {{ t('handoff.admin.add') }}
         </UButton>
         <UButton v-can="'user.invite'" icon="i-lucide-user-plus" @click="openInvite">{{
           t('admin.users.invite')
@@ -625,6 +636,12 @@ async function sendInvite() {
             </template>
           </PlatformKeyValue>
         </PlatformDrawerSection>
+        <PlatformDrawerSection
+          v-if="manifest.data.value?.handoff?.hosts.length"
+          :title="t('handoff.admin.identities')"
+        >
+          <PlatformAdminUserIdentities :user-id="selected.id" />
+        </PlatformDrawerSection>
         <PlatformDrawerSection v-if="access.can('role.read')" :title="t('admin.users.access')">
           <PlatformAdminUserAccess :user-id="selected.id" />
         </PlatformDrawerSection>
@@ -632,6 +649,7 @@ async function sendInvite() {
     </PlatformEntityDrawer>
 
     <PlatformAdminUserPasswordDialog v-model:open="passwordOpen" :user="passwordFor" />
+    <PlatformAdminPortalUserDialog v-model:open="portalOpen" />
 
     <UModal
       v-model:open="inviteOpen"

@@ -18,6 +18,8 @@ const { t } = useI18n()
 const api = useApi()
 const notify = useNotify()
 const session = useSession()
+// Signs in only at the host portal: no password to change, and the portal does the second factor.
+const portalOnly = computed(() => Boolean(session.me.value?.portalUser) && !session.user.value?.hasPassword)
 const dates = useDates()
 const client = useQueryClient()
 
@@ -106,7 +108,7 @@ async function regenerate(password: string) {
 
 <template>
   <div class="grid gap-6">
-    <section class="card">
+    <section v-if="!portalOnly" class="card">
       <header class="card-h">
         <h2>{{ t('account.security.passwordTitle') }}</h2>
         <p>{{ t('account.security.passwordText') }}</p>
@@ -141,7 +143,7 @@ async function regenerate(password: string) {
 
     <PlatformAccountSignInProviders />
 
-    <section class="card">
+    <section v-if="!portalOnly" class="card">
       <header class="card-h">
         <div class="flex-1">
           <h2>{{ t('account.security.mfaTitle') }}</h2>

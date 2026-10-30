@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CaptchaChallenge } from '@elvine-sk/platform-nuxt/utils'
+import type { CaptchaChallenge, SignInMode } from '@elvine-sk/platform-nuxt/utils'
 
 definePageMeta({ layout: 'auth', auth: 'guest', title: 'auth.signIn.title' })
 
@@ -22,10 +22,23 @@ const redirect = computed(() => safeRedirect(route.query.redirect))
 const ssoError = computed(() => {
   const code = typeof route.query.error === 'string' ? route.query.error : ''
   if (code === 'rate_limit.exceeded') return t('errors.rate_limited')
-  if (!code.startsWith('oidc.')) return ''
-  const key = `oidc.errors.${code.slice(5)}`
-  return te(key) ? t(key) : t('oidc.errors.failed')
+  for (const area of ['oidc', 'handoff']) {
+    if (!code.startsWith(`${area}.`)) continue
+    const key = `${area}.errors.${code.slice(area.length + 1)}`
+    return te(key) ? t(key) : t(`${area}.errors.failed`)
+  }
+  return ''
 })
+
+// Handoff mode: people sign in at the host portal; the form stays for `?local=1` and for errors.
+const { platform } = useRuntimeConfig().public
+const portalLogin = handoffRedirect(
+  platform.signInMode as SignInMode,
+  route.query,
+  platform.apiBase as string,
+  platform.signInUrl as string,
+)
+if (portalLogin) window.location.replace(portalLogin)
 
 useHead({ title: () => t('auth.signIn.title') })
 

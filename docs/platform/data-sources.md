@@ -10,16 +10,26 @@ app's database, its transactions or its migrations.
 DATA_SOURCES=hr,core
 DATA_SOURCE_HR_URL=mysql://hr_reader:…@hr-db:3306/hr   # required, must start with mysql://
 DATA_SOURCE_HR_POOL_SIZE=5                             # default 5
-DATA_SOURCE_HR_TIMEOUT_MS=5000                         # default 5000: connect, pool wait and each query
+DATA_SOURCE_HR_TIMEOUT_MS=5000                         # default 5000: connect, pool wait and each query (see below)
 DATA_SOURCE_HR_TIMEZONE=+07:00                         # default +00:00: the zone of the upstream's DATETIME values
+DATA_SOURCE_HR_CAMEL_CASE=false                        # default true; false keeps names as the database spells them
 ```
 
-- Names are lower-case `[a-z][a-z0-9_]*`; the variable uses the upper-case name. A `DATA_SOURCE_<X>_*` variable whose
-  name is not in `DATA_SOURCES` is a config error, so a misspelt name fails at boot.
+- Names are lower-case `[a-z][a-z0-9_]*`; the variable uses the upper-case name. Any variable starting with
+  `DATA_SOURCE_` that is not `<NAME>_URL`, `_POOL_SIZE`, `_TIMEOUT_MS`, `_TIMEZONE` or `_CAMEL_CASE` of a name in `DATA_SOURCES` is a
+  config error, so a misspelt name or setting (`DATA_SOURCE_HR_TZ`, `DATA_SOURCE_HR_TIMEOUT`) fails at boot. A name
+  listed twice is an error too.
+- Pool size and timeout are plain decimal digits (`1500`, not `1.5e3`).
 - The time zone is an offset (`+07:00`), not a named zone (`Asia/Vientiane`).
 - Sources connect lazily: one that is down at boot does not stop the app.
-- Tracing: pass `sourcePlugins: (name) => ({ plugins, onQuery })` in `PlatformAppOptions` (wire it to
-  `otelKyselyPlugin`, as for the app database).
+- Tracing: pass `sourcePlugins` in `PlatformAppOptions`, one `otelKyselyPlugin` per source so each span names it:
+
+  ```ts
+  sourcePlugins: (name) => {
+    const p = otelKyselyPlugin({ attributes: { 'nelv.data_source': name } })
+    return { plugins: [p], onQuery: p.onQuery }
+  },
+  ```
 
 ## Production: give each source a user with SELECT only
 
@@ -41,7 +51,10 @@ const people = await source('hr').selectFrom('employees').select(['empNo', 'full
 - A source is never in the app's transaction. Calling `source()` inside `inTransaction` is allowed; the read runs on
   its own connection and sees the upstream's data, not the transaction's. It does not roll back and is not consistent
   with the app's uncommitted rows.
-- Sources keep `CamelCasePlugin` but not the app's `typeCast`: no UUID decoding (a `CHAR(16) employee_id` is a
+- Sources keep `CamelCasePlugin` unless `_CAMEL_CASE=false`. Turn it off for a legacy schema with PascalCase or
+  mixed-case names: the plugin writes `PostName` as `post_name`, which the table does not have. Without it, type and
+  query names exactly as the database spells them (`tb_post.PostName`), and rows come back with those keys.
+- Sources do not get the app's `typeCast`: no UUID decoding (a `CHAR(16) employee_id` is a
   string), and `TINYINT(1)` stays a number (`1`, not `true`). `DECIMAL` and `DATE` are strings; `DATETIME` and
   `TIMESTAMP` are `Date` values read in the source's time zone.
 - Streaming (`.stream()`) errors from a source are not mapped to `source.unavailable`; use `.execute()`.
@@ -72,10 +85,18 @@ A failure to reach a source (connect, timeout, pool wait, access denied, unknown
   `503: jsonContent(ErrorSchema, 'The HR system is unavailable')` to the route's `responses`.
 - The timeout is per query. A list runs a count and a page, so against a slow upstream it can take about twice
   `DATA_SOURCE_<X>_TIMEOUT_MS` before answering; a down one fails on the first query.
+- The timeout bounds connecting and waiting for a pooled connection, and the server stops a statement after it
+  (`max_statement_time` / `max_execution_time`). The client also gives up on any statement after the timeout plus
+  1 s: if the upstream vanished without closing the connection (a firewall idle cut-off, a network partition), the
+  connection is closed and the query fails with `source.unavailable` instead of hanging.
+- The pool keeps at most `POOL_SIZE - 1` idle connections and closes one idle for 30 s (a pool of 1 reconnects
+  after each idle spell). At most `10 × POOL_SIZE` callers wait for a connection; beyond that, and after waiting
+  the timeout, a caller gets `source.unavailable` at once.
 - A source has its own pool; its failures never touch the app's pool.
 - `/ready` has a `sources` entry per source (`ok`, `unavailable`, or `unknown` until the first check). It never waits
   on a source and never returns `503` because of one; the status is refreshed in the background when older than
-  10 s.
+  10 s, and a check that has not answered after the timeout plus 1 s counts as `unavailable`. The API logs a warning
+  (source name and status, never the URL) when a source becomes `unavailable` and when it is `ok` again.
 
 ## Lists
 
@@ -90,7 +111,8 @@ const page = await paginate(await sourceScope(ctx, c, 'hr', qb, 'employee.read')
 ```
 
 - The query must come from `sourceScope` or `sourcePicker`: they bind it to the source. An unbound source query
-  passed to `paginate` is counted on the app database and fails.
+  passed to `paginate` is counted on the app database: it fails when the app has no table of that name, and if the
+  app has one, the total is silently that table's count.
 - `paginate` needs a `tieBreaker` (a unique column) when the table has no `id` column.
 - No tenant fence and no row policies: sources are not tenant-aware. Gate by permission, declared in the module that
   exposes the route, as for any permission.
@@ -154,8 +176,13 @@ mariadb -h localhost -P 3306 -u root -p hr_fam_src_hr < apps/api/test/sources/hr
 ## `platform doctor`
 
 Run `pnpm run platform doctor` in `apps/api`. For each source it prints the time zone, connects, and checks that the session is read-only and that `SHOW GRANTS`
-lists no write privileges on any database. A source it cannot reach, a session that is not read-only, or a write
-grant is a problem; run it with the production `DATA_SOURCE_*` variables.
+lists no write privileges on any database. A session that is not read-only, or a write
+grant is a problem (`fail:`, exit 1); run it with the production `DATA_SOURCE_*` variables.
+
+- A refused login (access denied) or an unknown database is a `fail:` line with the driver's message: the
+  configuration is wrong, and the read-only and grant checks could not run.
+- A source it cannot reach (connection refused, timed out, host not found or unreachable, or no answer within the
+  timeout) is only a `warn: source <name>: unreachable` line: the network may be down, not the configuration.
 
 ## Not covered
 

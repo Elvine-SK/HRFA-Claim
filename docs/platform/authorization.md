@@ -7,7 +7,7 @@
 - A user's roles come directly (`user_roles`) and through groups (`group_members` → `group_roles`). A role grants unconditional permission keys (`resource.action`) and holds policies `{ effect: allow | deny, resource, actions (may include '*'), condition? }`.
 - The `super_admin` role (`is_super`) passes every check and ignores policies.
 - Subjects load once per request (`subjectOf(c)`, `null` when signed out or `mfa_pending`) and are cached per user and authorization version for 60s. Every admin change calls `bump()` inside its transaction, so role and policy changes apply on the next request; app subject attributes may lag up to the TTL.
-- Policy conditions see the record's fields and `subject.*` variables: `id`, `roles`, `groups`, `isSuper`, plus the app's `subjectAttributes(userId)` hook passed to `authorization({ subjectAttributes })`. Reference one as `{ field: 'ownerId', op: 'eq', value: { var: 'subject.id' } }`.
+- Policy conditions see the record's fields and `subject.*` variables: `id`, `roles`, `groups`, `isSuper`, plus what `subjectAttributes(userId)` hooks return. Declare one on the module that knows the data (`defineModule({ subjectAttributes: async (userId) => ({ branchId }) })`, read by authorization through `moduleFields`) or pass it as `authorization.subjectAttributes` in `apps/api/src/platform.options.ts`. Every hook runs and their results merge; two hooks returning the same key throw. Results are cached with the subject (60 s). Reference one as `{ field: 'ownerId', op: 'eq', value: { var: 'subject.id' } }`.
 
 ## Checks
 
