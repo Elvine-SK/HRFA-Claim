@@ -46,7 +46,8 @@ local HRM copy. `/auth/sign-in?local=1` is the platform sign-in for the bootstra
   `GET /hrm/employees/{eid}`.
 - `auth-hrm` module: `GET /auth/hrm?code=` (public), `GET /hrm/me`; tables `hrm_user_links`,
   `hrm_handoff_redemptions`; role `employee` seeded; job `auth_hrm.sync_sessions` every minute.
-- Web: `middleware/hrm-sign-in.global.ts` + `utils/hrmSignIn.ts`, page `/me` ("My HRM profile").
+- Web: page `/me` ("My HRM profile"). Signed-out browsers go to HRM through the platform sign-in mode `handoff`
+  (`NUXT_PUBLIC_PLATFORM_SIGN_IN_URL`, since 1.1.0; the app middleware it replaced is gone).
 - Tests: `apps/api/test/` with the HRM test source (`test/sources/hrm.schema.sql`, `hrm.fixtures.sql`).
 
 Reviews: a security review of the sign-in (0 Critical, 5 Important, all fixed) and a light whole-branch review
@@ -222,7 +223,7 @@ Plan 5 is next. Write each plan when the previous one is done, so it can use the
 - Codes travel in the URL: strip `code` from reverse-proxy logs. `hrm_handoff_redemptions` is never cleaned.
 - HRM users have no MFA: do not give them administrator roles without a decision.
 - `findEmployee` shows a NULL `BRANCH_CODE` as `888010`; no fixtures for NULL organisation fields.
-- `NUXT_PUBLIC_HRM_LOGIN_URL` is read by the web server when it starts (the build does not bake it in); the PM2
+- `NUXT_PUBLIC_PLATFORM_SIGN_IN_URL` is read by the web server when it starts (the build does not bake it in); the PM2
   bundle stores it in `apps/web/hrm-login-url.txt` and `ecosystem.config.cjs` passes it on.
 - `/me` says "not linked" for any error, also when HRM is down.
 

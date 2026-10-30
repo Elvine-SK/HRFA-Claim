@@ -37,9 +37,6 @@ export default defineNuxtConfig({
     port: 3336,
   },
 
-  // HRM's login page (NUXT_PUBLIC_HRM_LOGIN_URL): where the sign-in page sends users (middleware/hrm-sign-in.global.ts).
-  runtimeConfig: { public: { hrmLoginUrl: '' } },
-
   css: [fileURLToPath(new URL('./app/assets/css/main.css', import.meta.url))],
 
   // The theme plugin owns `.dark` (spec §4.2: one owner of theme state).

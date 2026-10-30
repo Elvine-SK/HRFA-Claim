@@ -3,11 +3,12 @@
 const { readFileSync } = require('node:fs')
 const { join } = require('node:path')
 
-// HRM login page for the web. The web server reads NUXT_PUBLIC_HRM_LOGIN_URL when it starts (not at build
-// time); bundle.sh stores the --hrm-login-url argument in apps/web/hrm-login-url.txt. To change it later, edit
-// that file (or set the variable) and `pm2 reload ecosystem.config.cjs --update-env`.
+// HRM login page for the web: signed-out browsers go there (platform sign-in mode `handoff`; `?local=1` keeps the
+// platform page). The web server reads NUXT_PUBLIC_PLATFORM_SIGN_IN_URL when it starts (not at build time);
+// bundle.sh stores the --hrm-login-url argument in apps/web/hrm-login-url.txt. To change it later, edit that file
+// (or set the variable) and `pm2 reload ecosystem.config.cjs --update-env`.
 function hrmLoginUrl() {
-  if (process.env.NUXT_PUBLIC_HRM_LOGIN_URL) return process.env.NUXT_PUBLIC_HRM_LOGIN_URL
+  if (process.env.NUXT_PUBLIC_PLATFORM_SIGN_IN_URL) return process.env.NUXT_PUBLIC_PLATFORM_SIGN_IN_URL
   try {
     return readFileSync(join(__dirname, 'apps/web/hrm-login-url.txt'), 'utf8').trim()
   } catch {
@@ -46,7 +47,12 @@ module.exports = {
       script: '.output/server/index.mjs',
       exec_mode: 'fork',
       instances: 1,
-      env: { NODE_ENV: 'production', PORT: 3000, NUXT_PUBLIC_HRM_LOGIN_URL: hrmLoginUrl() },
+      env: {
+        NODE_ENV: 'production',
+        PORT: 3000,
+        NUXT_PUBLIC_PLATFORM_SIGN_IN_MODE: 'handoff',
+        NUXT_PUBLIC_PLATFORM_SIGN_IN_URL: hrmLoginUrl(),
+      },
     },
   ],
 }

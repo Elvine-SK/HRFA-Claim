@@ -6,7 +6,8 @@ The bundle `hr-fam-<sha>.tar.gz` holds everything the app runs: the API sources 
 
 The bundle is built on a developer machine with `tooling/deploy/bundle.sh --hrm-login-url <URL>`. The HRM login
 URL given to it is stored in `apps/web/hrm-login-url.txt`, which `ecosystem.config.cjs` hands to the web process
-(`NUXT_PUBLIC_HRM_LOGIN_URL`); to change it, edit that file and run `pm2 reload ecosystem.config.cjs --update-env`. Native packages inside it (argon2,
+(`NUXT_PUBLIC_PLATFORM_SIGN_IN_URL`, with `NUXT_PUBLIC_PLATFORM_SIGN_IN_MODE=handoff`; `/auth/sign-in?local=1` keeps the
+platform sign-in page for the administrator); to change it, edit that file and run `pm2 reload ecosystem.config.cjs --update-env`. Native packages inside it (argon2,
 esbuild) are built for the OS that made the bundle: it must be built on Linux x64 to run on the server.
 `bundle.sh` refuses to run on any other OS or CPU. `--allow-non-linux` overrides this with a loud warning; a bundle
 built that way is for inspection only and must not be installed.

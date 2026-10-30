@@ -53,9 +53,9 @@ pnpm install --frozen-lockfile
 echo "== typecheck"
 pnpm run typecheck
 
-echo "== build web (NUXT_PUBLIC_HRM_LOGIN_URL=$HRM_LOGIN_URL)"
+echo "== build web (NUXT_PUBLIC_PLATFORM_SIGN_IN_URL=$HRM_LOGIN_URL)"
 rm -rf apps/web/.output
-(cd apps/web && NUXT_PUBLIC_HRM_LOGIN_URL="$HRM_LOGIN_URL" pnpm exec nuxt build)
+(cd apps/web && NUXT_PUBLIC_PLATFORM_SIGN_IN_MODE=handoff NUXT_PUBLIC_PLATFORM_SIGN_IN_URL="$HRM_LOGIN_URL" pnpm exec nuxt build)
 
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
