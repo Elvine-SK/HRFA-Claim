@@ -153,7 +153,7 @@ describe('payment calculation', () => {
   describe('fuel', () => {
     it('form 1, 100 km', () => {
       const a = agreement({ members: [member({ privateCarKm: 100 })] })
-      expect(rows(a).find((r) => r[1] === 'fuel')).toEqual(['E1', 'fuel', 'LAK', 100, '357143.00'])
+      expect(rows(a).find((r) => r[1] === 'fuel')).toEqual(['E1', 'fuel', 'LAK', 14.286, '357143.00'])
     })
     it('refused on form 3', () => {
       const a = oversea({ members: [member({ privateCarKm: 100 })] })

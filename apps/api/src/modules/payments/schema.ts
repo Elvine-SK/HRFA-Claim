@@ -31,7 +31,8 @@ export const PaymentItemSchema = z
     component: z.enum(COMPONENTS),
     currency: z.enum(['LAK', 'USD']),
     rate: StoredAmount,
-    count: z.number().int(),
+    /** Litres for `fuel` (up to 3 decimals), a whole count otherwise. */
+    count: z.number(),
     amount: StoredAmount,
     basis: z.string(),
   })

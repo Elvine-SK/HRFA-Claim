@@ -48,7 +48,7 @@ export type PaymentRow = Omit<PaymentsTable, 'status' | 'version' | 'updatedBy' 
   travelFrom: string
   travelTo: string
 }
-export type ItemRow = Omit<PaymentItemsTable, 'id' | 'paymentId'>
+export type ItemRow = Omit<PaymentItemsTable, 'id' | 'paymentId' | 'count'> & { count: number }
 export interface Bill {
   eid: string
   night: number
@@ -75,12 +75,13 @@ export async function livePaymentOf(agreementId: string): Promise<string | null>
 }
 
 export async function itemsOf(paymentId: string): Promise<ItemRow[]> {
-  return appDb()
+  const rows = await appDb()
     .selectFrom('paymentItems')
     .select(['sortOrder', 'eid', 'component', 'currency', 'rate', 'count', 'amount', 'basis'])
     .where('paymentId', '=', uuidBin(paymentId))
     .orderBy('sortOrder')
     .execute()
+  return rows.map((r) => ({ ...r, count: Number(r.count) }))
 }
 
 export async function billsOf(paymentId: string): Promise<Bill[]> {

@@ -222,7 +222,9 @@ async function onPosted() {
               <tr v-for="(item, i) in m.items" :key="`${item.component}-${i}`">
                 <td>{{ t(`payments.component.${item.component}`) }}</td>
                 <td class="mt-num mono">{{ formatAmount(item.rate, item.currency) }}</td>
-                <td class="mt-num mono">× {{ item.count }}</td>
+                <td class="mt-num mono">
+                  × {{ item.component === 'fuel' ? t('payments.item.litres', { n: item.count.toFixed(3) }) : item.count }}
+                </td>
                 <td class="mt-num mono">{{ formatAmount(item.amount, item.currency) }}</td>
                 <td class="text-sm text-[var(--ui-text-muted)]">{{ item.basis }}</td>
               </tr>

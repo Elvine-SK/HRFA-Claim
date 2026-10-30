@@ -234,4 +234,17 @@ export const paymentsMigrations: MigrationSet = {
       }
     },
   },
+  // The fuel row counts litres (km ÷ km per litre), so rate × count reads as its amount.
+  '202610300400_payments_item_count_decimal': {
+    async up(db: Kysely<any>) {
+      await sql`ALTER TABLE payment_items MODIFY count decimal(10,3) NOT NULL`.execute(db)
+      // Fuel rows calculated before held the km, with the basis `fuel ÷ <km per litre> km per litre`. MariaDB
+      // applies SET in order, so the basis is rewritten from the km before the count becomes litres.
+      await sql`
+        UPDATE payment_items
+        SET basis = CONCAT(CAST(count AS UNSIGNED), ' km ÷ ', SUBSTRING_INDEX(SUBSTRING_INDEX(basis, '÷ ', -1), ' ', 1), ' km per litre'),
+            count = ROUND(count / CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(basis, ' km ÷ ', -1), ' ', 1) AS DECIMAL(10,2)), 3)
+        WHERE component = 'fuel' AND basis LIKE 'fuel ÷ % km per litre'`.execute(db)
+    },
+  },
 }

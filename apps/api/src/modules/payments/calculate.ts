@@ -52,6 +52,7 @@ export interface PaymentItem {
   component: Component
   currency: Currency
   rate: Amount
+  /** Litres for `fuel` (3 decimals), a whole count otherwise. */
   count: number
   /** Negative for `meal_deduction`. */
   amount: Amount
@@ -168,7 +169,9 @@ export function calculate(
 
     if (km > 0 && r) {
       if (r.fuelPrice === null) throw new CalcError('payments.fuel_price_missing', path('privateCarKm'))
-      push('fuel', 'LAK', r.fuelPrice, km, mulDivCeilWhole(r.fuelPrice, km, r.kmPerLitre), `fuel ÷ ${r.kmPerLitre} km per litre`)
+      // Count in litres (3 decimals, for reading only); the amount is worked out from the km, not the rounded litres.
+      const litres = Math.round((km / Number(r.kmPerLitre)) * 1000) / 1000
+      push('fuel', 'LAK', r.fuelPrice, litres, mulDivCeilWhole(r.fuelPrice, km, r.kmPerLitre), `${km} km ÷ ${r.kmPerLitre} km per litre`)
     }
 
     if (a.hasAdvance && m.isAdvanceHolder) {

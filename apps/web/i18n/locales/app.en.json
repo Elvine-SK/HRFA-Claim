@@ -327,7 +327,8 @@
       "count": "Count",
       "amount": "Amount",
       "basis": "Basis",
-      "none": "Nothing to pay"
+      "none": "Nothing to pay",
+      "litres": "{n} L"
     },
     "bills": {
       "title": "Bills for nights from day 8",

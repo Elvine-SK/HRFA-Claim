@@ -164,7 +164,8 @@ export interface PaymentItemsTable {
   component: string
   currency: 'LAK' | 'USD'
   rate: string
-  count: number
+  /** DECIMAL(10,3): litres for fuel, a whole count otherwise. */
+  count: { readonly __select__: string; readonly __insert__: number; readonly __update__: number }
   amount: string
   basis: string
 }
