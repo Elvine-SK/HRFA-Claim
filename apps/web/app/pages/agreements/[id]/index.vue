@@ -179,7 +179,12 @@ const mayEdit = computed(() => isDraft.value && access.canSome('agreement.create
             </tbody>
           </MasterTable>
         </UCard>
-        <PlatformFilesAttachments v-else-if="tab === 'files'" entity-type="agreement" :entity-id="a.id" />
+        <PlatformFilesAttachments
+          v-else-if="tab === 'files'"
+          entity-type="agreement"
+          :entity-id="a.id"
+          :locked="!isDraft"
+        />
         <UCard v-else>
           <PlatformRecordsHistoryTimeline
             :entries="history.data.value"

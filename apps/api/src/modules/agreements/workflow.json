@@ -1,7 +1,7 @@
 {
   "key": "agreement",
   "entityType": "agreement",
-  "name": "Travel agreement (spec §8)",
+  "name": "Travel agreement",
   "definition": {
     "stages": [
       {

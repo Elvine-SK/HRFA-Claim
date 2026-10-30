@@ -18,6 +18,13 @@ export function fromCents(c: bigint): Amount {
   return `${sign}${abs / 100n}.${(abs % 100n).toString().padStart(2, '0')}`
 }
 
+/** An amount with thousands separators, as people read it: "9351429.00" → "9,351,429.00". */
+export function groupAmount(a: Amount): string {
+  const [whole = '0', frac] = a.split('.')
+  const grouped = whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+  return frac === undefined ? grouped : `${grouped}.${frac}`
+}
+
 /** Exact sum of amounts. */
 export function addAmounts(...a: Amount[]): Amount {
   return fromCents(a.reduce((sum, x) => sum + toCents(x), 0n))

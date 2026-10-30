@@ -51,6 +51,11 @@ describe.skipIf(!dbTestsEnabled)('payments (submit and approval)', () => {
     expect(res.body.data.status).toBe('in_approval')
     const inbox = await sectionHead.get(`${API}/approval/inbox`)
     expect(inbox.body.data.map((i: any) => i.entityId)).toContain(p.id)
+    // The approver reads the REF and the total among the request's facts.
+    const task = inbox.body.data.find((i: any) => i.entityId === p.id)
+    const request = await sectionHead.get(`${API}/approval/requests/${task.requestId}`)
+    const total = p.totals.LAK.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+    expect(request.body.data.facts).toMatchObject({ ref: p.ref, total: `${total} LAK`, branchCode: '888010' })
 
     // Not the finance officer's own step, and not twice.
     expect((await finance.post(url(`/${p.id}/submit`), {})).status).toBe(409)

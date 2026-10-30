@@ -252,6 +252,20 @@ generator can do this; the options file only makes it the app's choice instead o
   case (`postname` for `PostName`). Apps reading a legacy schema need a per-source option to turn the plugin off, or
   a mapping that keeps the column name.
 - `sourcePicker` answers a bad request with 422 where the rest of the platform answers 400.
+- Error responses translate the top-level message by code, but not the `details` of a validation error, so a
+  refused submission reads "Validation failed" with its reasons in English. The first app translates the details in
+  its copy of `useNotify` from `errors.<code>` keys; the server could translate each detail by its code the same
+  way it translates the message.
+- Approval request search (`GET /approval/requests`) lists only the caller's own requests, or all of them with
+  `approval_request.read_all`. An approver therefore never sees the request on the record's status card, which says
+  "not submitted"; the first app hides the card when it finds nothing. Proposed: also list requests the caller is or
+  was assigned to.
+- A record type cannot say how to show its number on the approval page (the page prints the end of the id). The
+  first app puts its REF in the facts and its copy of the request page shows `facts.ref` when present. Proposed: a
+  `title(entityId)` hook on `defineApprovalEntity`.
+- A file entity cannot refuse delete: the uploader may always delete their own file, so an app that keeps files
+  once a record is submitted blocks `DELETE /files/{id}` in a middleware and hides the button itself. Proposed: a
+  `canDelete(c, entityId)` hook on `defineFileEntity`, reflected in `canDelete`.
 
 ## Nice to have
 

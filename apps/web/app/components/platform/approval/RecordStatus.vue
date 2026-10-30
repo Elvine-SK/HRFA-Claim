@@ -91,7 +91,9 @@ async function submit() {
 </script>
 
 <template>
-  <div class="rs">
+  <!-- Request search lists only one's own requests (or all with read_all): an approver of a record that is no longer
+       submittable sees none, so the card hides rather than say "not submitted". -->
+  <div v-if="requests.isPending.value || latest || submittable" class="rs">
     <span class="rs-ic" aria-hidden="true"><UIcon name="i-lucide-stamp" class="size-4" /></span>
     <div class="min-w-0 flex-1">
       <b class="block text-[13.5px]">{{ t('approval.record.title') }}</b>

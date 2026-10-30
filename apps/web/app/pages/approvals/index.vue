@@ -7,7 +7,9 @@ import type { Decision, InboxItem, RequestSummary } from '../../types/approval'
 
 definePageMeta({ title: 'approval.nav' })
 
-const { t } = useI18n()
+const { t, te } = useI18n()
+const stageName = (key: string) =>
+  te(`approval.stages.${key}`) ? t(`approval.stages.${key}`) : key.replaceAll(/[_-]/g, ' ')
 const { relative, dateTime } = useDates()
 const notify = useNotify()
 const access = useAccess()
@@ -310,7 +312,7 @@ const dueTone = { overdue: 'danger', today: 'warning', soon: 'warning', later: '
               <div class="ib-t">
                 <b>{{ entities.label(item.entityType) }} · {{ item.submittedBy.displayName }}</b>
                 <small>
-                  <span class="truncate capitalize">{{ item.stageKey.replaceAll(/[_-]/g, ' ') }}</span>
+                  <span class="truncate capitalize">{{ stageName(item.stageKey) }}</span>
                   <span aria-hidden="true">·</span>
                   <time :datetime="item.submittedAt" :title="dateTime(item.submittedAt)">{{
                     relative(item.submittedAt)

@@ -1,7 +1,7 @@
 {
   "key": "payment",
   "entityType": "payment",
-  "name": "Travel payment (spec §9)",
+  "name": "Travel payment",
   "definition": {
     "stages": [
       {

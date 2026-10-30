@@ -9,11 +9,12 @@ import type { Tone } from '../../../utils/tone'
  * The files of one record: list, download, preview, delete, and upload by picking or drag and drop with
  * progress. Limits come from the server (`GET /files` meta) and are checked before anything is sent.
  * `upload`: `confirm` (default) keeps picked files in the list until the person presses Upload; `auto` sends
- * each as soon as it is picked.
+ * each as soon as it is picked. `locked` hides delete when the record keeps its files (the uploader may otherwise
+ * always delete their own).
  */
 const props = withDefaults(
-  defineProps<{ entityType: string; entityId: string; upload?: 'confirm' | 'auto' }>(),
-  { upload: 'confirm' },
+  defineProps<{ entityType: string; entityId: string; upload?: 'confirm' | 'auto'; locked?: boolean }>(),
+  { upload: 'confirm', locked: false },
 )
 const emit = defineEmits<{ count: [n: number] }>()
 const { t } = useI18n()
@@ -252,7 +253,7 @@ useIntersectionObserver(sentinel, ([entry]) => {
                 :aria-label="t('files.download', { name: f.filename })"
               />
               <UButton
-                v-if="f.canDelete"
+                v-if="f.canDelete && !locked"
                 size="sm"
                 color="neutral"
                 variant="ghost"

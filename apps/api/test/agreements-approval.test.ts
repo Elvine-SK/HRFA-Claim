@@ -58,6 +58,10 @@ describe.skipIf(!dbTestsEnabled)('agreements (submit and approval)', () => {
     const res = await ho.post(url(`/${a.id}/submit`), {})
     expect(res.status, JSON.stringify(res.body)).toBe(200)
     expect(res.body.data.status).toBe('in_approval')
+    // The approver reads the REF and the subject among the request's facts.
+    const task = (await sectionHead.get(`${API}/approval/inbox`)).body.data.find((i: any) => i.entityId === a.id)
+    const request = await sectionHead.get(`${API}/approval/requests/${task.requestId}`)
+    expect(request.body.data.facts).toMatchObject({ ref: a.ref, subject: a.subject, formType: 'domestic' })
     await approve(sectionHead, a.id)
     await approve(deptHead, a.id)
     expect((await ho.get(url(`/${a.id}`))).body.data.status).toBe('in_approval')

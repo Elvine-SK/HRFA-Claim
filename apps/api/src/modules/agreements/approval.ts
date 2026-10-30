@@ -72,7 +72,10 @@ const factFields: FieldMap = {
 export const agreementApproval = (ctx: () => ModuleContext) =>
   defineApprovalEntity({
     type: 'agreement',
+    // `ref` and `subject` are for the approver to read (the request page lists the facts); conditions use the rest.
     facts: z.object({
+      ref: z.string(),
+      subject: z.string(),
       branchCode: z.string(),
       formType: z.string(),
       hasAdvance: z.boolean(),
@@ -84,6 +87,8 @@ export const agreementApproval = (ctx: () => ModuleContext) =>
       const row = await findAgreement(id)
       if (!row) throw new Error(`agreement ${id} not found`)
       return {
+        ref: row.ref,
+        subject: row.subject,
         branchCode: row.branchCode,
         formType: row.formType,
         hasAdvance: row.hasAdvance,

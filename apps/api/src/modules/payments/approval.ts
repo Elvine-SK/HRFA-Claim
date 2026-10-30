@@ -4,8 +4,9 @@ import { NOTIFICATIONS } from '@elvine-sk/platform-notifications'
 import { z, type ModuleContext } from '@elvine-sk/platform-server'
 import { branchRoleUsers } from '../agreements/approval.ts'
 import { HEAD_OFFICE_BRANCH } from '../agreements/types.ts'
+import { groupAmount } from '../travel-master/money.ts'
 import { transition } from './procedures.ts'
-import { assertBillsComplete, assertSomethingToPay, findPayment } from './queries.ts'
+import { assertBillsComplete, assertSomethingToPay, findPayment, itemsOf, totalsOf } from './queries.ts'
 import { mayReadPayment } from './scope.ts'
 
 /** Approval step 2 of ກ18 (step 1, the finance officer, is the submission). */
@@ -22,13 +23,20 @@ const factFields: FieldMap = {
 export const paymentApproval = (ctx: () => ModuleContext) =>
   defineApprovalEntity({
     type: 'payment',
-    facts: z.object({ branchCode: z.string(), headOffice: z.boolean() }),
+    // `ref` and `total` are for the approver to read (the request page lists the facts); conditions use the rest.
+    facts: z.object({ ref: z.string(), total: z.string(), branchCode: z.string(), headOffice: z.boolean() }),
     fields: factFields,
     display: { label: 'payments.entity', icon: 'i-lucide-banknote', link: '/payments/:id' },
     async loadFacts(id) {
       const row = await findPayment(id)
       if (!row) throw new Error(`payment ${id} not found`)
-      return { branchCode: row.branchCode, headOffice: row.branchCode === HEAD_OFFICE_BRANCH }
+      const totals = Object.entries(totalsOf(await itemsOf(id)))
+      return {
+        ref: row.ref,
+        total: totals.map(([ccy, amount]) => `${groupAmount(amount)} ${ccy}`).join(' + '),
+        branchCode: row.branchCode,
+        headOffice: row.branchCode === HEAD_OFFICE_BRANCH,
+      }
     },
     async canView(c, id) {
       const row = await findPayment(id)

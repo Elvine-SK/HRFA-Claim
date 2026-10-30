@@ -37,9 +37,16 @@ const facts = computed(() =>
         ? null
         : typeof value === 'object'
           ? JSON.stringify(value)
-          : String(value),
+          : te(`approval.factValues.${key}.${value}`)
+            ? t(`approval.factValues.${key}.${value}`)
+            : String(value),
   })),
 )
+// A record's own number (e.g. its REF) when its facts carry one, else the end of its id.
+const recordNo = computed(() => {
+  const ref = request.value?.facts?.ref
+  return typeof ref === 'string' && ref ? ref : `#${request.value?.entityId.slice(-6) ?? ''}`
+})
 
 async function onAct(action: RequestAction, comment: string) {
   if (!request.value) return
@@ -110,7 +117,7 @@ defineExpose({
               entities.label(request.entityType)
             }}</NuxtLink>
             <template v-else>{{ entities.label(request.entityType) }}</template>
-            <span class="muted font-mono text-[13px] font-medium"> #{{ request.entityId.slice(-6) }}</span>
+            <span class="muted ms-1.5 font-mono text-[13px] font-medium">{{ recordNo }}</span>
           </h2>
           <i18n-t keypath="approval.detail.submittedBy" scope="global" tag="p">
             <template #name>

@@ -392,9 +392,61 @@
     "agreements_rank_unmapped": "ຕຳແໜ່ງຂອງສະມາຊິກນີ້ຍັງບໍ່ມີຊັ້ນ: ໃຫ້ຜູ້ດູແລລະບົບກຳນົດ PostType",
     "agreements_account_missing": "ບໍ່ມີບັນຊີສະກຸນເງິນນີ້ໃນ HRM",
     "agreements_signed_copy_required": "ແນບສັນຍາທີ່ເຊັນແລ້ວກ່ອນສົ່ງ",
-    "agreements_not_draft": "ແກ້ໄຂໄດ້ສະເພາະສັນຍາທີ່ເປັນສະບັບຮ່າງ"
+    "agreements_not_draft": "ແກ້ໄຂໄດ້ສະເພາະສັນຍາທີ່ເປັນສະບັບຮ່າງ",
+    "payments_bad_transition": "ການຈ່າຍເງິນບໍ່ສາມາດປ່ຽນໄປເປັນສະຖານະນີ້ຈາກສະຖານະປັດຈຸບັນໄດ້",
+    "payments_exists": "ສັນຍານີ້ມີການຈ່າຍເງິນທີ່ຍັງບໍ່ຖືກຍົກເລີກແລ້ວ",
+    "payments_agreement_not_approved": "ຈ່າຍເງິນໄດ້ສະເພາະສັນຍາທີ່ໄດ້ຮັບອະນຸມັດແລ້ວ",
+    "payments_not_calculated": "ແກ້ໄຂໄດ້ສະເພາະການຈ່າຍເງິນທີ່ຢູ່ໃນສະຖານະຄິດໄລ່ແລ້ວ",
+    "payments_nothing_to_pay": "ບໍ່ມີຫຍັງຕ້ອງຈ່າຍ: ການຈ່າຍເງິນບໍ່ມີລາຍການ",
+    "payments_night_invalid": "ມີໃບບິນຂອງຄືນທີ່ບໍ່ຕ້ອງໃຊ້ໃບບິນ",
+    "payments_rate_missing": "ບໍ່ມີອັດຕາຂອງພະນັກງານຄົນນີ້ ໃນວັນເດີນທາງໄປ",
+    "payments_same_day_rate_missing": "ບໍ່ມີອັດຕາໄປ-ກັບພາຍໃນວັນ ໃນວັນເດີນທາງໄປ",
+    "payments_fuel_price_missing": "ບໍ່ມີລາຄານ້ຳມັນ ໃນວັນເດີນທາງໄປ",
+    "payments_fuel_not_overseas": "ບໍ່ຈ່າຍຄ່ານ້ຳມັນສຳລັບການເດີນທາງໄປຕ່າງປະເທດ",
+    "payments_advance_band_missing": "ບໍ່ມີຂັ້ນເງິນລ່ວງໜ້າທີ່ກວມເອົາການເດີນທາງນີ້",
+    "payments_amount_too_large": "ມີຈຳນວນເງິນເກີນ 13 ຫຼັກ",
+    "posting_entry_missing": "ລາຍການບັນຊີຂອງປະເພດຄ່າໃຊ້ຈ່າຍຂາດ, ຊ້ຳກັນ ຫຼື ຢູ່ຝັ່ງດຽວກັນ",
+    "posting_account_missing": "ມີພະນັກງານທີ່ບໍ່ມີບັນຊີໃນສະກຸນເງິນທີ່ຈະຈ່າຍ",
+    "payments_bills_missing": "ມີຄືນຕັ້ງແຕ່ມື້ທີ 8 ທີ່ບໍ່ມີໃບບິນ; ໃສ່ 0 ຖ້າບໍ່ມີ",
+    "payments_no_branch": "ຂໍ້ມູນ HRM ຂອງທ່ານບໍ່ມີສາຂາ ເຊິ່ງໄຟລ໌ອັບໂຫຼດຕ້ອງໃຊ້ສຳລັບບັນຊີ GL",
+    "posting_batch_exists": "ສັນຍານີ້ມີຊຸດລົງບັນຊີປະເພດນີ້ແລ້ວ",
+    "posting_unbalanced": "ຍອດ DR ແລະ CR ຂອງຊຸດລົງບັນຊີບໍ່ເທົ່າກັນໃນສະກຸນເງິນໃດໜຶ່ງ",
+    "validation_failed": "ຍັງເຮັດບໍ່ໄດ້"
   },
   "dates": {
     "openCalendar": "ເປີດປະຕິທິນ"
+  },
+  "approval": {
+    "facts": {
+      "ref": "REF",
+      "subject": "ເລື່ອງ",
+      "total": "ລວມ",
+      "branchCode": "ສາຂາ",
+      "formType": "ແບບຟອມ",
+      "hasAdvance": "ເງິນລ່ວງໜ້າຂອງຄະນະ",
+      "headOffice": "ສຳນັກງານໃຫຍ່"
+    },
+    "factValues": {
+      "formType": {
+        "domestic": "ແບບຟອມ 1: ລະຫວ່າງແຂວງ",
+        "district": "ແບບຟອມ 2: ລະຫວ່າງເມືອງພາຍໃນແຂວງ",
+        "overseas": "ແບບຟອມ 3: ຕ່າງປະເທດ (ໜຶ່ງປະເທດ)",
+        "border": "ແບບຟອມ 4: ເຂດຊາຍແດນ"
+      },
+      "hasAdvance": {
+        "true": "ແມ່ນ",
+        "false": "ບໍ່"
+      },
+      "headOffice": {
+        "true": "ແມ່ນ",
+        "false": "ບໍ່"
+      }
+    },
+    "stages": {
+      "section_head": "ຫົວໜ້າຂະແໜງ",
+      "department_head": "ຫົວໜ້າພະແນກ",
+      "management": "ຄະນະອຳນວຍການ",
+      "finance_section_head": "ຫົວໜ້າຂະແໜງການເງິນ"
+    }
   }
 }

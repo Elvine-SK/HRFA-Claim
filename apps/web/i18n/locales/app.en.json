@@ -392,9 +392,61 @@
     "agreements_rank_unmapped": "This member's position has no rank yet: ask an administrator to map its PostType",
     "agreements_account_missing": "No account in this currency in HRM",
     "agreements_signed_copy_required": "Attach the signed agreement before submitting",
-    "agreements_not_draft": "Only a draft agreement can be changed"
+    "agreements_not_draft": "Only a draft agreement can be changed",
+    "payments_bad_transition": "The payment cannot move to this status from its current one",
+    "payments_exists": "This agreement already has a payment that is not void",
+    "payments_agreement_not_approved": "Only an approved agreement is paid",
+    "payments_not_calculated": "Only a payment in the calculated status can be changed",
+    "payments_nothing_to_pay": "There is nothing to pay: the payment has no items",
+    "payments_night_invalid": "A bill is for a night that takes no bill",
+    "payments_rate_missing": "No rate for this member on the departure date",
+    "payments_same_day_rate_missing": "No same-day rate on the departure date",
+    "payments_fuel_price_missing": "No fuel price on the departure date",
+    "payments_fuel_not_overseas": "Fuel is not paid on an overseas trip",
+    "payments_advance_band_missing": "No advance band covers this trip",
+    "payments_amount_too_large": "An amount has more than 13 whole digits",
+    "posting_entry_missing": "The posting entries of a component are missing, duplicated or on the same side",
+    "posting_account_missing": "A member has no account in the currency to be paid",
+    "payments_bills_missing": "A night from day 8 has no bill; enter 0 if there is none",
+    "payments_no_branch": "Your HRM record has no branch, which the upload file needs for its GL accounts",
+    "posting_batch_exists": "This agreement already has a posting batch of this kind",
+    "posting_unbalanced": "Debits and credits of the batch differ in a currency",
+    "validation_failed": "This cannot be done yet"
   },
   "dates": {
     "openCalendar": "Open the calendar"
+  },
+  "approval": {
+    "facts": {
+      "ref": "REF",
+      "subject": "Subject",
+      "total": "Total",
+      "branchCode": "Branch",
+      "formType": "Form",
+      "hasAdvance": "Group travel advance",
+      "headOffice": "Head office"
+    },
+    "factValues": {
+      "formType": {
+        "domestic": "Form 1: between provinces",
+        "district": "Form 2: between districts of a province",
+        "overseas": "Form 3: overseas (one country)",
+        "border": "Form 4: border zone"
+      },
+      "hasAdvance": {
+        "true": "Yes",
+        "false": "No"
+      },
+      "headOffice": {
+        "true": "Yes",
+        "false": "No"
+      }
+    },
+    "stages": {
+      "section_head": "Section head",
+      "department_head": "Department head",
+      "management": "Management",
+      "finance_section_head": "Finance section head"
+    }
   }
 }
