@@ -266,6 +266,12 @@ generator can do this; the options file only makes it the app's choice instead o
 - A file entity cannot refuse delete: the uploader may always delete their own file, so an app that keeps files
   once a record is submitted blocks `DELETE /files/{id}` in a middleware and hides the button itself. Proposed: a
   `canDelete(c, entityId)` hook on `defineFileEntity`, reflected in `canDelete`.
+- Bug in 1.1.0 (`nelv update`): the web template now depends on `@elvine-sk/platform-auth-handoff` (its
+  `app/types/platform.ts` imports `platform-auth-handoff/schemas`), but no command adds a new template dependency
+  to an existing app's `apps/web/package.json` (`update` writes copied files, `upgrade` bumps versions, `add`
+  merges only `apps/api/package.json`). The app's typecheck fails until the dependency is added by hand. Proposed:
+  `nelv update` merges the target template's dependencies into the generated manifests like `nelv add` does for the
+  API, and `nelv doctor` reports an import of a platform package the manifest lacks.
 
 ## Nice to have
 
