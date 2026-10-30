@@ -21,18 +21,86 @@ send it by default; do not set `Referrer-Policy: no-referrer` on the portal page
 Only the hash is stored, so the table never holds a usable code. HR-FAM records every code it accepts and refuses
 the same code a second time, so HRM does not need to mark codes used.
 
-```php
-<?php
-// $eid: the signed-in employee's 5-character EID from the HRM session.
-$code = bin2hex(random_bytes(32));
-$stmt = $pdo->prepare(
-    'INSERT INTO tb_app_handoff (code_hash, eid, created_at, expires_at)
-     VALUES (?, ?, NOW(), NOW() + INTERVAL 60 SECOND)'
-);
-$stmt->execute([hash('sha256', $code), $eid]);
-header('Location: ' . HRFAM_URL . '/api/v1/auth/hrm?code=' . $code, true, 302);
-exit;
+### Example: HRM legacy API (Node.js, Express, `mysql2`)
+
+Two routes; keep the one that matches how the portal signs users in:
+
+- **Session cookie:** the tile's `md_url` points at `GET /hrfam/open`, which answers the `302` itself.
+- **Bearer token:** a plain link cannot send the `Authorization` header, so the portal calls `POST /hrfam/handoff`
+  and then sets `window.location` to the `url` it answers.
+
+```js
+// routes/hrfam.js
+const crypto = require('node:crypto')
+const express = require('express')
+
+const HRFAM_URL = process.env.HRFAM_URL // e.g. https://hr-fam.example, no trailing slash
+
+// pool: a mysql2/promise pool on bcel_hrm_v3.
+// requireLogin: HRM's existing middleware; it must set req.user.eid from the server-side session or the
+// verified token. Never take the EID from the query string or the body.
+module.exports = function hrfamRoutes(pool, requireLogin) {
+  const router = express.Router()
+
+  async function handoffUrl(eid) {
+    const code = crypto.randomBytes(32).toString('hex')
+    const codeHash = crypto.createHash('sha256').update(code).digest('hex')
+    await pool.execute(
+      `INSERT INTO tb_app_handoff (code_hash, eid, created_at, expires_at)
+       VALUES (?, ?, NOW(), NOW() + INTERVAL 60 SECOND)`,
+      [codeHash, eid],
+    )
+    return `${HRFAM_URL}/api/v1/auth/hrm?code=${code}`
+  }
+
+  // Session cookie: the tile links here.
+  router.get('/hrfam/open', requireLogin, async (req, res, next) => {
+    try {
+      const url = await handoffUrl(req.user.eid)
+      res.set('Cache-Control', 'no-store').redirect(302, url)
+    } catch (err) {
+      next(err)
+    }
+  })
+
+  // Bearer token: the portal calls this, then navigates to the answer's url.
+  router.post('/hrfam/handoff', requireLogin, async (req, res, next) => {
+    try {
+      const url = await handoffUrl(req.user.eid)
+      res.set('Cache-Control', 'no-store').json({ url })
+    } catch (err) {
+      next(err)
+    }
+  })
+
+  return router
+}
 ```
+
+```js
+// app.js
+app.use(require('./routes/hrfam')(pool, requireLogin))
+```
+
+```js
+// Portal, bearer-token variant: the tile's click handler.
+const res = await fetch('/api/hrfam/handoff', {
+  method: 'POST',
+  headers: { Authorization: `Bearer ${token}` },
+})
+if (res.ok) window.location.assign((await res.json()).url)
+```
+
+Notes for Express:
+
+- `helmet()` sets `Referrer-Policy: no-referrer` by default, which removes the `Referer` HR-FAM checks when
+  `HRM_ORIGIN` is set. Use `helmet({ referrerPolicy: { policy: 'strict-origin-when-cross-origin' } })`, at least on
+  the portal pages and these routes.
+- `HRM_ORIGIN` is the origin of the page the browser leaves: the portal page in the bearer-token variant, and
+  also the portal page in the cookie variant (a redirect keeps the original `Referer`).
+- The code is hex, so it needs no URL encoding. Express 4 does not catch errors from `async` handlers, hence the
+  `try`/`catch`.
+- Do not log the code or the redirect URL.
 
 `expires_at` is written by the database in HRM's local time (`+07:00`); HR-FAM reads HRM's dates in that zone.
 
