@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { addAmounts, compareAmounts, divCeilWhole, fitsAmount, fromCents, mulAmount, mulDivCeilWhole, toCents } from '../src/modules/travel-master/money.ts'
+import { addAmounts, compareAmounts, divCeilWhole, divRoundCents, fitsAmount, fromCents, mulAmount, mulDivCeilWhole, toCents } from '../src/modules/travel-master/money.ts'
 
 describe('money', () => {
   it('formats with two decimals', () => {
@@ -31,5 +31,12 @@ describe('money', () => {
     expect(fitsAmount('9999999999999.99')).toBe(true)
     expect(fitsAmount(fromCents(10n ** 15n))).toBe(false)
     expect(fitsAmount('-1.00')).toBe(false)
+  })
+  it('converts at a cross rate, half-up to cents', () => {
+    expect(divRoundCents('3500.00', '35.123456')).toBe('99.65') // 99.6485…
+    expect(divRoundCents('100', '3')).toBe('33.33')
+    expect(divRoundCents('0.05', '2')).toBe('0.03') // 0.025 → up
+    expect(() => divRoundCents('1', '0')).toThrow(TypeError)
+    expect(() => divRoundCents('1', '1.1234567')).toThrow(TypeError)
   })
 })

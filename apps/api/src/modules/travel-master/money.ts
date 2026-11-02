@@ -65,3 +65,20 @@ export function compareAmounts(a: Amount, b: Amount): -1 | 0 | 1 {
   const y = toCents(b)
   return x < y ? -1 : x > y ? 1 : 0
 }
+
+/** A cross rate: up to 9 whole digits and 6 decimals (ກ27). */
+export const RATE_PATTERN = /^\d{1,9}(\.\d{1,6})?$/
+
+/**
+ * a ÷ rate rounded half-up to cents, e.g. a receipt in THB at its cross rate to USD (ກ27: USD = amount ÷ cross rate).
+ * `rate` must match RATE_PATTERN and be positive, else TypeError.
+ */
+export function divRoundCents(a: Amount, rate: string): Amount {
+  if (typeof rate !== 'string' || !RATE_PATTERN.test(rate)) throw new TypeError(`invalid rate: ${JSON.stringify(rate)}`)
+  const [whole = '0', frac = ''] = rate.split('.')
+  const micro = BigInt(whole) * 1_000_000n + BigInt(frac.padEnd(6, '0'))
+  if (micro <= 0n) throw new TypeError(`rate must be positive: ${rate}`)
+  // cents ÷ (micro ÷ 10^6) = cents × 10^6 ÷ micro, rounded half-up.
+  const num = toCents(a) * 1_000_000n
+  return fromCents((num * 2n + micro) / (micro * 2n))
+}

@@ -4,6 +4,7 @@ import { TestClient } from '@elvine-sk/platform-server/testing'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { activeAccount } from '../src/modules/hrm/accounts.ts'
 import { findEmployee } from '../src/modules/hrm/employees.ts'
+import { holidaysBetween } from '../src/modules/hrm/holidays.ts'
 import { loggedInEids } from '../src/modules/hrm/logins.ts'
 import { runWithContext, SYSTEM_CONTEXT } from '@elvine-sk/platform-db'
 import { employeeOfUser } from '../src/modules/auth-hrm/users.ts'
@@ -64,6 +65,9 @@ describe.skipIf(!dbTestsEnabled)('hrm read layer', () => {
     expect(await activeAccount('10002', 'USD')).toBeNull()
   })
 
+  it('reads holidays, without those switched off', async () => {
+    expect([...(await holidaysBetween('2033-11-01', '2033-11-30'))]).toEqual(['2033-11-07'])
+  })
   it('lists logged-in EIDs', async () => {
     expect(await loggedInEids(['10001', '10002', '10003'])).toEqual(new Set(['10001', '10003']))
     expect(await loggedInEids([])).toEqual(new Set())

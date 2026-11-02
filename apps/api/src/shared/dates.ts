@@ -18,3 +18,19 @@ export function daysInclusive(from: string, to: string): number {
 }
 
 export const yearOf = (date: string): number => Number(date.slice(0, 4))
+
+/**
+ * The `n`th working day after `from` (not counting `from`): Saturdays, Sundays and `holidays` are skipped. The
+ * settlement deadline is `addWorkingDays(return date, 5, HRM holidays)` (spec §10, ກ20).
+ */
+export function addWorkingDays(from: string, n: number, holidays: ReadonlySet<string>): string {
+  let day = dayNumber(from)
+  let left = n
+  while (left > 0) {
+    day += 1
+    const date = new Date(day * DAY_MS)
+    const weekday = date.getUTCDay()
+    if (weekday !== 0 && weekday !== 6 && !holidays.has(date.toISOString().slice(0, 10))) left -= 1
+  }
+  return new Date(day * DAY_MS).toISOString().slice(0, 10)
+}

@@ -148,7 +148,10 @@ INSERT INTO tb_current_login (eid, session_token, start_time, last_act) VALUES
   ('10003', 'fixture-session-10003', NOW(), NOW());
 
 INSERT INTO tb_holiday (holiday_date, holiday_desc, status) VALUES
-  ('2026-12-02', 'National Day', 'Y');
+  ('2026-12-02', 'National Day', 'Y'),
+  ('2033-11-07', 'Plan 5 test holiday', 'Y'),
+  ('2033-11-21', 'Plan 5 test holiday, switched off', 'N'),
+  ('2035-03-08', 'Plan 5 test holiday', 'Y');
 
 -- Codes are the plain strings below; HRM stores only their sha256.
 INSERT INTO tb_app_handoff (code_hash, eid, created_at, expires_at) VALUES
