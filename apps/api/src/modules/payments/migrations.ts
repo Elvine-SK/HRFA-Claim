@@ -10,7 +10,7 @@ import {
   type Kysely,
   type MigrationSet,
 } from '@elvine-sk/platform-db'
-import { COMPONENTS, PAYMENT_STATUSES } from './types.ts'
+import { BATCH_KINDS, COMPONENTS, PAYMENT_STATUSES } from './types.ts'
 
 const STAMP_IN = `IN p_actor BINARY(16), IN p_at DATETIME(3), IN p_request_id VARCHAR(64), IN p_history_id BINARY(16)`
 
@@ -245,6 +245,13 @@ export const paymentsMigrations: MigrationSet = {
         SET basis = CONCAT(CAST(count AS UNSIGNED), ' km ÷ ', SUBSTRING_INDEX(SUBSTRING_INDEX(basis, '÷ ', -1), ' ', 1), ' km per litre'),
             count = ROUND(count / CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(basis, ' km ÷ ', -1), ' ', 1) AS DECIMAL(10,2)), 3)
         WHERE component = 'fuel' AND basis LIKE 'fuel ÷ % km per litre'`.execute(db)
+    },
+  },
+  // Plan 5: a settlement's file, and the clearing file of an overseas settlement's holding account.
+  '202611020300_payments_batch_kinds': {
+    async up(db: Kysely<any>) {
+      await sql`ALTER TABLE posting_batches DROP CONSTRAINT ck_posting_batches_kind`.execute(db)
+      await sql`ALTER TABLE posting_batches ADD CONSTRAINT ck_posting_batches_kind CHECK (${inCheck('kind', BATCH_KINDS)})`.execute(db)
     },
   },
 }

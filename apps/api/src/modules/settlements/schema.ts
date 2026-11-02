@@ -125,6 +125,11 @@ export const SettlementSchema = SettlementListItemSchema.extend({
   batches: z.array(SettlementBatchSchema),
 }).openapi('Settlement')
 
+export const BatchFileParams = z.object({
+  id: z.string().uuid().openapi({ param: { name: 'id', in: 'path' } }),
+  kind: z.enum(['settlement', 'clearing']).openapi({ param: { name: 'kind', in: 'path' } }),
+})
+
 export const SettlementLookupQuery = z.object({ number: z.string().trim().min(1).max(40) })
 
 export const SettlementLookupSchema = z

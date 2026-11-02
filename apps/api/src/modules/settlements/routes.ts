@@ -1,6 +1,7 @@
+import { getAudit } from '@elvine-sk/platform-audit'
 import { requireUser } from '@elvine-sk/platform-auth'
 import { AppError } from '@elvine-sk/platform-core'
-import { paginate } from '@elvine-sk/platform-db'
+import { inTransaction, paginate } from '@elvine-sk/platform-db'
 import {
   createRoute,
   dataOf,
@@ -13,10 +14,15 @@ import {
   ListQueryParams,
   type ApiRouter,
   type ModuleContext,
+  z,
 } from '@elvine-sk/platform-server'
 import { findAgreement, findByNumber } from '../agreements/queries.ts'
 import { caller, type C } from '../agreements/scope.ts'
+import { linesOf as batchLines } from '../payments/batches.ts'
+import { xlsxWriter } from '../payments/xlsx.ts'
 import { submitSettlement } from './approval.ts'
+import { batchOfKind, exportClearing, exportSettlement, markPosted } from './batches.ts'
+import { transition } from './procedures.ts'
 import {
   canFile,
   createSettlement,
@@ -29,16 +35,20 @@ import {
   type SettlementRow,
 } from './queries.ts'
 import {
+  BatchFileParams,
+  ClearingPostedSchema,
   SettlementCreateSchema,
   SettlementDraftSchema,
   settlementFields,
   SettlementListItemSchema,
   SettlementLookupQuery,
   SettlementLookupSchema,
+  SettlementPostedSchema,
   SettlementSchema,
   SettlementSubmitSchema,
+  SettlementVersionSchema,
 } from './schema.ts'
-import { isMember, maySeeSettlement, requireMember, scopedSettlements } from './scope.ts'
+import { isMember, maySeeSettlement, requireMember, requireSettlementExport, scopedSettlements } from './scope.ts'
 
 const tags = ['Settlements']
 
@@ -175,6 +185,164 @@ export function settlementRoutes(api: ApiRouter, ctx: ModuleContext) {
       const eid = await requireMember(ctx, c, row.agreementId)
       await submitSettlement(ctx, id, c.req.valid('json'), { userId: user.id, eid })
       return c.json({ data: await loadSettlement(id, lang(c)) }, 200)
+    },
+  )
+
+  /** Export rights on the settlement (403 without them, 404 for another branch). */
+  async function exporter(c: C, id: string) {
+    const row = await readable(ctx, c, id)
+    await requireSettlementExport(ctx, c, row.branchCode)
+    return row
+  }
+
+  api.openapi(
+    createRoute({
+      method: 'post',
+      path: '/settlements/{id}/export',
+      tags,
+      summary: "Create the approved settlement's posting batch (the upload file for CORE) and mark it exported",
+      request: { params: IdParam, ...jsonBody(SettlementVersionSchema) },
+      responses: { 200: jsonContent(dataOf(SettlementSchema), 'Exported'), ...errorResponses(401, 403, 404, 409, 422) },
+    }),
+    async (c) => {
+      requireUser(c)
+      const id = c.req.valid('param').id
+      const row = await exporter(c, id)
+      // GL accounts carry the exporting Finance user's branch (spec §11).
+      const { branch } = await caller(ctx, c)
+      if (!branch)
+        throw new AppError('payments.no_branch', 'Your HRM record has no branch, which the upload file needs', {
+          status: 422,
+        })
+      await inTransaction(async () => {
+        const { batchId, lines } = await exportSettlement(id, c.req.valid('json').version, branch)
+        await getAudit(ctx).record({
+          action: 'settlements.exported',
+          targetType: 'settlement',
+          targetId: id,
+          details: { ref: row.ref, batchId, lines },
+        })
+      })
+      return c.json({ data: await loadSettlement(id, lang(c)) }, 200)
+    },
+  )
+
+  api.openapi(
+    createRoute({
+      method: 'post',
+      path: '/settlements/{id}/posted',
+      tags,
+      summary:
+        "Confirm the settlement file was posted in CORE, with CORE's reference and, through the holding account, its suspense number",
+      request: { params: IdParam, ...jsonBody(SettlementPostedSchema) },
+      responses: { 200: jsonContent(dataOf(SettlementSchema), 'Posted'), ...errorResponses(401, 403, 404, 409, 422) },
+    }),
+    async (c) => {
+      requireUser(c)
+      const id = c.req.valid('param').id
+      const row = await exporter(c, id)
+      const { version, coreRef, rvsNo } = c.req.valid('json')
+      await inTransaction(async () => {
+        await markPosted(id, version, { coreRef, rvsNo })
+        await getAudit(ctx).record({
+          action: 'settlements.posted',
+          targetType: 'settlement',
+          targetId: id,
+          details: { ref: row.ref, coreRef: coreRef || null, rvsNo: rvsNo ?? null },
+        })
+      })
+      return c.json({ data: await loadSettlement(id, lang(c)) }, 200)
+    },
+  )
+
+  api.openapi(
+    createRoute({
+      method: 'post',
+      path: '/settlements/{id}/clearing',
+      tags,
+      summary: 'Create the clearing file of a posted overseas settlement (holding account back to the advance account)',
+      request: { params: IdParam, ...jsonBody(SettlementVersionSchema) },
+      responses: { 200: jsonContent(dataOf(SettlementSchema), 'Exported'), ...errorResponses(401, 403, 404, 409, 422) },
+    }),
+    async (c) => {
+      requireUser(c)
+      const id = c.req.valid('param').id
+      const row = await exporter(c, id)
+      await inTransaction(async () => {
+        const { batchId, lines } = await exportClearing(id, c.req.valid('json').version)
+        await getAudit(ctx).record({
+          action: 'settlements.clearing_exported',
+          targetType: 'settlement',
+          targetId: id,
+          details: { ref: row.ref, batchId, lines, rvsNo: row.rvsNo },
+        })
+      })
+      return c.json({ data: await loadSettlement(id, lang(c)) }, 200)
+    },
+  )
+
+  api.openapi(
+    createRoute({
+      method: 'post',
+      path: '/settlements/{id}/clearing/posted',
+      tags,
+      summary: 'Confirm the clearing file was posted in CORE, with its CORE reference if known',
+      request: { params: IdParam, ...jsonBody(ClearingPostedSchema) },
+      responses: { 200: jsonContent(dataOf(SettlementSchema), 'Cleared'), ...errorResponses(401, 403, 404, 409, 422) },
+    }),
+    async (c) => {
+      requireUser(c)
+      const id = c.req.valid('param').id
+      const row = await exporter(c, id)
+      const { version, coreRef } = c.req.valid('json')
+      await inTransaction(async () => {
+        await transition(id, version, 'cleared', { coreRef: coreRef ?? null })
+        await getAudit(ctx).record({
+          action: 'settlements.cleared',
+          targetType: 'settlement',
+          targetId: id,
+          details: { ref: row.ref, coreRef: coreRef || null },
+        })
+      })
+      return c.json({ data: await loadSettlement(id, lang(c)) }, 200)
+    },
+  )
+
+  api.openapi(
+    createRoute({
+      method: 'get',
+      path: '/settlements/{id}/batches/{kind}/file',
+      tags,
+      summary: "Download a settlement's upload file for CORE (.xlsx): the settlement file or its clearing file",
+      request: { params: BatchFileParams },
+      responses: {
+        200: {
+          description: 'Upload file',
+          content: { [xlsxWriter.contentType]: { schema: z.string().openapi({ format: 'binary' }) } },
+        },
+        ...errorResponses(401, 404),
+      },
+    }),
+    async (c) => {
+      requireUser(c)
+      const { id, kind } = c.req.valid('param')
+      const row = await readable(ctx, c, id)
+      const batch = await batchOfKind(id, kind)
+      if (!batch) throw AppError.notFound()
+      const file = await xlsxWriter.write(await batchLines(batch.id))
+      await getAudit(ctx).record({
+        action: 'settlements.downloaded',
+        targetType: 'settlement',
+        targetId: id,
+        details: { ref: row.ref, batchId: batch.id, kind },
+      })
+      return c.body(file as Uint8Array<ArrayBuffer>, 200, {
+        'content-type': xlsxWriter.contentType,
+        'content-disposition': `attachment; filename="${batch.fileName.replace(/[^\w.-]/g, '_')}"`,
+        'content-length': String(file.byteLength),
+        'cache-control': 'private, no-store',
+        'x-content-type-options': 'nosniff',
+      })
     },
   )
 }

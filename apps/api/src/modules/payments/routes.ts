@@ -256,7 +256,9 @@ export function paymentRoutes(api: ApiRouter, ctx: ModuleContext) {
       requireUser(c)
       const id = c.req.valid('param').id
       const batch = await findBatch(id)
-      if (!batch || !(await mayReadPayment(ctx, c, { branchCode: batch.documentBranch }))) throw AppError.notFound()
+      // Settlement and clearing files are served by the settlements module, under its own rule of who may read them.
+      if (!batch || batch.kind !== 'payment' || !(await mayReadPayment(ctx, c, { branchCode: batch.documentBranch })))
+        throw AppError.notFound()
       const file = await xlsxWriter.write(await linesOf(id))
       await getAudit(ctx).record({
         action: 'payments.downloaded',

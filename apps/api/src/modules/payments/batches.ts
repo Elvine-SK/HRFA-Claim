@@ -7,14 +7,14 @@ import { callProcedure, getContext, inTransaction, uuidArg, uuidBin } from '@elv
 import { daysInclusive } from '../../shared/dates.ts'
 import { appDb } from '../../shared/db.ts'
 import { branchRoleUsers } from '../agreements/approval.ts'
-import { membersOf, type MemberRow } from '../agreements/queries.ts'
+import { findAgreement, membersOf, type MemberRow } from '../agreements/queries.ts'
 import { findProvince } from '../hrm/geography.ts'
 import { countryByIso2, postingEntries, zoneOf, type ZoneCode } from '../travel-master/lookups.ts'
 import type { PaymentItem } from './calculate.ts'
 import { buildPaymentLines, paymentRemark, type PostingMember, type UploadLine } from './posting.ts'
 import { transition } from './procedures.ts'
 import { assertSomethingToPay, findPayment, itemsOf, livePaymentOf, type PaymentRow } from './queries.ts'
-import type { Component } from './types.ts'
+import type { BatchKind, Component } from './types.ts'
 import { xlsxWriter } from './xlsx.ts'
 
 export const BATCH_ERRORS = {
@@ -29,7 +29,7 @@ export const BATCH_ERRORS = {
 export async function createBatch(input: {
   id: string
   agreementId: string
-  kind: 'payment' | 'settlement'
+  kind: BatchKind
   sourceId: string
   branch: string
   fileName: string
@@ -56,7 +56,7 @@ export async function createBatch(input: {
 export interface BatchRow {
   id: string
   agreementId: string
-  kind: 'payment' | 'settlement'
+  kind: BatchKind
   sourceId: string
   branchCode: string
   fileName: string
@@ -87,7 +87,7 @@ export async function linesOf(batchId: string): Promise<UploadLine[]> {
 }
 
 /** `NAME_ENG SNAME_ENG` upper-case from the member's snapshot, else the Lao name. */
-function postingMember(m: MemberRow): PostingMember {
+export function postingMember(m: MemberRow): PostingMember {
   const eng = [m.nameEng, m.snameEng].filter(Boolean).join(' ').trim()
   return {
     eid: m.eid,
@@ -125,27 +125,36 @@ async function placeLo(agreementId: string): Promise<string> {
   }
 }
 
+/**
+ * The `REMARK` of every line of an agreement's files (spec §11): zone, leader, days, place, Doc.no, dates, REF.
+ * Payments and settlements write the same one.
+ */
+export async function agreementRemark(agreementId: string, members: MemberRow[]): Promise<string> {
+  const a = await findAgreement(agreementId)
+  if (!a?.zoneCode) throw new Error(`agreement ${agreementId} has no zone`)
+  const leader = members.find((m) => m.isLeader)
+  return paymentRemark({
+    zoneCode: a.zoneCode,
+    leaderName: leader ? `${leader.nameLao} ${leader.snameLao}` : '',
+    days: daysInclusive(a.travelFrom, a.travelTo),
+    placeLo: await placeLo(agreementId),
+    docNo: a.docNo,
+    travelFrom: a.travelFrom,
+    travelTo: a.travelTo,
+    ref: a.ref,
+  })
+}
+
 /** The upload lines of a payment, with GL accounts of `branch` (the Finance user's HRM branch). */
 async function paymentLines(row: PaymentRow, branch: string): Promise<UploadLine[]> {
   if (!row.zoneCode) throw new Error(`agreement ${row.agreementId} has no zone`)
   const zone = await zoneOf(row.zoneCode as ZoneCode)
-  const [members, items, entries, place] = await Promise.all([
-    membersOf(row.agreementId),
+  const members = await membersOf(row.agreementId)
+  const [items, entries, remark] = await Promise.all([
     itemsOf(row.id),
     postingEntries('payment', zone.kind),
-    placeLo(row.agreementId),
+    agreementRemark(row.agreementId, members),
   ])
-  const leader = members.find((m) => m.isLeader)
-  const remark = paymentRemark({
-    zoneCode: zone.code,
-    leaderName: leader ? `${leader.nameLao} ${leader.snameLao}` : '',
-    days: daysInclusive(row.travelFrom, row.travelTo),
-    placeLo: place,
-    docNo: row.docNo,
-    travelFrom: row.travelFrom,
-    travelTo: row.travelTo,
-    ref: row.ref,
-  })
   return buildPaymentLines({
     items: items.map((it): PaymentItem => ({ ...it, component: it.component as Component })),
     entries,

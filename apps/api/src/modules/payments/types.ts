@@ -10,6 +10,10 @@ export const PAYMENT_STATUSES = [
 ] as const
 export type PaymentStatus = (typeof PAYMENT_STATUSES)[number]
 
+/** Kinds of posting batch, one each per agreement (spec §11): the payment, the settlement and its clearing file. */
+export const BATCH_KINDS = ['payment', 'settlement', 'clearing'] as const
+export type BatchKind = (typeof BATCH_KINDS)[number]
+
 /** Kinds of line in the checking table, in the order they are listed per member. */
 export const COMPONENTS = [
   'daily',

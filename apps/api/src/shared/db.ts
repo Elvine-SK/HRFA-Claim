@@ -230,7 +230,7 @@ export interface SettlementLinesTable {
 export interface PostingBatchesTable {
   id: string
   agreementId: string
-  kind: 'payment' | 'settlement'
+  kind: 'payment' | 'settlement' | 'clearing'
   sourceId: string
   branchCode: string
   fileName: string

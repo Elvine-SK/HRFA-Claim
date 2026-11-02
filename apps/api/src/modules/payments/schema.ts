@@ -2,7 +2,7 @@ import type { FieldMap } from '@elvine-sk/platform-core'
 import { IsoDateTime, z } from '@elvine-sk/platform-server'
 import { FORM_TYPES } from '../agreements/types.ts'
 import { AMOUNT_PATTERN } from '../travel-master/money.ts'
-import { COMPONENTS, PAYMENT_STATUSES } from './types.ts'
+import { BATCH_KINDS, COMPONENTS, PAYMENT_STATUSES } from './types.ts'
 
 const Amount = z.string().regex(AMOUNT_PATTERN)
 /** A signed amount as stored, two decimals (a meal deduction is negative). */
@@ -91,7 +91,7 @@ export const PaymentListItemSchema = z
 export const PostingBatchSchema = z
   .object({
     id: z.string().uuid(),
-    kind: z.enum(['payment', 'settlement']),
+    kind: z.enum(BATCH_KINDS),
     /** The HRM branch of the Finance user who exported it (the GL accounts' prefix). */
     branchCode: z.string(),
     fileName: z.string(),
