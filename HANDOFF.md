@@ -244,6 +244,19 @@ Plan 4 working answers (user, 2026-10-29; built in plan 4, still to confirm with
   `finance_section_head`), `.xlsx` export, mark `posted` with an optional CORE reference, "cancelled after export"
   on agreement cancel. (The idempotent set-up command planned for the workflows was dropped: see "Carry into plan 5".)
 
+Plan 5 working answers (user, 2026-11-02; to confirm with Finance, may change later):
+
+- Q5 overseas settlement: every case with a spent part (partly used, fully used, overspent) passes through
+  2361800001, following the ກ22 text over the FA-M `ສາຍເດີນ` sheet (which draws it in case 1 only). Domestic
+  settlement never does. Overseas settlement entries are in USD on both sides, as in Q4 (my call).
+- Q5 timing: two moments. The settlement file books step 1 (DR 4405200001 / CR 2361800001, plus the CASA lines of
+  the case). After posting it in CORE, Finance types the suspense number into the app, which then produces a second
+  file for step 2 (DR 2361800001 / CR 1362220001). A third batch type, settlement clearing.
+- Q8 `RVS_NO`: the suspense number CORE gives the step 1 holding entry, typed by the finance officer; written on the
+  2361800001 lines of the clearing file.
+- My calls: the overdue list is a filter of the settlements list (reminder notifications in plan 6); cancelling an
+  agreement after its settlement is exported marks the settlement `cancelled_after_export`, like a payment.
+
 Carry into plan 5:
 
 - Deferred minors of plan 4, grouped:

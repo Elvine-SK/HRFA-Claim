@@ -516,7 +516,8 @@ Assumptions the build follows unless corrected:
 14. The branch of a posting batch is the HRM branch of the Finance user who exports it.
 
 Needed from the business (working answers for questions 3, 4, 6, 7, 9 and 14, given by the project owner on
-2026-10-29 for plan 4 and still to confirm with Finance, are in `HANDOFF.md` "Plan 4 working answers"):
+2026-10-29 for plan 4, and for questions 5 and 8, given on 2026-11-02 for plan 5, are in `HANDOFF.md` "Plan 4
+working answers" and "Plan 5 working answers"; all still to confirm with Finance):
 
 1. ~~Doc.no branch part: three digits or six (ກ12)?~~ Answered 2026-10-29: six digits (`0001.BCEL.888010.2026`).
 2. Regulation 4.2, Europe group 1: which country is "ອຽກລັງ" (code file "ອັງກະລັງ")? If it is Italy, Italy moves
