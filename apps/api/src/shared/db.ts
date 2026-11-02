@@ -175,6 +175,58 @@ export interface PaymentBillsTable {
   night: number
   amount: string
 }
+export interface SettlementsTable extends StandardColumns {
+  agreementId: string
+  paymentId: string
+  branchCode: string
+  status: Generated<
+    | 'draft'
+    | 'in_approval'
+    | 'approved'
+    | 'exported'
+    | 'posted'
+    | 'clearing_exported'
+    | 'cleared'
+    | 'void'
+    | 'cancelled_after_export'
+  >
+  zoneKind: 'domestic' | 'border' | 'overseas'
+  currency: 'LAK' | 'USD'
+  advance: string
+  holderEid: string
+  filedByEid: string
+  caseKind: 'unused' | 'partly_used' | 'fully_used' | 'overspent' | null
+  total: Generated<string>
+  remaining: string
+  dueDate: string
+  leaderEid: string | null
+  lateReason: string | null
+  submittedAt: Date | null
+  approvedAt: Date | null
+  exportedAt: Date | null
+  postedAt: Date | null
+  coreRef: string | null
+  rvsNo: string | null
+  clearingExportedAt: Date | null
+  clearedAt: Date | null
+  clearingCoreRef: string | null
+  cancelledAt: Date | null
+  agreementLive: Generated<string | null>
+}
+export interface SettlementLinesTable {
+  id: string
+  settlementId: string
+  sortOrder: number
+  description: string
+  expenseType: 'fuel' | 'fare' | null
+  currency: string
+  amount: string
+  crossRate: string | null
+  settledAmount: string
+  receiptFileId: string | null
+  noReceiptReason: string | null
+  rateProofFileId: string | null
+}
 export interface PostingBatchesTable {
   id: string
   agreementId: string
@@ -254,6 +306,8 @@ export interface AppTables {
   paymentItems: PaymentItemsTable
   paymentBills: PaymentBillsTable
   postingBatches: PostingBatchesTable
+  settlements: SettlementsTable
+  settlementLines: SettlementLinesTable
   postingLines: PostingLinesTable
   roles: RolesTable
   rolePermissions: RolePermissionsTable

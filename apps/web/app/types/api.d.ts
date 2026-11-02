@@ -11848,6 +11848,319 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/settlements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Settlements the caller may see (filters: status, agreementId, filedByEid; search: REF, Doc.no) */
+        get: {
+            parameters: {
+                query?: {
+                    page?: string;
+                    pageSize?: string;
+                    sort?: string;
+                    q?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Settlements */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["SettlementListItem"][];
+                            meta: components["schemas"]["PageMeta"];
+                        };
+                    };
+                };
+                /** @description Not authenticated */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Validation failed */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /** File the settlement of an agreement's advance, as a member of the agreement (spec §10, ກ13) */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SettlementCreate"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["Settlement"];
+                        };
+                    };
+                };
+                /** @description Not authenticated */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Validation failed */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/settlements/lookup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Find an agreement by REF or Doc.no, with its settlement and whether the caller may file one */
+        get: {
+            parameters: {
+                query: {
+                    number: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Found */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["SettlementLookup"];
+                        };
+                    };
+                };
+                /** @description Not authenticated */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Validation failed */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/settlements/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A settlement: lines, totals and case, step 2 candidates, lateness, posting batches */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Settlement */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["Settlement"];
+                        };
+                    };
+                };
+                /** @description Not authenticated */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        /** Replace the case and expense lines of a draft settlement (any member of the agreement) */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SettlementDraft"];
+                };
+            };
+            responses: {
+                /** @description Saved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["Settlement"];
+                        };
+                    };
+                };
+                /** @description Not authenticated */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Validation failed */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/platform/manifest": {
         parameters: {
             query?: never;
@@ -13174,6 +13487,155 @@ export interface components {
         PaymentPosted: {
             version: number;
             coreRef?: string;
+        };
+        Settlement: components["schemas"]["SettlementListItem"] & {
+            holderName: string;
+            lines: components["schemas"]["SettlementLine"][];
+            totals: components["schemas"]["SettlementTotals"];
+            candidates: {
+                eid: string;
+                name: string;
+            }[];
+            isLate: boolean;
+            batches: components["schemas"]["SettlementBatch"][];
+        };
+        SettlementLine: {
+            /** Format: uuid */
+            id: string;
+            description: string;
+            /** @enum {string|null} */
+            expenseType: "fuel" | "fare" | null;
+            currency: string;
+            /** @example 1500000.00 */
+            amount: string;
+            crossRate: string | null;
+            /** @example 1500000.00 */
+            settledAmount: string;
+            /** Format: uuid */
+            receiptFileId: string | null;
+            noReceiptReason: string | null;
+            /** Format: uuid */
+            rateProofFileId: string | null;
+        };
+        SettlementTotals: {
+            /** @example 1500000.00 */
+            total: string;
+            /** @example 1500000.00 */
+            remaining: string;
+            /** @enum {string} */
+            caseKind: "unused" | "partly_used" | "fully_used" | "overspent";
+            /** @example 1500000.00 */
+            returned: string;
+            /** @example 1500000.00 */
+            excess: string;
+            /** @example 1500000.00 */
+            holding: string;
+            byType: {
+                /** @example 1500000.00 */
+                fuel: string;
+                /** @example 1500000.00 */
+                fare: string;
+            };
+            needsClearing: boolean;
+        };
+        SettlementBatch: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            kind: "settlement" | "clearing";
+            branchCode: string;
+            fileName: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            cancelledAfterExportAt: string | null;
+        };
+        SettlementListItem: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            agreementId: string;
+            /** Format: uuid */
+            paymentId: string;
+            ref: string;
+            docNo: string;
+            subject: string;
+            branchCode: string;
+            /** @enum {string} */
+            zoneKind: "domestic" | "border" | "overseas";
+            /** @enum {string} */
+            currency: "LAK" | "USD";
+            /** @example 1500000.00 */
+            advance: string;
+            /** @example 1500000.00 */
+            total: string;
+            /** @example 1500000.00 */
+            remaining: string;
+            holderEid: string;
+            filedByEid: string;
+            /** @enum {string|null} */
+            caseKind: "unused" | "partly_used" | "fully_used" | "overspent" | null;
+            travelFrom: string;
+            travelTo: string;
+            dueDate: string;
+            /** @enum {string} */
+            status: "draft" | "in_approval" | "approved" | "exported" | "posted" | "clearing_exported" | "cleared" | "void" | "cancelled_after_export";
+            leaderEid: string | null;
+            lateReason: string | null;
+            /** Format: date-time */
+            submittedAt: string | null;
+            /** Format: date-time */
+            approvedAt: string | null;
+            /** Format: date-time */
+            exportedAt: string | null;
+            /** Format: date-time */
+            postedAt: string | null;
+            coreRef: string | null;
+            rvsNo: string | null;
+            /** Format: date-time */
+            clearingExportedAt: string | null;
+            /** Format: date-time */
+            clearedAt: string | null;
+            clearingCoreRef: string | null;
+            /** Format: date-time */
+            cancelledAt: string | null;
+            /** Format: uuid */
+            createdBy: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+        };
+        SettlementCreate: {
+            /** Format: uuid */
+            agreementId: string;
+        };
+        SettlementLookup: {
+            /** Format: uuid */
+            agreementId: string;
+            /** Format: uuid */
+            settlementId: string | null;
+            canFile: boolean;
+        };
+        SettlementDraft: {
+            version: number;
+            /** @enum {string|null} */
+            caseKind?: "unused" | "partly_used" | "fully_used" | "overspent" | null;
+            lines: components["schemas"]["SettlementLineInput"][];
+        };
+        SettlementLineInput: {
+            description: string;
+            /** @enum {string} */
+            expenseType?: "fuel" | "fare";
+            currency: string;
+            amount: string;
+            crossRate?: string;
+            /** Format: uuid */
+            receiptFileId?: string;
+            noReceiptReason?: string;
+            /** Format: uuid */
+            rateProofFileId?: string;
         };
         PlatformManifest: {
             modules: string[];

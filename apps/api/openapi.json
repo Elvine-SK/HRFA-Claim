@@ -5603,6 +5603,590 @@
           "version"
         ]
       },
+      "Settlement": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SettlementListItem"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "holderName": {
+                "type": "string"
+              },
+              "lines": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SettlementLine"
+                }
+              },
+              "totals": {
+                "$ref": "#/components/schemas/SettlementTotals"
+              },
+              "candidates": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "eid": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "eid",
+                    "name"
+                  ]
+                }
+              },
+              "isLate": {
+                "type": "boolean"
+              },
+              "batches": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SettlementBatch"
+                }
+              }
+            },
+            "required": [
+              "holderName",
+              "lines",
+              "totals",
+              "candidates",
+              "isLate",
+              "batches"
+            ]
+          }
+        ]
+      },
+      "SettlementLine": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "description": {
+            "type": "string"
+          },
+          "expenseType": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "fuel",
+              "fare",
+              null
+            ]
+          },
+          "currency": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "string",
+            "example": "1500000.00"
+          },
+          "crossRate": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "settledAmount": {
+            "type": "string",
+            "example": "1500000.00"
+          },
+          "receiptFileId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "noReceiptReason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "rateProofFileId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "id",
+          "description",
+          "expenseType",
+          "currency",
+          "amount",
+          "crossRate",
+          "settledAmount",
+          "receiptFileId",
+          "noReceiptReason",
+          "rateProofFileId"
+        ]
+      },
+      "SettlementTotals": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "string",
+            "example": "1500000.00"
+          },
+          "remaining": {
+            "type": "string",
+            "example": "1500000.00"
+          },
+          "caseKind": {
+            "type": "string",
+            "enum": [
+              "unused",
+              "partly_used",
+              "fully_used",
+              "overspent"
+            ]
+          },
+          "returned": {
+            "type": "string",
+            "example": "1500000.00"
+          },
+          "excess": {
+            "type": "string",
+            "example": "1500000.00"
+          },
+          "holding": {
+            "type": "string",
+            "example": "1500000.00"
+          },
+          "byType": {
+            "type": "object",
+            "properties": {
+              "fuel": {
+                "type": "string",
+                "example": "1500000.00"
+              },
+              "fare": {
+                "type": "string",
+                "example": "1500000.00"
+              }
+            },
+            "required": [
+              "fuel",
+              "fare"
+            ]
+          },
+          "needsClearing": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "total",
+          "remaining",
+          "caseKind",
+          "returned",
+          "excess",
+          "holding",
+          "byType",
+          "needsClearing"
+        ]
+      },
+      "SettlementBatch": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "settlement",
+              "clearing"
+            ]
+          },
+          "branchCode": {
+            "type": "string"
+          },
+          "fileName": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "cancelledAfterExportAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "branchCode",
+          "fileName",
+          "createdAt",
+          "cancelledAfterExportAt"
+        ]
+      },
+      "SettlementListItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "agreementId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "paymentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ref": {
+            "type": "string"
+          },
+          "docNo": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "branchCode": {
+            "type": "string"
+          },
+          "zoneKind": {
+            "type": "string",
+            "enum": [
+              "domestic",
+              "border",
+              "overseas"
+            ]
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "LAK",
+              "USD"
+            ]
+          },
+          "advance": {
+            "type": "string",
+            "example": "1500000.00"
+          },
+          "total": {
+            "type": "string",
+            "example": "1500000.00"
+          },
+          "remaining": {
+            "type": "string",
+            "example": "1500000.00"
+          },
+          "holderEid": {
+            "type": "string"
+          },
+          "filedByEid": {
+            "type": "string"
+          },
+          "caseKind": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "unused",
+              "partly_used",
+              "fully_used",
+              "overspent",
+              null
+            ]
+          },
+          "travelFrom": {
+            "type": "string"
+          },
+          "travelTo": {
+            "type": "string"
+          },
+          "dueDate": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "in_approval",
+              "approved",
+              "exported",
+              "posted",
+              "clearing_exported",
+              "cleared",
+              "void",
+              "cancelled_after_export"
+            ]
+          },
+          "leaderEid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lateReason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "submittedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "approvedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "exportedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "postedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "coreRef": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "rvsNo": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "clearingExportedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "clearedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "clearingCoreRef": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "cancelledAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "createdBy": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "agreementId",
+          "paymentId",
+          "ref",
+          "docNo",
+          "subject",
+          "branchCode",
+          "zoneKind",
+          "currency",
+          "advance",
+          "total",
+          "remaining",
+          "holderEid",
+          "filedByEid",
+          "caseKind",
+          "travelFrom",
+          "travelTo",
+          "dueDate",
+          "status",
+          "leaderEid",
+          "lateReason",
+          "submittedAt",
+          "approvedAt",
+          "exportedAt",
+          "postedAt",
+          "coreRef",
+          "rvsNo",
+          "clearingExportedAt",
+          "clearedAt",
+          "clearingCoreRef",
+          "cancelledAt",
+          "createdBy",
+          "createdAt",
+          "updatedAt",
+          "version"
+        ]
+      },
+      "SettlementCreate": {
+        "type": "object",
+        "properties": {
+          "agreementId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "agreementId"
+        ]
+      },
+      "SettlementLookup": {
+        "type": "object",
+        "properties": {
+          "agreementId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "settlementId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "canFile": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "agreementId",
+          "settlementId",
+          "canFile"
+        ]
+      },
+      "SettlementDraft": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "caseKind": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "unused",
+              "partly_used",
+              "fully_used",
+              "overspent",
+              null
+            ]
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SettlementLineInput"
+            },
+            "maxItems": 200
+          }
+        },
+        "required": [
+          "version",
+          "lines"
+        ]
+      },
+      "SettlementLineInput": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "expenseType": {
+            "type": "string",
+            "enum": [
+              "fuel",
+              "fare"
+            ]
+          },
+          "currency": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "amount": {
+            "type": "string",
+            "pattern": "^\\d{1,13}(\\.\\d{1,2})?$"
+          },
+          "crossRate": {
+            "type": "string",
+            "pattern": "^\\d{1,9}(\\.\\d{1,6})?$"
+          },
+          "receiptFileId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "noReceiptReason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "rateProofFileId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "description",
+          "currency",
+          "amount"
+        ]
+      },
       "PlatformManifest": {
         "type": "object",
         "properties": {
@@ -19432,6 +20016,390 @@
           },
           "403": {
             "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/settlements": {
+      "post": {
+        "tags": [
+          "Settlements"
+        ],
+        "summary": "File the settlement of an agreement's advance, as a member of the agreement (spec §10, ກ13)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettlementCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Settlement"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Settlements"
+        ],
+        "summary": "Settlements the caller may see (filters: status, agreementId, filedByEid; search: REF, Doc.no)",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "1"
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "example": "20"
+            },
+            "required": false,
+            "name": "pageSize",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "example": "-createdAt"
+            },
+            "required": false,
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "q",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Settlements",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/SettlementListItem"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PageMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/settlements/lookup": {
+      "get": {
+        "tags": [
+          "Settlements"
+        ],
+        "summary": "Find an agreement by REF or Doc.no, with its settlement and whether the caller may file one",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 40
+            },
+            "required": true,
+            "name": "number",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/SettlementLookup"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/settlements/{id}": {
+      "get": {
+        "tags": [
+          "Settlements"
+        ],
+        "summary": "A settlement: lines, totals and case, step 2 candidates, lateness, posting batches",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Settlement",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Settlement"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Settlements"
+        ],
+        "summary": "Replace the case and expense lines of a draft settlement (any member of the agreement)",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettlementDraft"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Saved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Settlement"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
             "content": {
               "application/json": {
                 "schema": {
