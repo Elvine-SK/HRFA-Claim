@@ -108,6 +108,23 @@ async function openPayment() {
     notify.error(error)
   }
 }
+// A member opens the settlement of the advance, filing it the first time once the advance is paid (ກ13).
+const { lookup: findSettlement, create: createSettlement } = useSettlementMutations()
+const me = useApiItem<{ eid: string }>('hrm-me', '/hrm/me', { retry: false })
+const canSettle = computed(
+  () => a.value?.status === 'approved' && a.value.hasAdvance && a.value.members.some((m) => m.eid === me.data.value?.eid),
+)
+async function openSettlement() {
+  if (!a.value) return
+  try {
+    const found = await findSettlement.mutateAsync(a.value.ref)
+    if (found.settlementId) return await router.push(`/settlements/${found.settlementId}`)
+    if (!found.canFile) return notify.error(new Error(t('settlements.list.cannotFile', { ref: a.value.ref })))
+    await router.push(`/settlements/${(await createSettlement.mutateAsync(a.value.id)).id}`)
+  } catch (error) {
+    notify.error(error)
+  }
+}
 const isDraft = computed(() => a.value?.status === 'draft')
 const mayEdit = computed(() => isDraft.value && access.canSome('agreement.create'))
 </script>
@@ -125,6 +142,14 @@ const mayEdit = computed(() => isDraft.value && access.canSome('agreement.create
         <UButton v-if="canPay" icon="i-lucide-banknote" :loading="findPayment.isPending.value || createPayment.isPending.value" @click="openPayment">{{
           t('agreements.detail.payment')
         }}</UButton>
+        <UButton
+          v-if="canSettle"
+          icon="i-lucide-receipt"
+          variant="soft"
+          :loading="findSettlement.isPending.value || createSettlement.isPending.value"
+          @click="openSettlement"
+          >{{ t('agreements.detail.settlement') }}</UButton
+        >
         <UButton v-if="canCancel" icon="i-lucide-ban" color="error" variant="soft" @click="cancelling = true">{{
           t('agreements.detail.cancel')
         }}</UButton>

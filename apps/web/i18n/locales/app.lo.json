@@ -135,7 +135,7 @@
     },
     "postingEntries": {
       "title": "ລາຍການລົງບັນຊີ",
-      "line": "ບັນຊີທີ່ DR ແລະ CR ຂອງແຕ່ລະປະເພດຄ່າໃຊ້ຈ່າຍ (ອ່ານຢ່າງດຽວ)",
+      "line": "ບັນຊີທີ່ DR ແລະ CR ຂອງແຕ່ລະກໍລະນີ ແລະ ປະເພດ (ອ່ານຢ່າງດຽວ)",
       "component": "ປະເພດ",
       "side": "ຝັ່ງ",
       "account": "ບັນຊີ",
@@ -146,6 +146,22 @@
         "domestic": "ພາຍໃນປະເທດ",
         "border": "ເຂດຊາຍແດນ",
         "overseas": "ຕ່າງປະເທດ"
+      },
+      "case": {
+        "payment": "ການຈ່າຍເງິນ",
+        "settlement": "ການສະສາງ",
+        "clearing": "ຕັດບັນຊີລໍຖ້າ"
+      },
+      "components": {
+        "daily": "ເບ້ຍລ້ຽງລາຍວັນ",
+        "accommodation": "ຄ່າທີ່ພັກ",
+        "fuel": "ຄ່ານ້ຳມັນ",
+        "personal": "ຄ່າໃຊ້ຈ່າຍສ່ວນຕົວ",
+        "advance": "ເງິນແຮ",
+        "fare": "ຄ່າໂດຍສານ",
+        "holding": "ບັນຊີລໍຖ້າ",
+        "returned": "ຜູ້ຖືເງິນແຮສົ່ງຄືນ",
+        "excess": "ໃຊ້ເກີນ, ຈ່າຍຄືນໃຫ້ຜູ້ຖືເງິນແຮ"
       }
     }
   },
@@ -177,7 +193,8 @@
       "cancelTitle": "ຍົກເລີກ {ref}",
       "cancelText": "ສັນຍາຈະເກັບ REF ໄວ້ ແລະ ເລກທີເອກະສານຈະໃຊ້ໄດ້ອີກສຳລັບສັນຍາແທນ. ບໍ່ສາມາດຍ້ອນຄືນໄດ້.",
       "cancelled": "ຍົກເລີກສັນຍາແລ້ວ",
-      "payment": "ການຈ່າຍເງິນ"
+      "payment": "ການຈ່າຍເງິນ",
+      "settlement": "ສະສາງເງິນແຮ"
     },
     "formType": {
       "domestic": "ແບບຟອມ 1: ລະຫວ່າງແຂວງ",
@@ -411,7 +428,30 @@
     "payments_no_branch": "ຂໍ້ມູນ HRM ຂອງທ່ານບໍ່ມີສາຂາ ເຊິ່ງໄຟລ໌ອັບໂຫຼດຕ້ອງໃຊ້ສຳລັບບັນຊີ GL",
     "posting_batch_exists": "ສັນຍານີ້ມີຊຸດລົງບັນຊີປະເພດນີ້ແລ້ວ",
     "posting_unbalanced": "ຍອດ DR ແລະ CR ຂອງຊຸດລົງບັນຊີບໍ່ເທົ່າກັນໃນສະກຸນເງິນໃດໜຶ່ງ",
-    "validation_failed": "ຍັງເຮັດບໍ່ໄດ້"
+    "validation_failed": "ຍັງເຮັດບໍ່ໄດ້",
+    "settlements_bad_transition": "ການສະສາງບໍ່ສາມາດປ່ຽນໄປເປັນສະຖານະນີ້ໄດ້",
+    "settlements_no_advance": "ສັນຍານີ້ບໍ່ມີເງິນແຮທີ່ຕ້ອງສະສາງ",
+    "settlements_advance_not_paid": "ເງິນແຮຍັງບໍ່ໄດ້ຈ່າຍ: ການຈ່າຍເງິນຍັງບໍ່ມີໄຟລ໌ອັບໂຫຼດ",
+    "settlements_exists": "ສັນຍານີ້ມີການສະສາງແລ້ວ",
+    "settlements_not_draft": "ແກ້ໄຂໄດ້ສະເພາະການສະສາງທີ່ເປັນສະບັບຮ່າງ",
+    "settlements_expense_type_required": "ກະລຸນາເລືອກ ຄ່ານ້ຳມັນ ຫຼື ຄ່າໂດຍສານ",
+    "settlements_expense_type_not_allowed": "ລາຍຈ່າຍຕ່າງປະເທດບໍ່ມີປະເພດ",
+    "settlements_cross_rate_required": "ກະລຸນາໃສ່ອັດຕາແລກປ່ຽນຂອງສະກຸນເງິນນີ້",
+    "settlements_cross_rate_not_allowed": "ລາຍຈ່າຍໃນສະກຸນເງິນແຮ ບໍ່ຕ້ອງມີອັດຕາແລກປ່ຽນ",
+    "settlements_receipt_required": "ກະລຸນາເລືອກໃບບິນ ຫຼື ບອກເຫດຜົນທີ່ບໍ່ມີ",
+    "settlements_rate_proof_required": "ກະລຸນາເລືອກຫຼັກຖານອັດຕາແລກປ່ຽນ",
+    "settlements_file_unknown": "ບໍ່ແມ່ນໄຟລ໌ທີ່ແນບກັບການສະສາງນີ້",
+    "settlements_receipt_locked": "ໃບບິນຂອງການສະສາງທີ່ສົ່ງແລ້ວ ຕ້ອງເກັບໄວ້",
+    "settlements_case_required": "ກະລຸນາເລືອກກໍລະນີ",
+    "settlements_case_mismatch": "ກໍລະນີບໍ່ກົງກັບຍອດລວມ",
+    "settlements_late_reason_required": "ການສະສາງຊ້າກວ່າກຳນົດ: ກະລຸນາບອກເຫດຜົນ",
+    "settlements_leader_required": "ກະລຸນາເລືອກຫົວໜ້າ ຫຼື ຮອງຫົວໜ້າຄະນະ ທີ່ກວດກາ",
+    "settlements_not_leader": "ບໍ່ແມ່ນຫົວໜ້າ ຫຼື ຮອງຫົວໜ້າຄະນະຂອງສັນຍານີ້",
+    "settlements_own_eid": "ຂັ້ນຕອນທີ 2 ຕ້ອງແມ່ນຄົນອື່ນ ບໍ່ແມ່ນທ່ານ",
+    "settlements_leader_no_account": "ຫົວໜ້າ ຫຼື ຮອງຫົວໜ້າຄົນນີ້ ຍັງບໍ່ເຄີຍເຂົ້າລະບົບ",
+    "settlements_no_clearing": "ການສະສາງນີ້ບໍ່ຜ່ານບັນຊີລໍຖ້າ",
+    "settlements_rvs_no_required": "ກະລຸນາໃສ່ເລກ suspense ຈາກ CORE",
+    "settlements_rvs_no_not_allowed": "ການສະສາງນີ້ບໍ່ຕ້ອງມີເລກ suspense"
   },
   "dates": {
     "openCalendar": "ເປີດປະຕິທິນ"
@@ -447,6 +487,112 @@
       "department_head": "ຫົວໜ້າພະແນກ",
       "management": "ຄະນະອຳນວຍການ",
       "finance_section_head": "ຫົວໜ້າຂະແໜງການເງິນ"
+    }
+  },
+  "settlements": {
+    "entity": "ການສະສາງເງິນແຮ",
+    "nav": {
+      "title": "ການສະສາງ"
+    },
+    "list": {
+      "title": "ການສະສາງເງິນແຮ",
+      "subtitle": "ສະສາງເງິນແຮຂອງການເດີນທາງ ພ້ອມໃບບິນ",
+      "tabList": "ການສະສາງ",
+      "tabOverdue": "ກາຍກຳນົດ",
+      "entities": "ການສະສາງ",
+      "readyTitle": "{ref} ໄດ້ຈ່າຍເງິນແຮແລ້ວ",
+      "readyText": "ສ້າງການສະສາງ: ປ້ອນລາຍຈ່າຍ ແລະ ແນບໃບບິນ.",
+      "file": "ສ້າງການສະສາງ",
+      "cannotFile": "{ref} ບໍ່ມີການສະສາງທີ່ຕ້ອງສ້າງ: ບໍ່ມີເງິນແຮ, ເງິນແຮຍັງບໍ່ໄດ້ຈ່າຍ ຫຼື ທ່ານບໍ່ແມ່ນສະມາຊິກ",
+      "started": "ເລີ່ມແລ້ວ",
+      "draft": "ສະບັບຮ່າງ",
+      "noneOverdue": "ບໍ່ມີການສະສາງທີ່ກາຍກຳນົດ"
+    },
+    "status": {
+      "draft": "ສະບັບຮ່າງ",
+      "in_approval": "ກຳລັງອະນຸມັດ",
+      "approved": "ອະນຸມັດແລ້ວ",
+      "exported": "ສ້າງໄຟລ໌ແລ້ວ",
+      "posted": "ລົງບັນຊີແລ້ວ",
+      "clearing_exported": "ສ້າງໄຟລ໌ຕັດບັນຊີລໍຖ້າແລ້ວ",
+      "cleared": "ຕັດບັນຊີລໍຖ້າແລ້ວ",
+      "void": "ຍົກເລີກ",
+      "cancelled_after_export": "ຍົກເລີກຫຼັງສ້າງໄຟລ໌"
+    },
+    "case": {
+      "unused": "ບໍ່ໄດ້ນຳໃຊ້",
+      "partly_used": "ນຳໃຊ້ສ່ວນໃດໜຶ່ງ",
+      "fully_used": "ນຳໃຊ້ທັງໝົດ",
+      "overspent": "ນຳໃຊ້ເກີນ"
+    },
+    "expenseType": {
+      "fuel": "ຄ່ານ້ຳມັນ",
+      "fare": "ຄ່າໂດຍສານ"
+    },
+    "field": {
+      "advance": "ເງິນແຮ",
+      "total": "ລາຍຈ່າຍ",
+      "dueDate": "ວັນຄົບກຳນົດ",
+      "holder": "ຜູ້ຖືເງິນແຮ",
+      "leader": "ຫົວໜ້າ ຫຼື ຮອງຫົວໜ້າຄະນະ",
+      "lateReason": "ເຫດຜົນທີ່ຊ້າ",
+      "rvsNo": "ເລກ suspense (RVS_NO)",
+      "clearingCoreRef": "ເລກອ້າງອີງ CORE ຂອງການຕັດບັນຊີລໍຖ້າ",
+      "zoneKind": "ເຂດ",
+      "caseKind": "ກໍລະນີ"
+    },
+    "lines": {
+      "title": "ລາຍຈ່າຍ",
+      "add": "ເພີ່ມລາຍຈ່າຍ",
+      "none": "ບໍ່ມີລາຍຈ່າຍ",
+      "description": "ລາຍລະອຽດ",
+      "expenseType": "ປະເພດ",
+      "currency": "ສະກຸນເງິນ",
+      "amount": "ຈຳນວນເງິນ",
+      "crossRate": "ອັດຕາແລກປ່ຽນ",
+      "crossRateHint": "ຈຳນວນເງິນ ÷ ອັດຕາແລກປ່ຽນ = {ccy}",
+      "receipt": "ໃບບິນ (PDF)",
+      "noReceipt": "ບໍ່ມີໃບບິນ",
+      "noReceiptReason": "ເຫດຜົນທີ່ບໍ່ມີໃບບິນ",
+      "rateProof": "ຫຼັກຖານອັດຕາແລກປ່ຽນ (PDF)",
+      "remove": "ລຶບ",
+      "caseHint": "ຕາມຍອດລວມ: {kind}",
+      "save": "ບັນທຶກລາຍຈ່າຍ",
+      "settled": "ຈຳນວນສະສາງ",
+      "noReceiptBadge": "ບໍ່ມີໃບບິນ: {reason}"
+    },
+    "totals": {
+      "title": "ຍອດລວມ",
+      "returned": "ຜູ້ຖືເງິນແຮສົ່ງຄືນ {amount}",
+      "excess": "ຈ່າຍຄືນໃຫ້ຜູ້ຖືເງິນແຮ {amount}",
+      "even": "ບໍ່ມີຫຍັງຕ້ອງສົ່ງຄືນ ຫຼື ຈ່າຍຄືນ",
+      "holding": "{amount} ຢູ່ໃນບັນຊີລໍຖ້າ ຈົນກວ່າຈະສ້າງໄຟລ໌ຕັດບັນຊີລໍຖ້າ"
+    },
+    "batch": {
+      "settlement": "ໄຟລ໌ການສະສາງ",
+      "clearing": "ໄຟລ໌ຕັດບັນຊີລໍຖ້າ"
+    },
+    "detail": {
+      "title": "ການສະສາງເງິນແຮ",
+      "late": "ຊ້າກວ່າກຳນົດ",
+      "submit": "ສົ່ງ",
+      "submitTitle": "ສົ່ງ {ref}",
+      "leaderHint": "ຫົວໜ້າ ຫຼື ຮອງຫົວໜ້າຄະນະ ກວດກ່ອນ",
+      "noLeaderStep": "ທ່ານເປັນຫົວໜ້າຄົນດຽວ: ການສະສາງໄປຫາຝ່າຍການເງິນໂດຍກົງ.",
+      "lateHint": "ຄົບກຳນົດວັນທີ {date}",
+      "submitted": "ສົ່ງການສະສາງແລ້ວ",
+      "saved": "ບັນທຶກລາຍຈ່າຍແລ້ວ",
+      "export": "ສ້າງໄຟລ໌ອັບໂຫຼດ",
+      "exportTitle": "ສ້າງໄຟລ໌ອັບໂຫຼດຂອງ {ref}",
+      "exportText": "ການສະສາງຈະຖືກໝາຍວ່າສ້າງໄຟລ໌ແລ້ວ ແລະ ໄຟລ໌ສຳລັບ CORE ສ້າງຈາກລາຍການລົງບັນຊີ. ຍົກເລີກຄືນບໍ່ໄດ້.",
+      "exported": "ສ້າງໄຟລ໌ອັບໂຫຼດແລ້ວ",
+      "clearing": "ສ້າງໄຟລ໌ຕັດບັນຊີລໍຖ້າ",
+      "clearingTitle": "ສ້າງໄຟລ໌ຕັດບັນຊີລໍຖ້າຂອງ {ref}",
+      "clearingText": "ບັນຊີລໍຖ້າຈະຖືກຕັດໄປຫາບັນຊີເງິນແຮ ດ້ວຍເລກ suspense {rvs}.",
+      "markCleared": "ໝາຍວ່າລົງບັນຊີຕັດລໍຖ້າແລ້ວ",
+      "markClearedTitle": "ໝາຍການຕັດບັນຊີລໍຖ້າຂອງ {ref} ວ່າລົງບັນຊີແລ້ວ",
+      "rvsHint": "ເລກທີ່ CORE ໃຫ້ລາຍການບັນຊີລໍຖ້າ; ໄຟລ໌ຕັດບັນຊີລໍຖ້າຕ້ອງໃຊ້",
+      "postedDone": "ໝາຍວ່າລົງບັນຊີແລ້ວ"
     }
   }
 }

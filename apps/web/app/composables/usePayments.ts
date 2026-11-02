@@ -40,14 +40,21 @@ export function usePayment(id: MaybeRefOrGetter<string | null | undefined>) {
   return useApiItem<Payment>(PAYMENTS_KEY, () => (toValue(id) ? `/payments/${toValue(id)}` : null))
 }
 
-/** Posting entries of the payment case for one zone kind (read only master page). */
-export function usePostingEntries(zoneKind: MaybeRefOrGetter<ZoneKind>) {
+export type PostingCase = 'payment' | 'settlement' | 'clearing'
+export const POSTING_CASES: PostingCase[] = ['payment', 'settlement', 'clearing']
+
+/** Posting entries of a case (payment, settlement, clearing) for one zone kind (read only master page). */
+export function usePostingEntries(caseKey: MaybeRefOrGetter<PostingCase>, zoneKind: MaybeRefOrGetter<ZoneKind>) {
   const api = useApi()
   return useQuery<PostingEntry[], ApiError>({
-    queryKey: computed(() => ['travel-master', 'posting-entries', toValue(zoneKind)] as const),
+    queryKey: computed(() => ['travel-master', 'posting-entries', toValue(caseKey), toValue(zoneKind)] as const),
     queryFn: async ({ signal }) =>
-      (await api<DataResponse<PostingEntry[]>>(`/travel-master/posting-entries?zoneKind=${toValue(zoneKind)}`, { signal }))
-        .data,
+      (
+        await api<DataResponse<PostingEntry[]>>(
+          `/travel-master/posting-entries?caseKey=${toValue(caseKey)}&zoneKind=${toValue(zoneKind)}`,
+          { signal },
+        )
+      ).data,
     staleTime: 60_000,
   })
 }

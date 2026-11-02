@@ -135,7 +135,7 @@
     },
     "postingEntries": {
       "title": "Posting entries",
-      "line": "Accounts debited and credited for each payment component (read only)",
+      "line": "Accounts debited and credited for each case and component (read only)",
       "component": "Component",
       "side": "Side",
       "account": "Account",
@@ -146,6 +146,22 @@
         "domestic": "Domestic",
         "border": "Border zone",
         "overseas": "Overseas"
+      },
+      "case": {
+        "payment": "Payment",
+        "settlement": "Settlement",
+        "clearing": "Clearing"
+      },
+      "components": {
+        "daily": "Daily allowance",
+        "accommodation": "Accommodation",
+        "fuel": "Fuel",
+        "personal": "Personal allowance",
+        "advance": "Advance",
+        "fare": "Fare",
+        "holding": "Holding account",
+        "returned": "Returned by the holder",
+        "excess": "Overspent, paid to the holder"
       }
     }
   },
@@ -177,7 +193,8 @@
       "cancelTitle": "Cancel {ref}",
       "cancelText": "The agreement keeps its REF and its Doc.no becomes free for the replacement. This cannot be undone.",
       "cancelled": "Agreement cancelled",
-      "payment": "Payment"
+      "payment": "Payment",
+      "settlement": "Settlement"
     },
     "formType": {
       "domestic": "Form 1: between provinces",
@@ -411,7 +428,30 @@
     "payments_no_branch": "Your HRM record has no branch, which the upload file needs for its GL accounts",
     "posting_batch_exists": "This agreement already has a posting batch of this kind",
     "posting_unbalanced": "Debits and credits of the batch differ in a currency",
-    "validation_failed": "This cannot be done yet"
+    "validation_failed": "This cannot be done yet",
+    "settlements_bad_transition": "The settlement cannot move to this status from its current one",
+    "settlements_no_advance": "This agreement has no advance to settle",
+    "settlements_advance_not_paid": "The advance is not paid yet: its payment has no upload file",
+    "settlements_exists": "This agreement already has a settlement",
+    "settlements_not_draft": "Only a draft settlement can be changed",
+    "settlements_expense_type_required": "Choose fuel or fare",
+    "settlements_expense_type_not_allowed": "Overseas expenses have no type",
+    "settlements_cross_rate_required": "Enter the cross rate of this currency",
+    "settlements_cross_rate_not_allowed": "An expense in the advance currency takes no cross rate",
+    "settlements_receipt_required": "Choose the receipt, or say why there is none",
+    "settlements_rate_proof_required": "Choose the proof of the cross rate",
+    "settlements_file_unknown": "Not a file attached to this settlement",
+    "settlements_receipt_locked": "The receipts of a submitted settlement are kept",
+    "settlements_case_required": "Choose the case",
+    "settlements_case_mismatch": "The case does not match the totals",
+    "settlements_late_reason_required": "The settlement is late: give the reason",
+    "settlements_leader_required": "Choose the leader or deputy who checks it",
+    "settlements_not_leader": "Not the leader or a deputy of this agreement",
+    "settlements_own_eid": "Step 2 is taken by someone other than you",
+    "settlements_leader_no_account": "This leader or deputy has not signed in to the app yet",
+    "settlements_no_clearing": "This settlement does not pass through the holding account",
+    "settlements_rvs_no_required": "Enter the suspense number from CORE",
+    "settlements_rvs_no_not_allowed": "This settlement takes no suspense number"
   },
   "dates": {
     "openCalendar": "Open the calendar"
@@ -447,6 +487,112 @@
       "department_head": "Department head",
       "management": "Management",
       "finance_section_head": "Finance section head"
+    }
+  },
+  "settlements": {
+    "entity": "Advance settlement",
+    "nav": {
+      "title": "Settlements"
+    },
+    "list": {
+      "title": "Advance settlements",
+      "subtitle": "Settle a trip's advance with its receipts",
+      "tabList": "Settlements",
+      "tabOverdue": "Overdue",
+      "entities": "settlements",
+      "readyTitle": "{ref} has its advance paid",
+      "readyText": "File its settlement: enter the expenses and attach the receipts.",
+      "file": "File settlement",
+      "cannotFile": "{ref} has no settlement to file: no advance, the advance is not paid yet, or you are not a member",
+      "started": "Started",
+      "draft": "Draft",
+      "noneOverdue": "No overdue settlements"
+    },
+    "status": {
+      "draft": "Draft",
+      "in_approval": "In approval",
+      "approved": "Approved",
+      "exported": "File created",
+      "posted": "Posted",
+      "clearing_exported": "Clearing file created",
+      "cleared": "Cleared",
+      "void": "Void",
+      "cancelled_after_export": "Cancelled after export"
+    },
+    "case": {
+      "unused": "Not used",
+      "partly_used": "Partly used",
+      "fully_used": "Fully used",
+      "overspent": "Overspent"
+    },
+    "expenseType": {
+      "fuel": "Fuel",
+      "fare": "Fare"
+    },
+    "field": {
+      "advance": "Advance",
+      "total": "Expenses",
+      "dueDate": "Due date",
+      "holder": "Advance holder",
+      "leader": "Leader or deputy",
+      "lateReason": "Reason for lateness",
+      "rvsNo": "Suspense number (RVS_NO)",
+      "clearingCoreRef": "CORE reference of the clearing",
+      "zoneKind": "Zone",
+      "caseKind": "Case"
+    },
+    "lines": {
+      "title": "Expenses",
+      "add": "Add expense",
+      "none": "No expenses",
+      "description": "Description",
+      "expenseType": "Type",
+      "currency": "Currency",
+      "amount": "Amount",
+      "crossRate": "Cross rate",
+      "crossRateHint": "Amount ÷ cross rate = {ccy}",
+      "receipt": "Receipt (PDF)",
+      "noReceipt": "No receipt",
+      "noReceiptReason": "Why there is no receipt",
+      "rateProof": "Proof of the rate (PDF)",
+      "remove": "Remove",
+      "caseHint": "By the totals: {kind}",
+      "save": "Save expenses",
+      "settled": "Settled",
+      "noReceiptBadge": "No receipt: {reason}"
+    },
+    "totals": {
+      "title": "Totals",
+      "returned": "The holder returns {amount}",
+      "excess": "The holder is reimbursed {amount}",
+      "even": "Nothing to return or reimburse",
+      "holding": "{amount} waits in the holding account until the clearing file"
+    },
+    "batch": {
+      "settlement": "Settlement file",
+      "clearing": "Clearing file"
+    },
+    "detail": {
+      "title": "Advance settlement",
+      "late": "Late",
+      "submit": "Submit",
+      "submitTitle": "Submit {ref}",
+      "leaderHint": "The leader or a deputy checks it first",
+      "noLeaderStep": "You are the only leader: the settlement goes straight to Finance.",
+      "lateHint": "It was due on {date}",
+      "submitted": "Settlement submitted",
+      "saved": "Expenses saved",
+      "export": "Create upload file",
+      "exportTitle": "Create the upload file for {ref}",
+      "exportText": "The settlement is marked exported and the file for CORE is made from its posting entries. This cannot be undone.",
+      "exported": "Upload file created",
+      "clearing": "Create clearing file",
+      "clearingTitle": "Create the clearing file for {ref}",
+      "clearingText": "The holding account is cleared to the advance account, with suspense number {rvs}.",
+      "markCleared": "Mark clearing posted",
+      "markClearedTitle": "Mark the clearing of {ref} as posted",
+      "rvsHint": "The number CORE gave the holding entry; the clearing file needs it",
+      "postedDone": "Marked as posted"
     }
   }
 }
