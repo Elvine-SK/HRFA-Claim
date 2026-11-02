@@ -32,7 +32,7 @@ pnpm install && pnpm migrate
 pnpm dev:api                         # :3335
 pnpm dev:web                         # :3336
 tooling/deploy/bundle.sh --hrm-login-url <URL>   # build/hr-fam-<sha>.tar.gz for the testing server
-RUN_DB_TESTS=1 pnpm test             # 260 tests; the test DBs are built on :3308 by global-setup
+RUN_DB_TESTS=1 pnpm test             # 264 tests; the test DBs are built on :3308 by global-setup
 ```
 
 `http://localhost:3335/api/v1/auth/hrm?code=valid-10001` signs in as fixture employee `10001` once per load of the

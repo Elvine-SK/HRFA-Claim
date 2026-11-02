@@ -451,7 +451,9 @@
     "settlements_leader_no_account": "ຫົວໜ້າ ຫຼື ຮອງຫົວໜ້າຄົນນີ້ ຍັງບໍ່ເຄີຍເຂົ້າລະບົບ",
     "settlements_no_clearing": "ການສະສາງນີ້ບໍ່ຜ່ານບັນຊີລໍຖ້າ",
     "settlements_rvs_no_required": "ກະລຸນາໃສ່ເລກ suspense ຈາກ CORE",
-    "settlements_rvs_no_not_allowed": "ການສະສາງນີ້ບໍ່ຕ້ອງມີເລກ suspense"
+    "settlements_rvs_no_not_allowed": "ການສະສາງນີ້ບໍ່ຕ້ອງມີເລກ suspense",
+    "settlements_amount_invalid": "ກະລຸນາໃສ່ຈຳນວນເງິນທີ່ຫຼາຍກວ່າສູນ",
+    "settlements_cross_rate_invalid": "ກະລຸນາໃສ່ອັດຕາແລກປ່ຽນທີ່ຫຼາຍກວ່າສູນ"
   },
   "dates": {
     "openCalendar": "ເປີດປະຕິທິນ"

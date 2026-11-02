@@ -1,8 +1,10 @@
+import { runWithContext, SYSTEM_CONTEXT, uuidBin } from '@elvine-sk/platform-db'
 import { dbTestsEnabled } from '@elvine-sk/platform-db/testing'
 import type { PlatformApp } from '@elvine-sk/platform-server'
 import type { TestClient } from '@elvine-sk/platform-server/testing'
 import { join } from 'node:path'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { appDb } from '../src/shared/db.ts'
 import { approve, createWorkflow, domesticBodies, roleIds } from './agreement-fixtures.ts'
 import { adminClient, API, bootApp, hrmClient } from './helpers.ts'
 import { attachFile, exportedPayment } from './payment-fixtures.ts'
@@ -28,6 +30,7 @@ describe.skipIf(!dbTestsEnabled)('settlements (submit and approval chain)', () =
   let hr: TestClient // 10101, HR officer at head office
   let leader: TestClient // 10102
   let holder: TestClient // 10103
+  let deputy: TestClient // 10104
   let sectionHead: TestClient // 10106, finance section head at head office
   let departmentHead: TestClient // 10107, head of the Administration–Finance department
   let brFinance: TestClient // 10110, office–IT officer at branch 888050 (finance officer)
@@ -50,6 +53,7 @@ describe.skipIf(!dbTestsEnabled)('settlements (submit and approval chain)', () =
     hr = (await hrmClient(platform, admin, '10101', [officer!])).client
     leader = (await hrmClient(platform, admin, '10102')).client
     holder = (await hrmClient(platform, admin, '10103')).client
+    deputy = (await hrmClient(platform, admin, '10104')).client
     sectionHead = (await hrmClient(platform, admin, '10106', [head!])).client
     departmentHead = (await hrmClient(platform, admin, '10107', [dept!])).client
     brFinance = (await hrmClient(platform, admin, '10110', [fin!])).client
@@ -175,6 +179,33 @@ describe.skipIf(!dbTestsEnabled)('settlements (submit and approval chain)', () =
     const again = await holder.post(url(`/${s.id}/submit`), { version: edit.body.data.version, leaderEid: '10102' })
     expect(again.status, JSON.stringify(again.body)).toBe(200)
     expect((await leader.get(`${API}/approval/inbox`)).body.data.map((i: any) => i.entityId)).toContain(s.id)
+  })
+
+  it('lets another member resubmit a returned settlement', async () => {
+    const s = await drafted(holder)
+    expect((await holder.post(url(`/${s.id}/submit`), { version: s.version, leaderEid: '10102' })).status).toBe(200)
+    await approve(leader, s.id)
+    await approve(finance, s.id, 'return')
+    const back = await get(s.id)
+    const res = await deputy.post(url(`/${s.id}/submit`), { version: back.version, leaderEid: '10102' })
+    expect(res.status, JSON.stringify(res.body)).toBe(200)
+    expect(res.body.data).toMatchObject({ status: 'in_approval', filedByEid: '10104' })
+    expect((await leader.get(`${API}/approval/inbox`)).body.data.map((i: any) => i.entityId)).toContain(s.id)
+  })
+
+  it('records the leader and the late reason in the history', async () => {
+    const s = await drafted(holder)
+    expect((await holder.post(url(`/${s.id}/submit`), { version: s.version, leaderEid: '10102' })).status).toBe(200)
+    const rows = await runWithContext(SYSTEM_CONTEXT, () =>
+      appDb()
+        .selectFrom('recordHistory')
+        .select(['action', 'changes'])
+        .where('entityType', '=', 'settlement')
+        .where('entityId', '=', uuidBin(s.id))
+        .execute(),
+    )
+    const changed = rows.map((r) => JSON.stringify(r.changes))
+    expect(changed.some((c) => c.includes('leaderEid') && c.includes('10102'))).toBe(true)
   })
 
   it('refuses a submission by someone who is not a member', async () => {

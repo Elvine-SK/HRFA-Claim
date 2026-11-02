@@ -451,7 +451,9 @@
     "settlements_leader_no_account": "This leader or deputy has not signed in to the app yet",
     "settlements_no_clearing": "This settlement does not pass through the holding account",
     "settlements_rvs_no_required": "Enter the suspense number from CORE",
-    "settlements_rvs_no_not_allowed": "This settlement takes no suspense number"
+    "settlements_rvs_no_not_allowed": "This settlement takes no suspense number",
+    "settlements_amount_invalid": "Enter an amount above zero",
+    "settlements_cross_rate_invalid": "Enter a cross rate above zero"
   },
   "dates": {
     "openCalendar": "Open the calendar"

@@ -9,7 +9,7 @@ import { HEAD_OFFICE_BRANCH } from '../agreements/types.ts'
  * Who sees which settlements (spec §12), by the branch on the settlement (its agreement's):
  * - `all`: super administrators, and `settlement.read` holders at head office;
  * - `branch`: `settlement.read` holders elsewhere, for the settlements of their HRM branch;
- * - everyone else: the settlements of the agreements they are a member of (any member files it, ກ13).
+ * - everyone, also a branch reader: the settlements of the agreements they are a member of (any member files it, ກ13).
  */
 export async function scopedSettlements<O>(
   ctx: ModuleContext,
@@ -17,22 +17,22 @@ export async function scopedSettlements<O>(
   qb: SelectQueryBuilder<any, any, O>,
 ): Promise<ScopedSelect<O>> {
   const scope = await callerScope(ctx, c, 'settlement.read')
-  if (scope.kind === 'branch') qb = qb.where('s.branchCode', '=', scope.branch)
-  if (scope.kind === 'own') {
-    const eid = scope.eid
-    qb = eid
-      ? qb.where((eb) =>
-          eb.exists(
-            eb
-              .selectFrom('agreementMembers as m')
-              .select('m.id')
-              .whereRef('m.agreementId', '=', 's.agreementId')
-              .where('m.eid', '=', eid),
-          ),
-        )
-      : qb.where(sql<boolean>`1 = 0`)
+  if (scope.kind !== 'all') {
+    // Members keep the settlements of their own trips, also a branch reader on another branch's trip.
+    const { eid } = await caller(ctx, c)
+    const branch = scope.kind === 'branch' ? scope.branch : null
+    qb = qb.where((eb) => {
+      const member = eb.exists(
+        eb
+          .selectFrom('agreementMembers as m')
+          .select('m.id')
+          .whereRef('m.agreementId', '=', 's.agreementId')
+          .where('m.eid', '=', eid ?? ''),
+      )
+      return branch ? eb.or([eb('s.branchCode', '=', branch), member]) : eid ? member : sql<boolean>`1 = 0`
+    })
   }
-  return scopedBy(qb, 'settlements: settlement.read holders for the HRM branch of the caller (head office: all), else memberships')
+  return scopedBy(qb, 'settlements: settlement.read holders for the HRM branch of the caller (head office: all), and memberships')
 }
 
 /** Whether `eid` is a member of the agreement. */
@@ -55,8 +55,8 @@ export async function maySeeSettlement(
 ): Promise<boolean> {
   const scope = await callerScope(ctx, c, 'settlement.read')
   if (scope.kind === 'all') return true
-  if (scope.kind === 'branch') return row.branchCode === scope.branch
-  return isMember(row.agreementId, scope.eid)
+  if (scope.kind === 'branch' && row.branchCode === scope.branch) return true
+  return isMember(row.agreementId, (await caller(ctx, c)).eid)
 }
 
 /** The caller as a member of the agreement: their EID, or 404 so other people's trips do not leak. */

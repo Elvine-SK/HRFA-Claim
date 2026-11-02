@@ -154,6 +154,45 @@ describe.skipIf(!dbTestsEnabled)('settlements (draft, lines, receipts)', () => {
     expect((await put([{ ...line, noReceiptReason: 'Tuk-tuk, no receipt given' }])).status).toBe(200)
   })
 
+  it('refuses a zero amount or cross rate at the line', async () => {
+    const { settlement: s } = await filed(deputy, overseas())
+    const [r, proof] = [await receipt(s.id), await receipt(s.id)]
+    const put = (line: Record<string, unknown>) =>
+      deputy.put(url(`/${s.id}`), {
+        version: 1,
+        lines: [{ description: 'Hotel', currency: 'THB', amount: '3500', crossRate: '35', receiptFileId: r, rateProofFileId: proof, ...line }],
+      })
+    const zeroRate = await put({ crossRate: '0.000000' })
+    expect([zeroRate.status, zeroRate.body.error?.details?.[0]?.path, zeroRate.body.error?.details?.[0]?.code]).toEqual([
+      422,
+      'lines.0.crossRate',
+      'settlements.cross_rate_invalid',
+    ])
+    const zeroAmount = await put({ amount: '0' })
+    expect([zeroAmount.status, zeroAmount.body.error?.details?.[0]?.path, zeroAmount.body.error?.details?.[0]?.code]).toEqual([
+      422,
+      'lines.0.amount',
+      'settlements.amount_invalid',
+    ])
+  })
+
+  it('lets a branch reader who is a member of a head office trip work on its settlement', async () => {
+    const body = domestic({
+      hasAdvance: true,
+      members: [
+        { eid: '10102', isLeader: true },
+        { eid: '10103', isAdvanceHolder: true },
+        { eid: '10110' },
+      ],
+    })
+    const { settlement: s } = await filed(brFinance, body)
+    expect((await brFinance.get(url(`/${s.id}`))).status).toBe(200)
+    const listed = await brFinance.get(url(`?filter[agreementId][eq]=${s.agreementId}`))
+    expect(listed.body.data.map((r: any) => r.id)).toEqual([s.id])
+    const saved = await brFinance.put(url(`/${s.id}`), { version: 1, lines: [] })
+    expect(saved.status, JSON.stringify(saved.body)).toBe(200)
+  })
+
   it('converts overseas lines at their cross rate and needs proof of the rate', async () => {
     const { settlement: s } = await filed(deputy, overseas())
     expect(s).toMatchObject({ zoneKind: 'overseas', currency: 'USD' })

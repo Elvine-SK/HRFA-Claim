@@ -1,7 +1,7 @@
 import { APPROVAL, defineApprovalEntity, type ApproverResolver } from '@elvine-sk/platform-approval'
 import { getAudit } from '@elvine-sk/platform-audit'
 import { AppError, type FieldMap } from '@elvine-sk/platform-core'
-import { inTransaction, updateVersioned } from '@elvine-sk/platform-db'
+import { currentDb, inTransaction, sql, updateVersioned, uuidBin, writeHistory } from '@elvine-sk/platform-db'
 import { NOTIFICATIONS } from '@elvine-sk/platform-notifications'
 import { z, type ModuleContext } from '@elvine-sk/platform-server'
 import { todayHrm } from '../../shared/dates.ts'
@@ -10,7 +10,7 @@ import { membersOf } from '../agreements/queries.ts'
 import { HEAD_OFFICE_BRANCH } from '../agreements/types.ts'
 import { linkedUserId } from '../auth-hrm/users.ts'
 import { groupAmount } from '../travel-master/money.ts'
-import { transition } from './procedures.ts'
+import { settlementHistory, transition } from './procedures.ts'
 import { assertLinesValid, candidatesOf, findSettlement, linesOf, notDraft, totalsOfRow } from './queries.ts'
 import { maySeeSettlement } from './scope.ts'
 
@@ -88,17 +88,31 @@ export async function submitSettlement(
       throw unprocessable('settlements.leader_required', 'Choose the leader or deputy who checks it', 'leaderEid')
 
     const lateReason = input.lateReason ?? row.lateReason
-    await updateVersioned(
+    const next = await updateVersioned(
       'settlements',
       id,
       input.version,
       { leaderEid, lateReason, filedByEid: submitter.eid },
       { softDelete: false },
     )
+    await writeHistory(settlementHistory, {
+      entityId: id,
+      version: next,
+      action: 'update',
+      before: { leaderEid: row.leaderEid, lateReason: row.lateReason },
+      after: { leaderEid, lateReason },
+    })
     const approval = ctx.services.get(APPROVAL)
     const open = await approval.openRequestOf('settlement', id)
-    if (open?.status === 'returned') await approval.resubmit(open.id, submitter.userId)
-    else await approval.submit('settlement', id, submitter.userId, { workflow: input.workflow })
+    if (open?.status === 'returned' && (await submittedBy(open.id, submitter.userId)))
+      await approval.resubmit(open.id, submitter.userId)
+    else {
+      // Any member may file (ກ13), but the platform lets only the requester resubmit: another member closes the
+      // returned request and starts a new one.
+      if (open?.status === 'returned')
+        await approval.cancel(open.id, submitter.userId, 'Submitted again by another member of the trip', true)
+      await approval.submit('settlement', id, submitter.userId, { workflow: input.workflow })
+    }
     if (todayHrm() > row.dueDate)
       await getAudit(ctx).record({
         action: 'settlements.submitted_late',
@@ -107,6 +121,13 @@ export async function submitSettlement(
         details: { ref: row.ref, dueDate: row.dueDate, lateReason },
       })
   })
+}
+
+/** Whether `userId` submitted the approval request (the platform's own table; it exposes no reader for it). */
+async function submittedBy(requestId: string, userId: string): Promise<boolean> {
+  const { rows } = await sql<{ id: string }>`SELECT id FROM approval_requests
+    WHERE id = ${uuidBin(requestId)} AND submitted_by = ${uuidBin(userId)}`.execute(currentDb())
+  return rows.length > 0
 }
 
 /** "Approve an advance settlement": statuses follow the request (spec §10). */

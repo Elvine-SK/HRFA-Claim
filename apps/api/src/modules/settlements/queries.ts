@@ -8,7 +8,7 @@ import { membersOf, type MemberRow } from '../agreements/queries.ts'
 import { holidaysBetween } from '../hrm/holidays.ts'
 import { itemsOf, livePaymentOf, findPayment } from '../payments/queries.ts'
 import { zoneOf, type Currency, type ZoneCode, type ZoneKind } from '../travel-master/lookups.ts'
-import type { Amount } from '../travel-master/money.ts'
+import { toCents, type Amount } from '../travel-master/money.ts'
 import { settlementHistory } from './procedures.ts'
 import type { SettlementLineInputSchema } from './schema.ts'
 import { LineError, settledAmountOf, totalsOf, type Totals } from './totals.ts'
@@ -234,15 +234,21 @@ async function checkLines(
       errors.push(invalid(at('expenseType'), 'settlements.expense_type_required', 'Choose fuel or fare'))
     if (overseas && line.expenseType)
       errors.push(invalid(at('expenseType'), 'settlements.expense_type_not_allowed', 'Overseas lines have no expense type'))
+    if (toCents(line.amount) === 0n)
+      errors.push(invalid(at('amount'), 'settlements.amount_invalid', 'Enter an amount above zero'))
+    const zeroRate = line.crossRate !== undefined && !/[1-9]/.test(line.crossRate)
+    if (zeroRate) errors.push(invalid(at('crossRate'), 'settlements.cross_rate_invalid', 'Enter a cross rate above zero'))
     let settledAmount: Amount = '0.00'
-    try {
-      settledAmount = settledAmountOf(
-        { currency: line.currency, amount: line.amount, crossRate: line.crossRate ?? null, expenseType: line.expenseType ?? null },
-        row.currency,
-      )
-    } catch (err) {
-      if (!(err instanceof LineError)) throw err
-      errors.push(invalid(at(err.path), err.code, err.message))
+    if (!zeroRate) {
+      try {
+        settledAmount = settledAmountOf(
+          { currency: line.currency, amount: line.amount, crossRate: line.crossRate ?? null, expenseType: line.expenseType ?? null },
+          row.currency,
+        )
+      } catch (err) {
+        if (!(err instanceof LineError)) throw err
+        errors.push(invalid(at(err.path), err.code, err.message))
+      }
     }
     if (!line.receiptFileId && !line.noReceiptReason)
       errors.push(invalid(at('receiptFileId'), 'settlements.receipt_required', 'Attach the receipt or say why there is none'))
