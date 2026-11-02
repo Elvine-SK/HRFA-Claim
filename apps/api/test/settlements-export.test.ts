@@ -32,7 +32,7 @@ describe.skipIf(!dbTestsEnabled)('settlements (upload file, posted, clearing)', 
   let finance: TestClient // 10100, finance officer at head office
   let hr: TestClient // 10101, HR officer at head office
   let holder: TestClient // 10103
-  let brFinance: TestClient // 10110, finance officer at branch 888020
+  let brFinance: TestClient // 10110, finance officer at branch 888050
 
   beforeAll(async () => {
     platform = await bootApp()

@@ -4,7 +4,9 @@ SET time_zone = '+07:00';
 
 INSERT INTO hrm_branch (BRANCH_ID, NAME_LA, NAME_EN, STATUS) VALUES
   ('888010', 'ສຳນັກງານໃຫຍ່', 'Head Office', 'Y'),
-  ('888020', 'ສາຂານະຄອນຫຼວງ', 'Vientiane Capital Branch', 'Y');
+  ('888020', 'ສາຂານະຄອນຫຼວງ', 'Vientiane Capital Branch', 'Y'),
+  -- Plan 5's branch people, apart from 888020 so the role holders of one test file do not meet another's.
+  ('888050', 'ສາຂາຫຼວງພະບາງ', 'Luang Prabang Branch', 'Y');
 
 INSERT INTO hrm_department (DEPT_ID, NAME_LA, NAME_EN, STATUS) VALUES
   ('0101', 'ພະແນກບໍລິຫານ-ການເງິນ', 'Administration and Finance Department', 'Y');
@@ -15,7 +17,8 @@ INSERT INTO hrm_section (DEPT_ID, SECT_ID, NAME_LA, NAME_EN, IS_DELETE) VALUES
 INSERT INTO hrm_unit (BRANCH_ID, UNIT_ID, FULL_NAME_LA, FULL_NAME_EN) VALUES
   ('888010', '030101', 'ໜ່ວຍງານບັນຊີ', 'Accounting Unit'),
   -- Unit ids repeat across branches in HRM: the key is (BRANCH_ID, UNIT_ID).
-  ('888020', '030101', 'ໜ່ວຍບໍລິການສາຂາ', 'Branch Service Unit');
+  ('888020', '030101', 'ໜ່ວຍບໍລິການສາຂາ', 'Branch Service Unit'),
+  ('888050', '030101', 'ໜ່ວຍບໍລິການສາຂາ', 'Branch Service Unit');
 
 INSERT INTO hrm_position (PostID, PostName, PostNameEng, PostType, PostStatus, PostOrderBy) VALUES
   (12, 'ຫົວໜ້າພະແນກ', 'Head of Department', 7, 'Y', 1),
@@ -99,10 +102,10 @@ INSERT INTO hrm_employee
   ('10105', 'ຄຳ', 'ແສງ', 'Kham', 'Saeng', '888010', '0101', NULL, NULL, '00', '12', 1, 'N', 'A'),
   ('10106', 'ວິໄລ', 'ພອນ', 'Vilay', 'Phone', '888010', '0101', NULL, NULL, '00', '12', 1, 'N', 'A'),
   ('10107', 'ສຸກ', 'ສະຫວັນ', 'Souk', 'Savanh', '888010', '0101', NULL, NULL, '00', '12', 1, 'N', 'A'),
-  ('10110', 'ແກ້ວ', 'ມະນີ', 'Keo', 'Many', '888020', '0101', NULL, NULL, '00', '12', 1, 'N', 'A'),
-  ('10111', 'ຈັນ', 'ທະລາ', 'Chanh', 'Thala', '888020', '0101', NULL, NULL, '00', '12', 1, 'N', 'A'),
-  ('10112', 'ໄຊ', 'ຍະ', 'Xay', 'Ya', '888020', '0101', NULL, NULL, '00', '12', 1, 'N', 'A'),
-  ('10113', 'ດາວ', 'ເຮືອງ', 'Dao', 'Heuang', '888020', '0101', NULL, NULL, '00', '12', 1, 'N', 'A');
+  ('10110', 'ແກ້ວ', 'ມະນີ', 'Keo', 'Many', '888050', '0101', NULL, NULL, '00', '12', 1, 'N', 'A'),
+  ('10111', 'ຈັນ', 'ທະລາ', 'Chanh', 'Thala', '888050', '0101', NULL, NULL, '00', '12', 1, 'N', 'A'),
+  ('10112', 'ໄຊ', 'ຍະ', 'Xay', 'Ya', '888050', '0101', NULL, NULL, '00', '12', 1, 'N', 'A'),
+  ('10113', 'ດາວ', 'ເຮືອງ', 'Dao', 'Heuang', '888050', '0101', NULL, NULL, '00', '12', 1, 'N', 'A');
 
 INSERT INTO hrm_employee_account_currency (eid, ccy, account_no, account_name, is_deleted, created_at) VALUES
   ('10001', 'LAK', '0101-OLD', 'SOMPHONE KEOMANY', 0, '2025-01-01 09:00:00'),

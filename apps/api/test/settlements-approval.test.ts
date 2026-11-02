@@ -9,7 +9,7 @@ import { attachFile, exportedPayment } from './payment-fixtures.ts'
 
 const url = (p = '') => `${API}/settlements${p}`
 const domestic = domesticBodies(2034, '10102')
-let seq = 900 // 888020 Doc.nos this file builds by hand
+let seq = 900 // 888050 Doc.nos this file builds by hand
 
 /** Leader 10102, advance holder 10103, deputy 10104. */
 const team = {
@@ -30,7 +30,7 @@ describe.skipIf(!dbTestsEnabled)('settlements (submit and approval chain)', () =
   let holder: TestClient // 10103
   let sectionHead: TestClient // 10106, finance section head at head office
   let departmentHead: TestClient // 10107, head of the Administration–Finance department
-  let brFinance: TestClient // 10110, office–IT officer at branch 888020 (finance officer)
+  let brFinance: TestClient // 10110, office–IT officer at branch 888050 (finance officer)
   let brMember: TestClient // 10111
   let brSectionHead: TestClient // 10112, office–IT section head (finance section head)
   let brManagement: TestClient // 10113, branch management
@@ -98,7 +98,7 @@ describe.skipIf(!dbTestsEnabled)('settlements (submit and approval chain)', () =
   it('runs the branch chain and skips step 2 for a lone leader', async () => {
     seq += 1
     const body = domestic({
-      docNo: `${seq}.BCEL.888020.2034`,
+      docNo: `${seq}.BCEL.888050.2034`,
       hasAdvance: true,
       members: [{ eid: '10111', isLeader: true, isAdvanceHolder: true }],
     })

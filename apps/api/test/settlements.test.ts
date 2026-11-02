@@ -37,7 +37,7 @@ describe.skipIf(!dbTestsEnabled)('settlements (draft, lines, receipts)', () => {
   let leader: TestClient // 10102
   let holder: TestClient // 10103
   let deputy: TestClient // 10104
-  let brFinance: TestClient // 10110, finance officer at branch 888020
+  let brFinance: TestClient // 10110, finance officer at branch 888050
 
   beforeAll(async () => {
     platform = await bootApp()
