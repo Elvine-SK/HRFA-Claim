@@ -6187,6 +6187,30 @@
           "amount"
         ]
       },
+      "SettlementSubmit": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "leaderEid": {
+            "type": "string",
+            "pattern": "^\\d{5}$"
+          },
+          "lateReason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "workflow": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "version"
+        ]
+      },
       "PlatformManifest": {
         "type": "object",
         "properties": {
@@ -20382,6 +20406,95 @@
         "responses": {
           "200": {
             "description": "Saved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Settlement"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/settlements/{id}/submit": {
+      "post": {
+        "tags": [
+          "Settlements"
+        ],
+        "summary": "Submit a draft settlement for approval (or resubmit a returned one), naming the leader or deputy of step 2",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettlementSubmit"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Submitted",
             "content": {
               "application/json": {
                 "schema": {

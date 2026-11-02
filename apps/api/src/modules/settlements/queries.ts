@@ -269,6 +269,26 @@ async function checkLines(
   return out
 }
 
+/** The stored lines checked again, as at submission (a receipt may have been deleted since they were saved). */
+export async function assertLinesValid(
+  row: { id: string; zoneKind: ZoneKind; currency: Currency },
+  lines: LineRow[],
+): Promise<void> {
+  await checkLines(
+    row,
+    lines.map((l) => ({
+      description: l.description,
+      expenseType: l.expenseType ?? undefined,
+      currency: l.currency,
+      amount: l.amount,
+      crossRate: l.crossRate ?? undefined,
+      receiptFileId: l.receiptFileId ?? undefined,
+      noReceiptReason: l.noReceiptReason ?? undefined,
+      rateProofFileId: l.rateProofFileId ?? undefined,
+    })),
+  )
+}
+
 /** The draft's case and lines replace the stored ones; optimistic locking on `version`. */
 export async function saveDraft(
   id: string,

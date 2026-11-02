@@ -16,6 +16,7 @@ import {
 } from '@elvine-sk/platform-server'
 import { findAgreement, findByNumber } from '../agreements/queries.ts'
 import { caller, type C } from '../agreements/scope.ts'
+import { submitSettlement } from './approval.ts'
 import {
   canFile,
   createSettlement,
@@ -35,6 +36,7 @@ import {
   SettlementLookupQuery,
   SettlementLookupSchema,
   SettlementSchema,
+  SettlementSubmitSchema,
 } from './schema.ts'
 import { isMember, maySeeSettlement, requireMember, scopedSettlements } from './scope.ts'
 
@@ -152,6 +154,26 @@ export function settlementRoutes(api: ApiRouter, ctx: ModuleContext) {
       await requireMember(ctx, c, row.agreementId)
       const { version, caseKind, lines } = c.req.valid('json')
       await saveDraft(id, version, { caseKind, lines })
+      return c.json({ data: await loadSettlement(id, lang(c)) }, 200)
+    },
+  )
+
+  api.openapi(
+    createRoute({
+      method: 'post',
+      path: '/settlements/{id}/submit',
+      tags,
+      summary:
+        'Submit a draft settlement for approval (or resubmit a returned one), naming the leader or deputy of step 2',
+      request: { params: IdParam, ...jsonBody(SettlementSubmitSchema) },
+      responses: { 200: jsonContent(dataOf(SettlementSchema), 'Submitted'), ...errorResponses(401, 404, 409, 422) },
+    }),
+    async (c) => {
+      const { user } = requireUser(c)
+      const id = c.req.valid('param').id
+      const row = await readable(ctx, c, id)
+      const eid = await requireMember(ctx, c, row.agreementId)
+      await submitSettlement(ctx, id, c.req.valid('json'), { userId: user.id, eid })
       return c.json({ data: await loadSettlement(id, lang(c)) }, 200)
     },
   )

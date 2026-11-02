@@ -1,4 +1,5 @@
 import { defineModule, type ModuleContext } from '@elvine-sk/platform-server'
+import { settlementApproval, settlementResolvers } from './approval.ts'
 import { keepReceipts, settlementFiles } from './files.ts'
 import { settlementsMigrations } from './migrations.ts'
 import { settlementRoutes } from './routes.ts'
@@ -19,6 +20,17 @@ const messages = {
     'settlements.rate_proof_required': 'Attach the proof of the cross rate',
     'settlements.file_unknown': 'Not a file attached to this settlement',
     'settlements.receipt_locked': 'The receipts of a submitted settlement are kept',
+    'settlements.case_required': 'Choose the case of the settlement',
+    'settlements.case_mismatch': 'The case does not match the totals',
+    'settlements.late_reason_required': 'The settlement is late: give the reason',
+    'settlements.leader_required': 'Choose the leader or deputy who checks it',
+    'settlements.not_leader': 'Not the leader or a deputy of this agreement',
+    'settlements.own_eid': 'Step 2 is taken by someone other than you',
+    'settlements.leader_no_account': 'This leader or deputy has not signed in to the app yet, so the step cannot reach them',
+    'notify.settlements.approved.title': 'Settlement {ref} is approved',
+    'notify.settlements.approved.body': 'It is ready for the upload file.',
+    'notify.settlements.returned.title': 'Settlement {ref} came back to you',
+    'notify.settlements.returned.body': 'Correct it and submit it again.',
   },
   lo: {
     'settlements.bad_transition': 'ການສະສາງບໍ່ສາມາດປ່ຽນໄປເປັນສະຖານະນີ້ຈາກສະຖານະປັດຈຸບັນໄດ້',
@@ -34,6 +46,17 @@ const messages = {
     'settlements.rate_proof_required': 'ກະລຸນາແນບຫຼັກຖານອັດຕາແລກປ່ຽນ',
     'settlements.file_unknown': 'ບໍ່ແມ່ນໄຟລ໌ທີ່ແນບກັບການສະສາງນີ້',
     'settlements.receipt_locked': 'ໃບບິນຂອງການສະສາງທີ່ສົ່ງແລ້ວ ຕ້ອງເກັບໄວ້',
+    'settlements.case_required': 'ກະລຸນາເລືອກກໍລະນີຂອງການສະສາງ',
+    'settlements.case_mismatch': 'ກໍລະນີທີ່ເລືອກ ບໍ່ກົງກັບຍອດລວມ',
+    'settlements.late_reason_required': 'ການສະສາງຊ້າກວ່າກຳນົດ: ກະລຸນາບອກເຫດຜົນ',
+    'settlements.leader_required': 'ກະລຸນາເລືອກຫົວໜ້າຄະນະ ຫຼື ຮອງຫົວໜ້າ ທີ່ກວດກາ',
+    'settlements.not_leader': 'ບໍ່ແມ່ນຫົວໜ້າ ຫຼື ຮອງຫົວໜ້າຄະນະຂອງສັນຍານີ້',
+    'settlements.own_eid': 'ຂັ້ນຕອນທີ 2 ຕ້ອງແມ່ນຄົນອື່ນ ບໍ່ແມ່ນທ່ານ',
+    'settlements.leader_no_account': 'ຫົວໜ້າ ຫຼື ຮອງຫົວໜ້າຄົນນີ້ ຍັງບໍ່ເຄີຍເຂົ້າລະບົບ, ຂັ້ນຕອນນີ້ຈຶ່ງສົ່ງຫາບໍ່ໄດ້',
+    'notify.settlements.approved.title': 'ການສະສາງ {ref} ໄດ້ຮັບອະນຸມັດແລ້ວ',
+    'notify.settlements.approved.body': 'ພ້ອມສຳລັບໄຟລ໌ອັບໂຫຼດ.',
+    'notify.settlements.returned.title': 'ການສະສາງ {ref} ຖືກສົ່ງກັບຄືນຫາທ່ານ',
+    'notify.settlements.returned.body': 'ກະລຸນາແກ້ໄຂ ແລະ ສົ່ງໃໝ່.',
   },
 }
 
@@ -57,7 +80,11 @@ export const settlementsModule = defineModule({
   menus: [
     { key: 'settlements', label: 'settlements.nav.title', to: '/settlements', icon: 'i-lucide-receipt', group: 'workspace' },
   ],
+  approvalEntities: [settlementApproval(ctx)],
+  approvalResolvers: settlementResolvers,
   fileEntities: [settlementFiles(ctx)],
+  notificationTypes: { 'settlements.approved': {}, 'settlements.returned': {} },
+  auditActions: ['settlements.submitted_late'],
   messages,
   setup(c) {
     moduleCtx = c

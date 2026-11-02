@@ -1,0 +1,41 @@
+{
+  "key": "settlement",
+  "entityType": "settlement",
+  "name": "Advance settlement",
+  "definition": {
+    "stages": [
+      {
+        "key": "leader",
+        "steps": [
+          {
+            "key": "leader",
+            "approvers": { "resolver": "settlement.leader" },
+            "completion": "any",
+            "condition": { "field": "hasLeaderStep", "op": "eq", "value": true }
+          }
+        ]
+      },
+      {
+        "key": "finance_officer",
+        "steps": [
+          { "key": "finance_officer", "approvers": { "resolver": "settlement.finance_officer" }, "completion": "any" }
+        ]
+      },
+      {
+        "key": "finance_section_head",
+        "steps": [
+          {
+            "key": "finance_section_head",
+            "approvers": { "resolver": "settlement.finance_section_head" },
+            "completion": "any"
+          }
+        ]
+      },
+      {
+        "key": "final",
+        "steps": [{ "key": "final", "approvers": { "resolver": "settlement.final" }, "completion": "any" }]
+      }
+    ],
+    "rules": { "allowSelfApproval": false, "rejectEndsRequest": true }
+  }
+}
