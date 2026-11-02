@@ -1,5 +1,7 @@
 import { defineModule, type ModuleContext } from '@elvine-sk/platform-server'
+import { onAgreementCancelled } from '../agreements/events.ts'
 import { settlementApproval, settlementResolvers } from './approval.ts'
+import { cancelSettlementOf } from './batches.ts'
 import { keepReceipts, settlementFiles } from './files.ts'
 import { settlementsMigrations } from './migrations.ts'
 import { settlementRoutes } from './routes.ts'
@@ -34,6 +36,8 @@ const messages = {
     'notify.settlements.approved.body': 'It is ready for the upload file.',
     'notify.settlements.returned.title': 'Settlement {ref} came back to you',
     'notify.settlements.returned.body': 'Correct it and submit it again.',
+    'notify.settlements.cancelled_after_export.title': 'Settlement {ref} was cancelled after its upload file',
+    'notify.settlements.cancelled_after_export.body': 'The agreement was cancelled: {reason}. No reversal file is made; settle it with the bank.',
   },
   lo: {
     'settlements.bad_transition': 'ການສະສາງບໍ່ສາມາດປ່ຽນໄປເປັນສະຖານະນີ້ຈາກສະຖານະປັດຈຸບັນໄດ້',
@@ -63,6 +67,8 @@ const messages = {
     'notify.settlements.approved.body': 'ພ້ອມສຳລັບໄຟລ໌ອັບໂຫຼດ.',
     'notify.settlements.returned.title': 'ການສະສາງ {ref} ຖືກສົ່ງກັບຄືນຫາທ່ານ',
     'notify.settlements.returned.body': 'ກະລຸນາແກ້ໄຂ ແລະ ສົ່ງໃໝ່.',
+    'notify.settlements.cancelled_after_export.title': 'ການສະສາງ {ref} ຖືກຍົກເລີກຫຼັງສ້າງໄຟລ໌ອັບໂຫຼດ',
+    'notify.settlements.cancelled_after_export.body': 'ສັນຍາຖືກຍົກເລີກ: {reason}. ບໍ່ມີໄຟລ໌ກັບລາຍການ; ໃຫ້ແກ້ໄຂກັບທະນາຄານ.',
   },
 }
 
@@ -89,7 +95,7 @@ export const settlementsModule = defineModule({
   approvalEntities: [settlementApproval(ctx)],
   approvalResolvers: settlementResolvers,
   fileEntities: [settlementFiles(ctx)],
-  notificationTypes: { 'settlements.approved': {}, 'settlements.returned': {} },
+  notificationTypes: { 'settlements.approved': {}, 'settlements.returned': {}, 'settlements.cancelled_after_export': {} },
   auditActions: [
     'settlements.submitted_late',
     'settlements.exported',
@@ -97,10 +103,12 @@ export const settlementsModule = defineModule({
     'settlements.clearing_exported',
     'settlements.cleared',
     'settlements.downloaded',
+    'settlements.cancelled_after_export',
   ],
   messages,
   setup(c) {
     moduleCtx = c
+    onAgreementCancelled((agreementId, reason) => cancelSettlementOf(ctx(), agreementId, reason))
   },
   middleware: () => keepReceipts(),
   routes: (api, c) => settlementRoutes(api, c),

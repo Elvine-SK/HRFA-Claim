@@ -1,10 +1,12 @@
-import { runWithContext, SYSTEM_CONTEXT } from '@elvine-sk/platform-db'
+import { runWithContext, SYSTEM_CONTEXT, uuidBin } from '@elvine-sk/platform-db'
 import { dbTestsEnabled } from '@elvine-sk/platform-db/testing'
 import type { PlatformApp } from '@elvine-sk/platform-server'
 import type { TestClient } from '@elvine-sk/platform-server/testing'
 import ExcelJS from 'exceljs'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { onAgreementCancelled } from '../src/modules/agreements/events.ts'
 import { transition } from '../src/modules/settlements/procedures.ts'
+import { appDb } from '../src/shared/db.ts'
 import { domesticBodies, roleIds } from './agreement-fixtures.ts'
 import { adminClient, API, bootApp, hrmClient } from './helpers.ts'
 import { attachFile, exportedPayment } from './payment-fixtures.ts'
@@ -192,5 +194,70 @@ describe.skipIf(!dbTestsEnabled)('settlements (upload file, posted, clearing)', 
     expect(ok.status).toBe(200)
     expect((await download(brFinance, s.id, 'settlement')).status).toBe(404)
     expect((await download(holder, s.id, 'settlement')).status).toBe(200)
+  })
+
+  const cancelAgreement = async (agreementId: string) => {
+    const ag = (await finance.get(`${API}/agreements/${agreementId}`)).body.data
+    return finance.post(`${API}/agreements/${agreementId}/cancel`, { version: ag.version, reason: 'Trip dropped' })
+  }
+  const stamps = (agreementId: string) =>
+    runWithContext(SYSTEM_CONTEXT, () =>
+      appDb()
+        .selectFrom('postingBatches')
+        .select(['kind', 'cancelledAfterExportAt'])
+        .where('agreementId', '=', uuidBin(agreementId))
+        .orderBy('kind')
+        .execute(),
+    )
+
+  it('cancel in approval voids the settlement, and the payment is marked in the same cancel', async () => {
+    const { agreement } = await exportedPayment(platform, finance, hr, domestic(team))
+    const s = (await holder.post(url(), { agreementId: agreement.id })).body.data
+    await runWithContext(SYSTEM_CONTEXT, () => transition(s.id, 1, 'in_approval'))
+    const res = await cancelAgreement(agreement.id)
+    expect(res.status, JSON.stringify(res.body)).toBe(200)
+    expect((await finance.get(url(`/${s.id}`))).body.data.status).toBe('void')
+    const payments = await finance.get(`${API}/payments?filter[agreementId][eq]=${agreement.id}`)
+    expect(payments.body.data.map((p: any) => p.status)).toEqual(['cancelled_after_export'])
+  })
+
+  it('cancel after clearing marks the settlement and both of its batches', async () => {
+    const s = await approved(overseas(), [{ currency: 'USD', amount: '600.00' }], 'partly_used')
+    const e = await finance.post(url(`/${s.id}/export`), { version: s.version })
+    const p = await finance.post(url(`/${s.id}/posted`), { version: e.body.data.version, rvsNo: 'SUS-2035-9' })
+    const c = await finance.post(url(`/${s.id}/clearing`), { version: p.body.data.version })
+    expect(c.status, JSON.stringify(c.body)).toBe(200)
+
+    const res = await cancelAgreement(s.agreementId)
+    expect(res.status, JSON.stringify(res.body)).toBe(200)
+    expect((await finance.get(url(`/${s.id}`))).body.data.status).toBe('cancelled_after_export')
+    const marked = await stamps(s.agreementId)
+    expect(marked.map((b) => [b.kind, b.cancelledAfterExportAt !== null])).toEqual([
+      ['clearing', true],
+      ['payment', true],
+      ['settlement', true],
+    ])
+    const told = (await finance.get(`${API}/notifications`)).body.data.filter(
+      (n: any) => n.type === 'settlements.cancelled_after_export',
+    )
+    expect(told.map((n: any) => n.link)).toContain(`/settlements/${s.id}`)
+    expect((await download(finance, s.id, 'clearing')).status).toBe(200)
+    const listed = await finance.get(url(`?filter[status][eq]=cancelled_after_export&filter[agreementId][eq]=${s.agreementId}`))
+    expect(listed.body.data.map((r: any) => r.id)).toEqual([s.id])
+  })
+
+  it('rolls the whole cancel back when a listener fails', async () => {
+    const { agreement } = await exportedPayment(platform, finance, hr, domestic(team))
+    const s = (await holder.post(url(), { agreementId: agreement.id })).body.data
+    // A listener after the payments and settlements ones, failing for this agreement only.
+    onAgreementCancelled(async (id) => {
+      if (id === agreement.id) throw new Error('listener failed')
+    })
+    const res = await cancelAgreement(agreement.id)
+    expect(res.status).toBe(500)
+    expect((await finance.get(`${API}/agreements/${agreement.id}`)).body.data.status).toBe('approved')
+    expect((await finance.get(url(`/${s.id}`))).body.data.status).toBe('draft')
+    const payments = await finance.get(`${API}/payments?filter[agreementId][eq]=${agreement.id}`)
+    expect(payments.body.data.map((p: any) => p.status)).toEqual(['exported'])
   })
 })

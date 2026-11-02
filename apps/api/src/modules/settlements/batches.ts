@@ -1,13 +1,18 @@
-import { AppError, uuidv7 } from '@elvine-sk/platform-core'
+import { APPROVAL } from '@elvine-sk/platform-approval'
+import { getAudit } from '@elvine-sk/platform-audit'
+import { AppError, now, uuidv7 } from '@elvine-sk/platform-core'
 import { inTransaction, uuidBin } from '@elvine-sk/platform-db'
+import { NOTIFICATIONS } from '@elvine-sk/platform-notifications'
+import type { ModuleContext } from '@elvine-sk/platform-server'
 import { appDb } from '../../shared/db.ts'
+import { branchRoleUsers } from '../agreements/approval.ts'
 import { membersOf } from '../agreements/queries.ts'
 import { agreementRemark, createBatch, postingMember } from '../payments/batches.ts'
 import { xlsxWriter } from '../payments/xlsx.ts'
 import { postingEntries } from '../travel-master/lookups.ts'
 import { buildClearingLines, buildSettlementLines } from './posting.ts'
 import { transition } from './procedures.ts'
-import { findSettlement, linesOf, totalsOfRow, type SettlementRow } from './queries.ts'
+import { findSettlement, linesOf, liveSettlementOf, totalsOfRow, type SettlementRow } from './queries.ts'
 
 export const badTransition = () =>
   new AppError('settlements.bad_transition', 'The settlement cannot move to this status from its current one', {
@@ -138,5 +143,44 @@ export async function exportClearing(id: string, version: number): Promise<{ bat
     })
     await transition(id, version, 'clearing_exported')
     return { batchId, lines: lines.length }
+  })
+}
+
+
+/**
+ * The agreement was cancelled (spec §8, ກ16). Before export the settlement is void and its approval request is
+ * cancelled; after export its files stay as they are (no reversal file), the settlement and its batches are marked
+ * and Finance of its branch is told. A settlement already void or cancelled after export is left alone.
+ */
+export async function cancelSettlementOf(ctx: ModuleContext, agreementId: string, reason: string): Promise<void> {
+  const id = await liveSettlementOf(agreementId)
+  if (!id) return
+  const row = await findSettlement(id)
+  if (!row || row.status === 'void' || row.status === 'cancelled_after_export') return
+  if (row.status === 'draft' || row.status === 'in_approval' || row.status === 'approved') {
+    // Void first, so the request's own "cancelled" status change finds nothing to move.
+    await transition(id, row.version, 'void')
+    await ctx.services.get(APPROVAL).cancelForEntity('settlement', id)
+    return
+  }
+  await transition(id, row.version, 'cancelled_after_export')
+  await appDb()
+    .updateTable('postingBatches')
+    .set({ cancelledAfterExportAt: now() })
+    .where('sourceId', '=', uuidBin(id))
+    .where('kind', 'in', ['settlement', 'clearing'])
+    .execute()
+  await getAudit(ctx).record({
+    action: 'settlements.cancelled_after_export',
+    targetType: 'settlement',
+    targetId: id,
+    details: { ref: row.ref, from: row.status, reason },
+  })
+  await ctx.services.get(NOTIFICATIONS).notify({
+    userIds: await branchRoleUsers('finance_officer', row.branchCode),
+    type: 'settlements.cancelled_after_export',
+    params: { ref: row.ref, reason },
+    link: `/settlements/${id}`,
+    subject: { type: 'settlement', id },
   })
 }
