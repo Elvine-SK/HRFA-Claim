@@ -165,6 +165,30 @@ export const ClearingPostedSchema = z
   .object({ version: z.number().int().min(1), coreRef: z.string().trim().max(50).optional() })
   .openapi('ClearingPosted')
 
+/** An agreement whose settlement is overdue (spec §10, ກ20). */
+export const OverdueSchema = z
+  .object({
+    agreementId: z.string().uuid(),
+    ref: z.string(),
+    docNo: z.string(),
+    travelTo: z.string(),
+    dueDate: z.string(),
+    branchCode: z.string(),
+    holderEid: z.string(),
+    holderName: z.string(),
+    /** The draft, when one was started. */
+    settlementId: z.string().uuid().nullable(),
+  })
+  .openapi('SettlementOverdue')
+
+/** Filters and sort of the overdue list (agreements as `a`). */
+export const overdueFields: FieldMap = {
+  ref: { type: 'string', column: 'a.ref', sortable: true, searchable: true },
+  docNo: { type: 'string', column: 'a.docNo', sortable: true, searchable: true },
+  branchCode: { type: 'string', column: 'a.branchCode' },
+  travelTo: { type: 'date', column: 'a.travelTo', sortable: true },
+}
+
 /** List filters and sort (`settlements` as `s`, its agreement as `a`). */
 export const settlementFields: FieldMap = {
   ref: { type: 'string', column: 'a.ref', sortable: true, searchable: true },

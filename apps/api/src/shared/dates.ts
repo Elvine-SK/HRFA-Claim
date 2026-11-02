@@ -17,6 +17,11 @@ export function daysInclusive(from: string, to: string): number {
   return days
 }
 
+/** `date` moved by `n` calendar days (negative: back). */
+export function addDays(date: string, n: number): string {
+  return new Date((dayNumber(date) + n) * DAY_MS).toISOString().slice(0, 10)
+}
+
 export const yearOf = (date: string): number => Number(date.slice(0, 4))
 
 /**

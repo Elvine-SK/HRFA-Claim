@@ -210,4 +210,33 @@ describe.skipIf(!dbTestsEnabled)('settlements (draft, lines, receipts)', () => {
     expect(found.body.data).toEqual({ agreementId: agreement.id, settlementId: s.id, canFile: false })
     expect((await brFinance.get(url(`/lookup?number=${encodeURIComponent(agreement.ref)}`))).status).toBe(404)
   })
+
+  it('lists overdue settlements for Finance', async () => {
+    // Returned Monday 5 January 2026, due 12 January: overdue today.
+    const past = { ...team, travelFrom: '2026-01-02', travelTo: '2026-01-05' }
+    const unfiled = await exportedPayment(platform, finance, hr, domestic(past))
+    const { agreement: drafted, settlement: draft } = await filed(deputy, domestic(past))
+    const { agreement: sent, settlement: submitted } = await filed(deputy, domestic(past))
+    await runWithContext(SYSTEM_CONTEXT, () => transition(submitted.id, 1, 'in_approval'))
+    const future = await exportedPayment(platform, finance, hr, domestic(team))
+
+    const res = await finance.get(url('/overdue?sort=-travelTo'))
+    expect(res.status, JSON.stringify(res.body)).toBe(200)
+    const byAgreement = new Map(res.body.data.map((r: any) => [r.agreementId, r]))
+    expect(byAgreement.get(unfiled.agreement.id)).toMatchObject({
+      ref: unfiled.agreement.ref,
+      travelTo: '2026-01-05',
+      dueDate: '2026-01-12',
+      holderEid: '10103',
+      settlementId: null,
+    })
+    expect(byAgreement.get(drafted.id)).toMatchObject({ settlementId: draft.id })
+    expect(byAgreement.has(sent.id)).toBe(false)
+    expect(byAgreement.has(future.agreement.id)).toBe(false)
+
+    const branch = await brFinance.get(url('/overdue'))
+    expect(branch.status).toBe(200)
+    expect(branch.body.data.some((r: any) => r.agreementId === unfiled.agreement.id)).toBe(false)
+    expect((await leader.get(url('/overdue'))).status).toBe(403)
+  })
 })

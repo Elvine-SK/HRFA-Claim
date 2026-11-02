@@ -6108,6 +6108,54 @@
           "canFile"
         ]
       },
+      "SettlementOverdue": {
+        "type": "object",
+        "properties": {
+          "agreementId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ref": {
+            "type": "string"
+          },
+          "docNo": {
+            "type": "string"
+          },
+          "travelTo": {
+            "type": "string"
+          },
+          "dueDate": {
+            "type": "string"
+          },
+          "branchCode": {
+            "type": "string"
+          },
+          "holderEid": {
+            "type": "string"
+          },
+          "holderName": {
+            "type": "string"
+          },
+          "settlementId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "agreementId",
+          "ref",
+          "docNo",
+          "travelTo",
+          "dueDate",
+          "branchCode",
+          "holderEid",
+          "holderName",
+          "settlementId"
+        ]
+      },
       "SettlementDraft": {
         "type": "object",
         "properties": {
@@ -20348,6 +20396,108 @@
           },
           "404": {
             "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/settlements/overdue": {
+      "get": {
+        "tags": [
+          "Settlements"
+        ],
+        "summary": "Agreements whose paid advance is past its settlement due date and not submitted yet (Finance)",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "1"
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "example": "20"
+            },
+            "required": false,
+            "name": "pageSize",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "example": "-createdAt"
+            },
+            "required": false,
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "q",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Overdue",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/SettlementOverdue"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PageMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
             "content": {
               "application/json": {
                 "schema": {

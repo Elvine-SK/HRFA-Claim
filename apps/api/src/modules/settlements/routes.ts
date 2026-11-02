@@ -1,7 +1,7 @@
 import { getAudit } from '@elvine-sk/platform-audit'
 import { requireUser } from '@elvine-sk/platform-auth'
 import { AppError } from '@elvine-sk/platform-core'
-import { inTransaction, paginate } from '@elvine-sk/platform-db'
+import { inTransaction, paginate, scopedBy } from '@elvine-sk/platform-db'
 import {
   createRoute,
   dataOf,
@@ -17,7 +17,8 @@ import {
   z,
 } from '@elvine-sk/platform-server'
 import { findAgreement, findByNumber } from '../agreements/queries.ts'
-import { caller, type C } from '../agreements/scope.ts'
+import { addDays, todayHrm } from '../../shared/dates.ts'
+import { caller, callerScope, type C } from '../agreements/scope.ts'
 import { linesOf as batchLines } from '../payments/batches.ts'
 import { xlsxWriter } from '../payments/xlsx.ts'
 import { submitSettlement } from './approval.ts'
@@ -26,17 +27,23 @@ import { transition } from './procedures.ts'
 import {
   canFile,
   createSettlement,
+  DUE_WORKING_DAYS,
   findSettlement,
   liveSettlementOf,
   loadSettlement,
+  overdueOf,
+  overdueRows,
   saveDraft,
   settlementRows,
   toListItem,
+  type OverdueRow,
   type SettlementRow,
 } from './queries.ts'
 import {
   BatchFileParams,
   ClearingPostedSchema,
+  overdueFields,
+  OverdueSchema,
   SettlementCreateSchema,
   SettlementDraftSchema,
   settlementFields,
@@ -128,6 +135,29 @@ export function settlementRoutes(api: ApiRouter, ctx: ModuleContext) {
         },
         200,
       )
+    },
+  )
+
+  api.openapi(
+    createRoute({
+      method: 'get',
+      path: '/settlements/overdue',
+      tags,
+      summary: 'Agreements whose paid advance is past its settlement due date and not submitted yet (Finance)',
+      request: { query: ListQueryParams },
+      responses: { 200: jsonContent(listOf(OverdueSchema), 'Overdue'), ...errorResponses(401, 403, 422) },
+    }),
+    async (c) => {
+      requireUser(c)
+      const scope = await callerScope(ctx, c, 'settlement.read')
+      if (scope.kind === 'own') throw AppError.forbidden()
+      let qb = overdueRows(addDays(todayHrm(), -DUE_WORKING_DAYS))
+      if (scope.kind === 'branch') qb = qb.where('a.branchCode', '=', scope.branch)
+      const query = listQueryFrom(c, overdueFields, { defaultSort: [{ field: 'travelTo', dir: 'asc' }] })
+      const page = await paginate(scopedBy(qb, 'settlements overdue: settlement.read holders for their HRM branch (head office: all)'), query, overdueFields, {
+        tieBreaker: 'a.id',
+      })
+      return c.json({ data: await overdueOf(page.data as OverdueRow[], lang(c)), meta: page.meta }, 200)
     },
   )
 

@@ -398,3 +398,60 @@ export async function loadSettlement(id: string, lang: string) {
     batches,
   }
 }
+
+
+/** The overdue list's rows before scope (`a` agreements, `p` payments, `m` the holder, `s` the live settlement). */
+export const overdueRows = (cutoff: string) =>
+  appDb()
+    .selectFrom('agreements as a')
+    .innerJoin('payments as p', (j) => j.onRef('p.agreementId', '=', 'a.id').on('p.status', 'in', ['exported', 'posted']))
+    .innerJoin('agreementMembers as m', (j) => j.onRef('m.agreementId', '=', 'a.id').on('m.isAdvanceHolder', '=', true))
+    .leftJoin('settlements as s', (j) => j.onRef('s.agreementId', '=', 'a.id').on('s.status', '<>', 'void'))
+    .select([
+      'a.id as agreementId',
+      'a.ref',
+      'a.docNo',
+      'a.travelTo',
+      'a.branchCode',
+      'm.eid as holderEid',
+      'm.nameLao',
+      'm.snameLao',
+      's.id as settlementId',
+    ])
+    .where('a.hasAdvance', '=', true)
+    .where((eb) => eb.or([eb('s.id', 'is', null), eb('s.status', '=', 'draft')]))
+    // Five working days are at least five calendar days: only these can be overdue today.
+    .where('a.travelTo', '<=', cutoff)
+
+export interface OverdueRow {
+  agreementId: string
+  ref: string
+  docNo: string
+  travelTo: string
+  branchCode: string
+  holderEid: string
+  nameLao: string
+  snameLao: string
+  settlementId: string | null
+}
+
+/** The page's rows whose due date has passed, with it (spec §10: Finance lists overdue settlements). */
+export async function overdueOf(rows: OverdueRow[], lang: string, today = todayHrm()) {
+  const out = []
+  for (const r of rows) {
+    const dueDate = await dueDateOf(r.travelTo)
+    if (dueDate >= today) continue
+    out.push({
+      agreementId: r.agreementId,
+      ref: r.ref,
+      docNo: displayDocNo(r.docNo, lang),
+      travelTo: r.travelTo,
+      dueDate,
+      branchCode: r.branchCode,
+      holderEid: r.holderEid,
+      holderName: `${r.nameLao} ${r.snameLao}`,
+      settlementId: r.settlementId,
+    })
+  }
+  return out
+}
