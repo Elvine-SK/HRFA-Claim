@@ -138,6 +138,27 @@ Once, after the first migration that includes plan 4:
 3. Travel master data → Flat rates: enter the fuel price before calculating a trip with a private car. Without a
    price on the departure date the payment answers `payments.fuel_price_missing`.
 
+## Settlement approval
+
+Once, after the first migration that includes plan 5:
+
+1. Administration → Approvals → New workflow: key `settlement`, record type "Settlement", name as in
+   `apps/api/src/modules/settlements/workflow.json`. Add its four stages: the leader or deputy (resolver
+   `settlement.leader`, with the condition `hasLeaderStep` equals true, so the stage is skipped when the filer is
+   the only leader), then `settlement.finance_officer`, `settlement.finance_section_head` and `settlement.final`.
+   Publish it and make it the default. The same file can be posted to `POST /api/v1/approval/workflows` and
+   `.../{id}/versions` with `activate: true`.
+2. Administration → Users, per HRM branch (ກ19):
+   - head office: `finance_officer` (step 3, exports the files, confirms posted), `finance_section_head` (step 4),
+     `finance_department_head` (step 5, the head of the Administration–Finance department);
+   - a branch: its office–IT officer gets `finance_officer`, its office–IT section head `finance_section_head`,
+     and branch management `management` (step 5).
+   A branch without one of these cannot submit a settlement (`no eligible approver`).
+3. Members file settlements themselves: no role is needed. The leader or deputy who takes step 2 must have
+   signed in to the app once (from HRM), or the submission answers `settlements.leader_no_account`.
+4. Overseas settlements that used money pass through 2361800001: after uploading the settlement file, Finance
+   marks it posted with CORE's suspense number (`RVS_NO`), then creates the clearing file and marks that posted.
+
 ## Upgrade
 
 1. Unpack the new bundle (keep `apps/api/.env` and the files folder).

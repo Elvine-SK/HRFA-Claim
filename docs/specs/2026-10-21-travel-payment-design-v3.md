@@ -514,6 +514,12 @@ Assumptions the build follows unless corrected:
     province name as stored, including `ແຂວງ`, the country's Lao name, or the border route's name.
 13. A rejected payment is void; a new one can be calculated for the agreement.
 14. The branch of a posting batch is the HRM branch of the Finance user who exports it.
+15. The settlement deadline counts working days: not Saturday, not Sunday, not a `tb_holiday` date (status `Y`).
+16. A settlement line in another currency is converted as amount ÷ cross rate, rounded half-up to cents.
+17. Overseas settlements with a spent part pass through 2361800001 in every case (ກ22), in two files: the
+    settlement file books the holding entry; Finance types CORE's suspense number (`RVS_NO`) when marking it
+    posted; the clearing file (DR 2361800001 / CR 1362220001) carries it. Border settlements do not.
+18. The member who submits a settlement is its filer; step 2 refuses that member's own EID.
 
 Needed from the business (working answers for questions 3, 4, 6, 7, 9 and 14, given by the project owner on
 2026-10-29 for plan 4, and for questions 5 and 8, given on 2026-11-02 for plan 5, are in `HANDOFF.md` "Plan 4
@@ -560,5 +566,6 @@ Needed from HRM and IT:
 3. Agreements with REF, Doc.no and approval. Needs business question 1 (Doc.no branch part) before the parser is
    final.
 4. Payment calculation, checking table, upload file. Needs business questions 3, 4, 6, 7, 9 and 14.
-5. Settlement with approval chain and posting batch. Needs business questions 5 and 8.
+5. Settlement with approval chain and posting batch. Needs business questions 5 and 8. **Done** (plan 5, with
+   working answers to questions 5 and 8).
 6. Dashboard, reminders, printable views, transit form.

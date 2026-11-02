@@ -1,10 +1,11 @@
 # Handoff — hr-fam (2026-10-29)
 
 Travel payment app for BCEL on nelvine-platform. Working name "HR-FAM" until the business names it (ຂ9).
-**Plans 1–4 are built** (local git only): plan 1 the app scaffold, the HRM read layer and sign-in from HRM;
+**Plans 1–5 are built** (local git only): plan 1 the app scaffold, the HRM read layer and sign-in from HRM;
 plan 2 the master data and the PM2 bundle; plan 3 the agreements (forms 1–4, REF, Doc.no, approval, cancel);
-plan 4 the payments (calculation, checking table, approval, posting batch and upload file).
-Next: plan 5 (settlement, approval chain, posting of settlements).
+plan 4 the payments (calculation, checking table, approval, posting batch and upload file); plan 5 the advance
+settlement (forms 5–6, approval chain, settlement and clearing files).
+Next: plan 6 (dashboard, reminders, printable views, transit form).
 
 ## Start here
 
@@ -18,7 +19,8 @@ Next: plan 5 (settlement, approval chain, posting of settlements).
 - **Done:** [plan 1](docs/superpowers/plans/2026-10-20-plan-1-foundation.md),
   [plan 2](docs/superpowers/plans/2026-10-21-plan-2-master-data.md),
   [plan 3](docs/superpowers/plans/2026-10-29-plan-3-agreements.md),
-  [plan 4](docs/superpowers/plans/2026-10-29-plan-4-payments.md). **Next:** write plan 5.
+  [plan 4](docs/superpowers/plans/2026-10-29-plan-4-payments.md),
+  [plan 5](docs/superpowers/plans/2026-11-02-plan-5-settlements.md). **Next:** write plan 6.
 - **HRM team kit:** [`docs/hrm-handoff.md`](docs/hrm-handoff.md) (handoff table, redirect script, grants, errors).
 
 ## Run it
@@ -30,7 +32,7 @@ pnpm install && pnpm migrate
 pnpm dev:api                         # :3335
 pnpm dev:web                         # :3336
 tooling/deploy/bundle.sh --hrm-login-url <URL>   # build/hr-fam-<sha>.tar.gz for the testing server
-RUN_DB_TESTS=1 pnpm test             # 217 tests; the test DBs are built on :3308 by global-setup
+RUN_DB_TESTS=1 pnpm test             # 260 tests; the test DBs are built on :3308 by global-setup
 ```
 
 `http://localhost:3335/api/v1/auth/hrm?code=valid-10001` signs in as fixture employee `10001` once per load of the
@@ -153,6 +155,49 @@ Reviews: a security review of the sign-in (0 Critical, 5 Important, all fixed) a
 - Not checked in a browser yet (no browser tool in the build session; the chrome-devtools connection failed):
   typecheck and the locale test only. Try the payment screens in en and lo.
 
+## What plan 5 built
+
+- `settlements` module (depends on `payments`; `payments` does not import it): tables `settlements`,
+  `settlement_lines`; procedure `settlements_transition` (status changes, history row, CORE reference and `RVS_NO`
+  on `posted`, CORE reference of the clearing on `cleared`). One live settlement per agreement (live = not `void`).
+- Statuses: `draft`, `in_approval`, `approved`, `exported`, `posted`, `clearing_exported`, `cleared`, `void`,
+  `cancelled_after_export`. Only `draft` changes. Returned, rejected or withdrawn go back to `draft`. `posted` is final
+  unless the settlement passes through the holding account.
+- Filing (spec §10, ກ13): any member of an agreement with an advance whose payment is `exported` or `posted`. The
+  advance amount, currency (the payment's `advance` item) and holder are copied on create and cannot be edited. The
+  due date is the 5th working day after `travelTo`: weekends and `tb_holiday` dates (status `Y`) are skipped
+  (`hrm/holidays.ts`, `addWorkingDays`).
+- Lines: free text, `fuel` or `fare` on domestic and border settlements (none overseas), currency, amount, cross
+  rate (another currency only; settled = amount ÷ rate, half-up to cents), a PDF receipt or a reason, and a PDF
+  proof of the rate. Receipts are files of the settlement (`files` entity `settlement`, PDF only, 50 MB); each line
+  picks one. Receipts cannot be deleted once the settlement has left draft (`settlements.receipt_locked`).
+- Totals (`totals.ts`): case from the totals (`unused`, `partly_used`, `fully_used`, `overspent`); `returned`,
+  `excess`; `holding` = min(spent, advance), overseas only. The filer chooses the case; a mismatch is refused at submit.
+- Approval (ກ19): workflow `apps/api/src/modules/settlements/workflow.json`, stages leader (resolver
+  `settlement.leader`, skipped by the condition `hasLeaderStep`), `settlement.finance_officer`,
+  `settlement.finance_section_head`, `settlement.final` (head office: new role `finance_department_head`; a branch:
+  `management`). Submitting names the leader or deputy (not the submitter, who becomes the filer); a leader who never
+  signed in to the app is refused (`settlements.leader_no_account`). A late submission needs a reason and is audited.
+- Posting: entries are data (`travel_posting_entries` cases `settlement` and `clearing`, migration `202611020100`,
+  `SEED_SETTLEMENT_ENTRIES`). Batch kinds are now `payment`, `settlement`, `clearing` (migration
+  `202611020300_payments_batch_kinds`). Overseas with a spent part: the settlement file credits 2361800001;
+  `POST /settlements/{id}/posted` needs `rvsNo`; `POST /settlements/{id}/clearing` writes DR 2361800001 / CR
+  1362220001 with `RVS_NO` on the 2361800001 line, on the branch of the settlement file. `REMARK` is the payment's
+  (`agreementRemark` in `payments/batches.ts`, now shared).
+- Routes under `/api/v1/settlements`: create, list, `lookup`, `overdue` (Finance, `settlement.read`), get, `PUT`
+  (draft lines), `submit`, `export`, `posted`, `clearing`, `clearing/posted`, `batches/{kind}/file`. The payments
+  file route serves `payment` batches only.
+- Cancel: draft, in approval or approved ⇒ `void` (request cancelled); after the settlement file ⇒
+  `cancelled_after_export`, its batches stamped, Finance of the branch notified. Same cancel transaction as the payment.
+- Web: `/settlements` (list, REF/Doc.no box, overdue view for Finance), `/settlements/{id}` (lines editor, files
+  card, totals, submit dialog with the leader and the late reason, export, posted with `RVS_NO`, clearing, downloads),
+  a "Settlement" button on an approved agreement for its members, a case filter on `/master/posting-entries`.
+- Test fixtures: `test/payment-fixtures.ts` (`exportedPayment`, `attachFile`); people `10100`–`10107` (head office)
+  and `10110`–`10113` at a new fixture branch `888050`; Doc.no years 2033–2035.
+- Set-up on a server: [`docs/deploy-testing.md`](docs/deploy-testing.md) "Settlement approval".
+- Not checked in a browser yet: the dev `.env` points at another database and HRM. Try the settlement screens in en
+  and lo, domestic and overseas through the clearing file.
+
 ## Approach: app first, platform later
 
 nelvine-platform is at `1.0.0` and has none of the proposal's items released
@@ -187,10 +232,10 @@ PascalCase upstream columns do not survive `CamelCasePlugin`.
 | 2    | Master data with seed (ranks, zones, rates, bands, fuel, GL), PM2 bundle | Done |
 | 3    | Agreements: forms 1–4, REF, Doc.no, approval             | Done         |
 | 4    | Payment calculation, checking table, upload file         | Done         |
-| 5    | Settlement, approval chain, posting batch                | To write     |
+| 5    | Settlement, approval chain, posting batch                | Done         |
 | 6    | Dashboard, reminders, printable views, transit form      | To write     |
 
-Plan 5 is next. Write each plan when the previous one is done, so it can use the real code.
+Plan 6 is next. Write each plan when the previous one is done, so it can use the real code.
 
 ## Decisions
 
@@ -257,7 +302,7 @@ Plan 5 working answers (user, 2026-11-02; to confirm with Finance, may change la
 - My calls: the overdue list is a filter of the settlements list (reminder notifications in plan 6); cancelling an
   agreement after its settlement is exported marks the settlement `cancelled_after_export`, like a payment.
 
-Carry into plan 5:
+Carry into plan 6 (from plan 4, still open unless struck):
 
 - Deferred minors of plan 4, grouped:
   - Calculation: `compareAmounts` in the meal cap can throw before the `amount_too_large` guard (unreachable with real
@@ -275,10 +320,9 @@ Carry into plan 5:
   - Web: no leader, holder or account markers in the checking table; "posted" uses its own modal, not `useConfirm`;
     an invalid bill has no field highlight; the lookup's "no payment" answer uses `notify.error`.
   - Tests and housekeeping: `mulDivCeilWhole` repeats a count check and has no test for fractional input; the
-    `seed.ts` header still says "frozen after 202610220110" but `SEED_POSTING_ENTRIES` belongs to `202610300100`; the
-    posting-entries test pins only the domestic accommodation GL; `caseKey` is an unbounded `z.string()`.
-- Settlement and its posting cases, `RVS_NO` (the suspense reference) and the holding-account timing (spec §17).
-- The set-up command for the agreement and payment workflows is not built: the approval module creates workflows
+    posting-entries test pins only the domestic accommodation GL. (Done in plan 5: the `seed.ts` header, `caseKey`
+    is an enum, a listener error rolling the cancel back is tested.)
+- The set-up command for the agreement, payment and settlement workflows is not built: the approval module creates workflows
   only through its HTTP routes, so both are created by hand ([`docs/deploy-testing.md`](docs/deploy-testing.md))
   until proposal C6.
 - Finance confirming the plan 4 working answers (above), the Europe group 1 word (question 2) and the `PostType` map
@@ -297,5 +341,5 @@ Carry into plan 5:
   Brazil depend on it), the `PostType` → `P1`–`P9` map (ຂ1), the Lao spelling of AE to confirm, and the
   Caucasus countries (AM, AZ, GE) seeded in zone group OA2. The visual browser checks of the `/master` pages
   are still to do.
-- Later plans: the holding-account timing and `RVS_NO` (plan 5). The full list, with the build step each blocks, is spec v3 §17–18.
+- Plan 5 working answers (above) to confirm with Finance: questions 5 and 8. The full list, with the build step each blocks, is spec v3 §17–18.
 - Deployment: PM2 bundle built (see above); not yet installed on the testing server.
