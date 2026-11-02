@@ -9228,7 +9228,7 @@ export interface paths {
         get: {
             parameters: {
                 query: {
-                    caseKey?: string;
+                    caseKey?: "payment" | "settlement" | "clearing";
                     zoneKind: "domestic" | "border" | "overseas";
                 };
                 header?: never;

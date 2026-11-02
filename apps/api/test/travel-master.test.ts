@@ -272,8 +272,33 @@ describe.skipIf(!dbTestsEnabled)('travel-master routes', () => {
   it('looks up posting entries by case and zone kind', async () => {
     await sys(async () => {
       expect(await postingEntries('payment', 'overseas')).toHaveLength(8)
-      expect(await postingEntries('settlement', 'overseas')).toEqual([])
+      expect(await postingEntries('settlement', 'overseas')).toHaveLength(5)
+      expect(await postingEntries('clearing', 'domestic')).toEqual([])
     })
+  })
+
+  it('lists the settlement and clearing entries', async () => {
+    const rows = async (caseKey: string, zoneKind: string) => {
+      const res = await someone.get(url(`/posting-entries?caseKey=${caseKey}&zoneKind=${zoneKind}`))
+      expect(res.status).toBe(200)
+      return (res.body.data as { component: string; side: string; accountKind: string; gl: string | null }[]).map(
+        (e) => `${e.component} ${e.side} ${e.gl ?? e.accountKind}`,
+      )
+    }
+    const domestic = ['advance CR 1362220001', 'fuel DR 4405100001', 'fare DR 4405200001', 'returned DR member', 'excess CR member']
+    expect(await rows('settlement', 'domestic')).toEqual(domestic)
+    expect(await rows('settlement', 'border')).toEqual(domestic)
+    expect(await rows('settlement', 'overseas')).toEqual([
+      'advance CR 1362220001',
+      'fare DR 4405200001',
+      'holding CR 2361800001',
+      'returned DR member',
+      'excess CR member',
+    ])
+    expect(await rows('clearing', 'overseas')).toEqual(['holding DR 2361800001', 'advance CR 1362220001'])
+    expect(await rows('clearing', 'domestic')).toEqual([])
+    expect(await rows('payment', 'domestic')).toHaveLength(8)
+    expect((await someone.get(url('/posting-entries?caseKey=refund&zoneKind=domestic'))).status).toBe(422)
   })
 
   it('refuses writes without travel_master.manage', async () => {

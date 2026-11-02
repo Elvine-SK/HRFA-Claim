@@ -41,7 +41,7 @@ export const PostingEntrySchema = z
   .openapi('TravelPostingEntry')
 
 export const PostingEntryQuery = z.object({
-  caseKey: z.string().default('payment'),
+  caseKey: z.enum(['payment', 'settlement', 'clearing']).default('payment'),
   zoneKind: z.enum(['domestic', 'border', 'overseas']),
 })
 

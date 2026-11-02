@@ -21,6 +21,7 @@ import {
   SEED_RANK_MAP,
   SEED_RANKS,
   SEED_RATES,
+  SEED_SETTLEMENT_ENTRIES,
   SEED_ZONES,
 } from './seed.ts'
 
@@ -192,7 +193,7 @@ export const travelMasterMigrations: MigrationSet = {
     },
   },
 
-  // Which GL account is debited or credited for each payment component (plan 4); settlement cases come later.
+  // Which GL account is debited or credited for each payment component (plan 4); the settlement cases follow in 202611020100.
   '202610300100_travel-master_posting_entries': {
     async up(db: Kysely<any>) {
       await createTable(db, 'travel_posting_entries')
@@ -229,6 +230,28 @@ export const travelMasterMigrations: MigrationSet = {
             gl: e.gl,
             seq: e.seq,
             sort_order: i + 1,
+          })),
+        )
+        .execute()
+    },
+  },
+
+  // The settlement and clearing cases (plan 5), after the payment rows.
+  '202611020100_travel-master_settlement_entries': {
+    async up(db: Kysely<any>) {
+      await db
+        .insertInto('travel_posting_entries')
+        .values(
+          SEED_SETTLEMENT_ENTRIES.map((e, i) => ({
+            id: uuidBin(uuidv7()),
+            case_key: e.caseKey,
+            zone_kind: e.zoneKind,
+            component: e.component,
+            side: e.side,
+            account_kind: e.accountKind,
+            gl: e.gl,
+            seq: e.seq,
+            sort_order: 1000 + i,
           })),
         )
         .execute()

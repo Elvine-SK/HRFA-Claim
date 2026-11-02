@@ -16508,6 +16508,11 @@
           {
             "schema": {
               "type": "string",
+              "enum": [
+                "payment",
+                "settlement",
+                "clearing"
+              ],
               "default": "payment"
             },
             "required": false,

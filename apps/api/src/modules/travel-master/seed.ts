@@ -6,8 +6,8 @@ import { RANK_CODES, type ZoneKind } from './lookups.ts'
  * changes a database that already ran it (add a migration or publish a new set instead).
  *
  * FROZEN: each block of this file is frozen once its migration has run on the testing server: the master data
- * and `countries.ts` by 202610220110, `SEED_POSTING_ENTRIES` by 202610300100. A change goes in a new migration,
- * never an edit here.
+ * and `countries.ts` by 202610220110, `SEED_POSTING_ENTRIES` by 202610300100, `SEED_SETTLEMENT_ENTRIES` by
+ * 202611020100. A change goes in a new migration, never an edit here.
  */
 
 /** The 2026 regulation's sets take effect from its first day. */
@@ -234,3 +234,45 @@ export const SEED_POSTING_ENTRIES: SeedPostingEntry[] = (['domestic', 'border', 
       { caseKey: 'payment', zoneKind, component: d.component, side: 'CR', accountKind: 'member', gl: null, seq: null },
     ]),
 )
+
+const gl = (caseKey: string, zoneKind: ZoneKind, component: string, side: 'DR' | 'CR', account: string): SeedPostingEntry => ({
+  caseKey,
+  zoneKind,
+  component,
+  side,
+  accountKind: 'gl',
+  gl: account,
+  seq: '0001',
+})
+const member = (zoneKind: ZoneKind, component: string, side: 'DR' | 'CR'): SeedPostingEntry => ({
+  caseKey: 'settlement',
+  zoneKind,
+  component,
+  side,
+  accountKind: 'member',
+  gl: null,
+  seq: null,
+})
+
+/**
+ * Cases `settlement` and `clearing` (FA-M `ສາຍເດີນ` section 4, ກ22; plan 5 working answers). `advance` is the
+ * advance account credited, `fuel` and `fare` the expense debited by line type, `holding` the account an overseas
+ * settlement's spent money waits in until the clearing file; `returned` (the holder repays the remainder) and
+ * `excess` (the holder is reimbursed what was overspent) are the holder's own account.
+ */
+export const SEED_SETTLEMENT_ENTRIES: SeedPostingEntry[] = [
+  ...(['domestic', 'border'] as const).flatMap((zoneKind) => [
+    gl('settlement', zoneKind, 'advance', 'CR', '1362220001'),
+    gl('settlement', zoneKind, 'fuel', 'DR', '4405100001'),
+    gl('settlement', zoneKind, 'fare', 'DR', '4405200001'),
+    member(zoneKind, 'returned', 'DR'),
+    member(zoneKind, 'excess', 'CR'),
+  ]),
+  gl('settlement', 'overseas', 'advance', 'CR', '1362220001'),
+  gl('settlement', 'overseas', 'fare', 'DR', '4405200001'),
+  gl('settlement', 'overseas', 'holding', 'CR', '2361800001'),
+  member('overseas', 'returned', 'DR'),
+  member('overseas', 'excess', 'CR'),
+  gl('clearing', 'overseas', 'holding', 'DR', '2361800001'),
+  gl('clearing', 'overseas', 'advance', 'CR', '1362220001'),
+]
