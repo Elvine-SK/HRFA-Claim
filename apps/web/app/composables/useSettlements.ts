@@ -61,15 +61,6 @@ export function useSettlementFiles(id: MaybeRefOrGetter<string>) {
   })
 }
 
-function saveBlob(blob: Blob, filename: string) {
-  const url = URL.createObjectURL(blob)
-  const a = Object.assign(document.createElement('a'), { href: url, download: filename })
-  document.body.append(a)
-  a.click()
-  a.remove()
-  setTimeout(() => URL.revokeObjectURL(url), 1000)
-}
-
 export function useSettlementMutations() {
   const api = useApi()
   const client = useQueryClient()

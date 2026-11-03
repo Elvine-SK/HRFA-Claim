@@ -194,7 +194,8 @@
       "cancelText": "The agreement keeps its REF and its Doc.no becomes free for the replacement. This cannot be undone.",
       "cancelled": "Agreement cancelled",
       "payment": "Payment",
-      "settlement": "Settlement"
+      "settlement": "Settlement",
+      "pdf": "Print (PDF)"
     },
     "formType": {
       "domestic": "Form 1: between provinces",

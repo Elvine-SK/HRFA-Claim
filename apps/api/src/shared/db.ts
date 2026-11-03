@@ -283,6 +283,7 @@ export interface GroupRolesTable {
 export interface UsersTable {
   id: string
   status: string
+  displayName: string
   deletedAt: Date | null
 }
 export interface HrmUserLinksTable {

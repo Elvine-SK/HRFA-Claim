@@ -8,6 +8,7 @@ const access = useAccess()
 const placeName = usePlaceName()
 const localName = useLocalName()
 const id = computed(() => String(route.params.id))
+const pdf = usePdf()
 const agreement = useAgreement(id)
 const history = useAgreementHistory(id)
 const a = computed(() => agreement.data.value)
@@ -149,6 +150,14 @@ const mayEdit = computed(() => isDraft.value && access.canSome('agreement.create
           :loading="findSettlement.isPending.value || createSettlement.isPending.value"
           @click="openSettlement"
           >{{ t('agreements.detail.settlement') }}</UButton
+        >
+        <UButton
+          icon="i-lucide-printer"
+          variant="soft"
+          color="neutral"
+          :loading="pdf.busy.value"
+          @click="pdf.download(`/agreements/${a.id}/pdf`, `${a.ref}.pdf`)"
+          >{{ t('agreements.detail.pdf') }}</UButton
         >
         <UButton v-if="canCancel" icon="i-lucide-ban" color="error" variant="soft" @click="cancelling = true">{{
           t('agreements.detail.cancel')

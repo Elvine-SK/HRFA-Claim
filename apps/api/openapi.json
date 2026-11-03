@@ -2775,6 +2775,22 @@
           "updatedAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "shipped": {
+            "type": "boolean"
+          },
+          "shippedStatus": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "current",
+              "outdated",
+              "edited",
+              "inactive",
+              null
+            ]
           }
         },
         "required": [
@@ -2787,7 +2803,9 @@
           "isDefault",
           "activeVersionId",
           "version",
-          "updatedAt"
+          "updatedAt",
+          "shipped",
+          "shippedStatus"
         ]
       },
       "ApprovalWorkflowAudience": {
@@ -16051,6 +16069,85 @@
         }
       }
     },
+    "/api/v1/approval/workflows/{id}/use-shipped": {
+      "post": {
+        "tags": [
+          "Approval admin"
+        ],
+        "summary": "Publish the version shipped with the app as a new live version",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Shipped version is live",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ApprovalWorkflowDetail"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/approval/workflows/{id}/activate": {
       "post": {
         "tags": [
@@ -19126,6 +19223,58 @@
           },
           "503": {
             "description": "HRM is unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/agreements/{id}/pdf": {
+      "get": {
+        "tags": [
+          "Agreements"
+        ],
+        "summary": "The agreement as a PDF laid out like the paper form (forms 1–4), with its signers",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PDF",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
             "content": {
               "application/json": {
                 "schema": {

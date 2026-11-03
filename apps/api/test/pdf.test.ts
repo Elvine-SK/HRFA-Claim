@@ -1,10 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { renderPdf, scriptRuns, type PrintModel } from '../src/modules/print/pdf.ts'
-
-/** Pages of a pdfkit file: its page objects are plain dictionaries (no object streams). */
-export function pageCount(pdf: Uint8Array): number {
-  return (Buffer.from(pdf).toString('latin1').match(/\/Type \/Page\b(?!s)/g) ?? []).length
-}
+import { pageCount } from './pdf-helpers.ts'
 
 describe('script runs', () => {
   it('splits Lao from Latin, digits and punctuation', () => {
@@ -27,7 +23,7 @@ describe('PDF renderer', () => {
     const rows = Array.from({ length: 60 }, (_, i) => [String(i + 1), 'ຄ່າເດີນທາງ '.repeat(20), '1,000.00'])
     const model: PrintModel = {
       title: 'ໃບສະຫຼຸບເງິນແຮເດີນທາງ',
-      draft: true,
+      mark: 'ຮ່າງ / DRAFT',
       date: '03/11/2026',
       blocks: [
         { kind: 'fields', rows: [['ເລກທີ (Doc No.):', '0001.ທຄຕລ.888010.2026']] },
@@ -59,7 +55,7 @@ describe('PDF renderer', () => {
   })
 
   it('renders a one-page form', async () => {
-    const pdf = await renderPdf({ title: 'T', draft: false, date: '01/01/2026', blocks: [{ kind: 'title', text: 'x' }] })
+    const pdf = await renderPdf({ title: 'T', mark: null, date: '01/01/2026', blocks: [{ kind: 'title', text: 'x' }] })
     expect(pageCount(pdf)).toBe(1)
   })
 })

@@ -44,6 +44,10 @@ import {
   CancelSchema,
   LookupQuery,
 } from './schema.ts'
+import { todayHrm } from '../../shared/dates.ts'
+import { agreementPrintModel, printPlace } from '../print/agreement.ts'
+import { pdfHeaders, renderPdf } from '../print/pdf.ts'
+import { signersOf } from '../print/signers.ts'
 import { agreementCancelled } from './events.ts'
 import { transition } from './procedures.ts'
 import { caller, mayCreateFor, mayRead, scopedAgreements, type C } from './scope.ts'
@@ -156,6 +160,40 @@ export function agreementRoutes(api: ApiRouter, ctx: ModuleContext) {
       requireUser(c)
       const { row, members } = await readable(ctx, c, c.req.valid('param').id)
       return c.json({ data: toAgreement(row, members, lang(c)) }, 200)
+    },
+  )
+
+  api.openapi(
+    createRoute({
+      method: 'get',
+      path: '/agreements/{id}/pdf',
+      tags,
+      summary: 'The agreement as a PDF laid out like the paper form (forms 1–4), with its signers',
+      request: { params: IdParam },
+      responses: {
+        200: { description: 'PDF', content: { 'application/pdf': { schema: z.string().openapi({ format: 'binary' }) } } },
+        ...errorResponses(401, 404),
+      },
+    }),
+    async (c) => {
+      requireUser(c)
+      const { row, members } = await readable(ctx, c, c.req.valid('param').id)
+      const pdf = await renderPdf(
+        agreementPrintModel({
+          agreement: row,
+          members,
+          place: await printPlace(row),
+          signers: await signersOf('agreement', row.id),
+          today: todayHrm(),
+        }),
+      )
+      await getAudit(ctx).record({
+        action: 'agreements.printed',
+        targetType: 'agreement',
+        targetId: row.id,
+        details: { ref: row.ref },
+      })
+      return c.body(pdf as Uint8Array<ArrayBuffer>, 200, pdfHeaders(pdf, `${row.ref}.pdf`))
     },
   )
 

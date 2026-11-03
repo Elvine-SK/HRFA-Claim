@@ -7,6 +7,9 @@ import PDFDocument from 'pdfkit'
  * Noto Sans.
  */
 
+export const DRAFT = 'ຮ່າງ / DRAFT'
+export const CANCELLED = 'ຍົກເລີກ / CANCELLED'
+
 export interface Column {
   header: string
   width: number
@@ -23,8 +26,8 @@ export type Block =
 
 export interface PrintModel {
   title: string
-  /** Before approval: the header carries "ຮ່າງ / DRAFT". */
-  draft: boolean
+  /** Printed in red top left: `DRAFT` before approval, `CANCELLED` once cancelled; none when approved. */
+  mark: string | null
   /** `dd/mm/yyyy`, printed top right. */
   date: string
   blocks: Block[]
@@ -342,9 +345,9 @@ export function renderPdf(model: PrintModel): Promise<Uint8Array> {
   })
 
   let y = PAGE.margin
-  if (model.draft) {
+  if (model.mark) {
     doc.save().fillColor('#b91c1c')
-    draw(doc, 'ຮ່າງ / DRAFT', PAGE.margin, y, { width: CONTENT_WIDTH / 2, bold: true })
+    draw(doc, model.mark, PAGE.margin, y, { width: CONTENT_WIDTH / 2, bold: true })
     doc.restore()
   }
   draw(doc, `ວັນທີ (Date): ${model.date}`, PAGE.margin + CONTENT_WIDTH / 2, y, {
@@ -377,4 +380,15 @@ export function renderPdf(model: PrintModel): Promise<Uint8Array> {
   }
   doc.end()
   return done
+}
+
+/** The headers of a PDF download: an attachment, never cached. */
+export function pdfHeaders(pdf: Uint8Array, fileName: string): Record<string, string> {
+  return {
+    'content-type': 'application/pdf',
+    'content-disposition': `attachment; filename="${fileName.replace(/[^\w.-]/g, '_')}"`,
+    'content-length': String(pdf.byteLength),
+    'cache-control': 'private, no-store',
+    'x-content-type-options': 'nosniff',
+  }
 }
