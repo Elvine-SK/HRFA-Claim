@@ -11,6 +11,7 @@ export type SettlementLine = Schemas['SettlementLine']
 export type SettlementLineInput = Schemas['SettlementLineInput']
 export type SettlementLookup = Schemas['SettlementLookup']
 export type SettlementOverdue = Schemas['SettlementOverdue']
+export type SettlementToFile = Schemas['SettlementToFile']
 export type SettlementStatus = SettlementListItem['status']
 export type CaseKind = NonNullable<SettlementListItem['caseKind']>
 export type BatchFileKind = 'settlement' | 'clearing'

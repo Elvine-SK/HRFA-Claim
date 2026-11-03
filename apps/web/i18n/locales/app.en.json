@@ -384,6 +384,18 @@
       "optional": "Optional",
       "cancelledAfterExport": "Cancelled after its upload file was made",
       "cancelledAfterExportText": "The agreement was cancelled. No reversal file is made: settle it with the bank."
+    },
+    "stats": {
+      "withoutPayment": "Agreements without payment"
+    },
+    "widgets": {
+      "viewAll": "Payments",
+      "withoutPayment": {
+        "title": "Agreements without payment",
+        "subtitle": "Approved, not calculated yet",
+        "description": "Approved agreements that have no payment yet.",
+        "empty": "Every approved agreement has its payment."
+      }
     }
   },
   "errors": {
@@ -595,6 +607,27 @@
       "markClearedTitle": "Mark the clearing of {ref} as posted",
       "rvsHint": "The number CORE gave the holding entry; the clearing file needs it",
       "postedDone": "Marked as posted"
+    },
+    "stats": {
+      "overdue": "Settlements overdue",
+      "toFile": "Settlements to file"
+    },
+    "widgets": {
+      "viewAll": "All",
+      "late": "Late",
+      "dueOn": "Due {date}",
+      "toFile": {
+        "title": "Settlements to file",
+        "subtitle": "Your trips with a paid advance",
+        "description": "The trips you are a member of whose advance settlement is still to submit.",
+        "empty": "Nothing to settle."
+      },
+      "overdue": {
+        "title": "Overdue settlements",
+        "subtitle": "Past the five working days",
+        "description": "Paid advances whose settlement is past its due date and not submitted.",
+        "empty": "No settlement is overdue."
+      }
     }
   }
 }
