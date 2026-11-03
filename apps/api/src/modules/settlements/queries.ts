@@ -1,7 +1,7 @@
 import { AppError, uuidv7, type FieldError } from '@elvine-sk/platform-core'
 import { createdStamp, inTransaction, updateVersioned, uuidBin, writeHistory } from '@elvine-sk/platform-db'
 import { toIso } from '@elvine-sk/platform-server'
-import { addWorkingDays, todayHrm } from '../../shared/dates.ts'
+import { addDays, addWorkingDays, latestReturnFor, todayHrm } from '../../shared/dates.ts'
 import { appDb, type SettlementLinesTable, type SettlementsTable } from '../../shared/db.ts'
 import { formatDocNo, parseDocNo } from '../agreements/doc-no.ts'
 import { membersOf, type MemberRow } from '../agreements/queries.ts'
@@ -124,6 +124,12 @@ export async function dueDateOf(travelTo: string): Promise<string> {
   // Five working days fit in 60 calendar days whatever HRM's holidays are.
   const until = addWorkingDays(travelTo, 60, new Set())
   return addWorkingDays(travelTo, DUE_WORKING_DAYS, await holidaysBetween(travelTo, until))
+}
+
+/** The latest return date that is overdue `today`: the overdue list and the reminders cut on it in SQL. */
+export async function overdueCutoff(today = todayHrm()): Promise<string> {
+  const holidays = await holidaysBetween(addDays(today, -60), today)
+  return latestReturnFor(today, DUE_WORKING_DAYS, holidays)
 }
 
 /**
@@ -426,7 +432,6 @@ export const overdueRows = (cutoff: string) =>
     ])
     .where('a.hasAdvance', '=', true)
     .where((eb) => eb.or([eb('s.id', 'is', null), eb('s.status', '=', 'draft')]))
-    // Five working days are at least five calendar days: only these can be overdue today.
     .where('a.travelTo', '<=', cutoff)
 
 export interface OverdueRow {
@@ -441,23 +446,21 @@ export interface OverdueRow {
   settlementId: string | null
 }
 
-/** The page's rows whose due date has passed, with it (spec §10: Finance lists overdue settlements). */
-export async function overdueOf(rows: OverdueRow[], lang: string, today = todayHrm()) {
-  const out = []
-  for (const r of rows) {
-    const dueDate = await dueDateOf(r.travelTo)
-    if (dueDate >= today) continue
-    out.push({
-      agreementId: r.agreementId,
-      ref: r.ref,
-      docNo: displayDocNo(r.docNo, lang),
-      travelTo: r.travelTo,
-      dueDate,
-      branchCode: r.branchCode,
-      holderEid: r.holderEid,
-      holderName: `${r.nameLao} ${r.snameLao}`,
-      settlementId: r.settlementId,
-    })
-  }
-  return out
+/** The overdue list's page (every row is overdue: the query cut on `overdueCutoff`), with each due date. */
+export async function overdueOf(rows: OverdueRow[], lang: string) {
+  if (!rows.length) return []
+  const from = rows.reduce((m, r) => (r.travelTo < m ? r.travelTo : m), rows[0]!.travelTo)
+  const until = rows.reduce((m, r) => (r.travelTo > m ? r.travelTo : m), rows[0]!.travelTo)
+  const holidays = await holidaysBetween(from, addWorkingDays(until, 60, new Set()))
+  return rows.map((r) => ({
+    agreementId: r.agreementId,
+    ref: r.ref,
+    docNo: displayDocNo(r.docNo, lang),
+    travelTo: r.travelTo,
+    dueDate: addWorkingDays(r.travelTo, DUE_WORKING_DAYS, holidays),
+    branchCode: r.branchCode,
+    holderEid: r.holderEid,
+    holderName: `${r.nameLao} ${r.snameLao}`,
+    settlementId: r.settlementId,
+  }))
 }

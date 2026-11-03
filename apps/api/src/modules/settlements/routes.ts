@@ -17,7 +17,6 @@ import {
   z,
 } from '@elvine-sk/platform-server'
 import { findAgreement, findByNumber } from '../agreements/queries.ts'
-import { addDays, todayHrm } from '../../shared/dates.ts'
 import { caller, callerScope, type C } from '../agreements/scope.ts'
 import { linesOf as batchLines } from '../payments/batches.ts'
 import { xlsxWriter } from '../payments/xlsx.ts'
@@ -27,10 +26,10 @@ import { transition } from './procedures.ts'
 import {
   canFile,
   createSettlement,
-  DUE_WORKING_DAYS,
   findSettlement,
   liveSettlementOf,
   loadSettlement,
+  overdueCutoff,
   overdueOf,
   overdueRows,
   saveDraft,
@@ -151,7 +150,7 @@ export function settlementRoutes(api: ApiRouter, ctx: ModuleContext) {
       requireUser(c)
       const scope = await callerScope(ctx, c, 'settlement.read')
       if (scope.kind === 'own') throw AppError.forbidden()
-      let qb = overdueRows(addDays(todayHrm(), -DUE_WORKING_DAYS))
+      let qb = overdueRows(await overdueCutoff())
       if (scope.kind === 'branch') qb = qb.where('a.branchCode', '=', scope.branch)
       const query = listQueryFrom(c, overdueFields, { defaultSort: [{ field: 'travelTo', dir: 'asc' }] })
       const page = await paginate(scopedBy(qb, 'settlements overdue: settlement.read holders for their HRM branch (head office: all)'), query, overdueFields, {

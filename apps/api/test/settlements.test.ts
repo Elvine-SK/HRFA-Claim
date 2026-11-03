@@ -4,6 +4,7 @@ import type { PlatformApp } from '@elvine-sk/platform-server'
 import type { TestClient } from '@elvine-sk/platform-server/testing'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { transition } from '../src/modules/settlements/procedures.ts'
+import { addDays, todayHrm } from '../src/shared/dates.ts'
 import { approvedAgreement, domesticBodies, roleIds } from './agreement-fixtures.ts'
 import { adminClient, API, bootApp, hrmClient } from './helpers.ts'
 import { attachFile, exportedPayment } from './payment-fixtures.ts'
@@ -277,5 +278,22 @@ describe.skipIf(!dbTestsEnabled)('settlements (draft, lines, receipts)', () => {
     expect(branch.status).toBe(200)
     expect(branch.body.data.some((r: any) => r.agreementId === unfiled.agreement.id)).toBe(false)
     expect((await leader.get(url('/overdue'))).status).toBe(403)
+  })
+
+  it('pages the overdue list exactly', async () => {
+    // Returned five calendar days ago: due today at the earliest, so never overdue yet.
+    const today = todayHrm()
+    const recent = await exportedPayment(
+      platform,
+      finance,
+      hr,
+      domestic({ ...team, travelFrom: addDays(today, -7), travelTo: addDays(today, -5) }),
+    )
+    const all = await finance.get(url('/overdue?pageSize=100'))
+    expect(all.status, JSON.stringify(all.body)).toBe(200)
+    expect(all.body.data.some((r: any) => r.agreementId === recent.agreement.id)).toBe(false)
+    expect(all.body.meta.total).toBe(all.body.data.length)
+    const first = await finance.get(url('/overdue?pageSize=1'))
+    expect(first.body.data).toHaveLength(1)
   })
 })

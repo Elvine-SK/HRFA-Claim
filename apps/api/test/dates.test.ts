@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { addWorkingDays, daysInclusive, yearOf } from '../src/shared/dates.ts'
+import { addWorkingDays, daysInclusive, latestReturnFor, yearOf } from '../src/shared/dates.ts'
 
 describe('HRM dates', () => {
   it('counts both ends', () => {
@@ -14,5 +14,11 @@ describe('HRM dates', () => {
     expect(addWorkingDays('2033-11-04', 5, new Set(['2033-11-07']))).toBe('2033-11-14')
     expect(addWorkingDays('2033-11-01', 5, new Set())).toBe('2033-11-08')
     expect(addWorkingDays('2033-12-30', 1, new Set())).toBe('2034-01-02') // Friday ⇒ Monday, across the year
+  })
+  it('finds the latest overdue return date', () => {
+    const h = new Set(['2033-11-07'])
+    expect(latestReturnFor('2033-11-15', 5, h)).toBe('2033-11-07') // a return on 4–7 is due on 14 < 15
+    expect(latestReturnFor('2033-11-14', 5, h)).toBe('2033-11-03') // 4 is due on 14, not overdue
+    expect(latestReturnFor('2033-11-08', 5, new Set())).toBe('2033-10-31') // 1 is due on 8
   })
 })

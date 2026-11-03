@@ -39,3 +39,13 @@ export function addWorkingDays(from: string, n: number, holidays: ReadonlySet<st
   }
   return new Date(day * DAY_MS).toISOString().slice(0, 10)
 }
+
+/**
+ * The latest return date `r` whose deadline `addWorkingDays(r, n, holidays)` is before `today`: a trip returned on or
+ * before it is overdue. `addWorkingDays` never decreases with its start date, so this walks back from `today`.
+ */
+export function latestReturnFor(today: string, n: number, holidays: ReadonlySet<string>): string {
+  let r = addDays(today, -n)
+  while (addWorkingDays(r, n, holidays) >= today) r = addDays(r, -1)
+  return r
+}
