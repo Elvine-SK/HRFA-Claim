@@ -76,6 +76,25 @@ const GRANTS: Record<string, string[]> = {
   management: ['settlement.read'],
 }
 
+/** Dashboard widgets (plan 6): `stats` and `approvals` are the platform's, the others this app's. */
+const EVERYONE_WIDGETS = ['widget.stats', 'widget.approvals']
+const FINANCE_WIDGETS = [
+  ...EVERYONE_WIDGETS,
+  'widget.settlements_to_file',
+  'widget.agreements_without_payment',
+  'widget.settlements_overdue',
+]
+const WIDGET_GRANTS: Record<string, string[]> = {
+  employee: [...EVERYONE_WIDGETS, 'widget.settlements_to_file'],
+  hr_officer: EVERYONE_WIDGETS,
+  hr_section_head: EVERYONE_WIDGETS,
+  hr_department_head: EVERYONE_WIDGETS,
+  management: EVERYONE_WIDGETS,
+  finance_officer: FINANCE_WIDGETS,
+  finance_section_head: FINANCE_WIDGETS,
+  finance_department_head: FINANCE_WIDGETS,
+}
+
 export const settlementsMigrations: MigrationSet = {
   '202611020200_settlements_create': {
     async up(db: Kysely<any>) {
@@ -199,6 +218,27 @@ export const settlementsMigrations: MigrationSet = {
         .addCheckConstraint('ck_settlement_reminders_kind', inCheck('kind', REMINDER_KINDS))
         .addUniqueConstraint('uq_settlement_reminders', ['agreement_id', 'kind', 'occurrence'])
         .execute()
+    },
+  },
+  '202611030200_settlements_widget_grants': {
+    // Dashboard widgets per role (plan 6); administrators change them later. Only missing rows are added.
+    async up(db: Kysely<any>) {
+      for (const [key, permissions] of Object.entries(WIDGET_GRANTS)) {
+        const role = await db.selectFrom('roles').select('id').where('key', '=', key).executeTakeFirst()
+        if (!role) continue // removed by an administrator
+        const held = await db
+          .selectFrom('role_permissions')
+          .select('permission_key')
+          .where('role_id', '=', uuidBin(role.id as string))
+          .where('permission_key', 'in', permissions)
+          .execute()
+        const missing = permissions.filter((p) => !held.some((h) => h.permission_key === p))
+        if (!missing.length) continue
+        await db
+          .insertInto('role_permissions')
+          .values(missing.map((permission_key) => ({ role_id: uuidBin(role.id as string), permission_key })))
+          .execute()
+      }
     },
   },
 }

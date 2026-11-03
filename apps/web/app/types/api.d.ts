@@ -8442,11 +8442,12 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Start a CSV import (`dryRun=true` only validates) */
+        /** Start a CSV import (`dryRun=true` only validates; `target` for entities that import into one) */
         post: {
             parameters: {
                 query?: {
                     dryRun?: "true" | "false";
+                    target?: string;
                 };
                 header?: never;
                 path: {
@@ -11220,6 +11221,77 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/payments/agreements-without-payment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Approved agreements with no payment yet, for Finance of their branch (dashboard, spec §14) */
+        get: {
+            parameters: {
+                query?: {
+                    page?: string;
+                    pageSize?: string;
+                    sort?: string;
+                    q?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Agreements */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["AgreementWithoutPayment"][];
+                            meta: components["schemas"]["PageMeta"];
+                        };
+                    };
+                };
+                /** @description Not authenticated */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Validation failed */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/payments/lookup": {
         parameters: {
             query?: never;
@@ -12084,6 +12156,68 @@ export interface paths {
                 };
                 /** @description Forbidden */
                 403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Validation failed */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/settlements/to-file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The caller's agreements whose advance is paid and whose settlement is not submitted yet (dashboard) */
+        get: {
+            parameters: {
+                query?: {
+                    page?: string;
+                    pageSize?: string;
+                    sort?: string;
+                    q?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description To file */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["SettlementToFile"][];
+                            meta: components["schemas"]["PageMeta"];
+                        };
+                    };
+                };
+                /** @description Not authenticated */
+                401: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -14030,6 +14164,18 @@ export interface components {
             /** Format: uuid */
             agreementId: string;
         };
+        AgreementWithoutPayment: {
+            /** Format: uuid */
+            id: string;
+            ref: string;
+            docNo: string;
+            /** @enum {string} */
+            formType: "domestic" | "district" | "overseas" | "border";
+            subject: string;
+            travelFrom: string;
+            travelTo: string;
+            branchCode: string;
+        };
         PaymentLookup: {
             /** Format: uuid */
             agreementId: string;
@@ -14194,6 +14340,17 @@ export interface components {
             holderName: string;
             /** Format: uuid */
             settlementId: string | null;
+        };
+        SettlementToFile: {
+            /** Format: uuid */
+            agreementId: string;
+            ref: string;
+            docNo: string;
+            travelTo: string;
+            dueDate: string;
+            /** Format: uuid */
+            settlementId: string | null;
+            isLate: boolean;
         };
         SettlementDraft: {
             version: number;

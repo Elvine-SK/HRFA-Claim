@@ -21,6 +21,14 @@ import {
 import { findAgreement, findByNumber } from '../agreements/queries.ts'
 import { caller, type C } from '../agreements/scope.ts'
 import { exportPayment, findBatch, linesOf } from './batches.ts'
+import {
+  scopedWithoutPayment,
+  scopedWithoutPaymentSelect,
+  toWithoutPaymentItem,
+  withoutPaymentFields,
+  WithoutPaymentSchema,
+  type WithoutPaymentRow,
+} from './dashboard.ts'
 import { transition } from './procedures.ts'
 import {
   assertBillsComplete,
@@ -98,6 +106,30 @@ export function paymentRoutes(api: ApiRouter, ctx: ModuleContext) {
         tieBreaker: 'p.id',
       })
       return c.json({ data: (page.data as PaymentRow[]).map((r) => toListItem(r, lang(c))), meta: page.meta }, 200)
+    },
+  )
+
+  // Before `/payments/{id}`, so the name is not read as an id.
+  api.openapi(
+    createRoute({
+      method: 'get',
+      path: '/payments/agreements-without-payment',
+      tags,
+      summary: 'Approved agreements with no payment yet, for Finance of their branch (dashboard, spec §14)',
+      request: { query: ListQueryParams },
+      responses: { 200: jsonContent(listOf(WithoutPaymentSchema), 'Agreements'), ...errorResponses(401, 403, 422) },
+    }),
+    async (c) => {
+      requireUser(c)
+      if ((await scopedWithoutPayment(ctx, c)).scope.kind === 'own') throw AppError.forbidden()
+      const query = listQueryFrom(c, withoutPaymentFields, { defaultSort: [{ field: 'travelFrom', dir: 'asc' }] })
+      const page = await paginate(await scopedWithoutPaymentSelect(ctx, c), query, withoutPaymentFields, {
+        tieBreaker: 'a.id',
+      })
+      return c.json(
+        { data: (page.data as WithoutPaymentRow[]).map((r) => toWithoutPaymentItem(r, lang(c))), meta: page.meta },
+        200,
+      )
     },
   )
 

@@ -2,6 +2,7 @@ import { defineModule, type ModuleContext } from '@elvine-sk/platform-server'
 import { onAgreementCancelled } from '../agreements/events.ts'
 import { paymentApproval, paymentResolvers } from './approval.ts'
 import { cancelPaymentOf } from './batches.ts'
+import { paymentStats } from './dashboard.ts'
 import { paymentsMigrations } from './migrations.ts'
 import { paymentRoutes } from './routes.ts'
 import { paymentFields } from './schema.ts'
@@ -69,9 +70,11 @@ const ctx = () => {
  */
 export const paymentsModule = defineModule({
   name: 'payments',
-  dependsOn: ['authorization', 'auth-hrm', 'travel-master', 'agreements', 'audit', 'approval', 'notifications'],
+  dependsOn: ['authorization', 'auth-hrm', 'travel-master', 'agreements', 'audit', 'approval', 'notifications', 'dashboard'],
   migrations: paymentsMigrations,
   permissions: { payment: ['read', 'calculate', 'export'] },
+  dashboardStats: paymentStats,
+  dashboardWidgets: ['agreements_without_payment'],
   lists: { payments: { fields: paymentFields } },
   menus: [
     {

@@ -32,6 +32,8 @@ import {
   overdueCutoff,
   overdueOf,
   overdueRows,
+  toFileOf,
+  toFileRows,
   saveDraft,
   settlementRows,
   toListItem,
@@ -53,6 +55,7 @@ import {
   SettlementSchema,
   SettlementSubmitSchema,
   SettlementVersionSchema,
+  ToFileSchema,
 } from './schema.ts'
 import { isMember, maySeeSettlement, requireMember, requireSettlementExport, scopedSettlements } from './scope.ts'
 
@@ -157,6 +160,28 @@ export function settlementRoutes(api: ApiRouter, ctx: ModuleContext) {
         tieBreaker: 'a.id',
       })
       return c.json({ data: await overdueOf(page.data as OverdueRow[], lang(c)), meta: page.meta }, 200)
+    },
+  )
+
+  api.openapi(
+    createRoute({
+      method: 'get',
+      path: '/settlements/to-file',
+      tags,
+      summary: "The caller's agreements whose advance is paid and whose settlement is not submitted yet (dashboard)",
+      request: { query: ListQueryParams },
+      responses: { 200: jsonContent(listOf(ToFileSchema), 'To file'), ...errorResponses(401, 422) },
+    }),
+    async (c) => {
+      requireUser(c)
+      const { eid } = await caller(ctx, c)
+      // Only the caller's own trips, whatever their role.
+      const qb = toFileRows(eid ?? '')
+      const query = listQueryFrom(c, overdueFields, { defaultSort: [{ field: 'travelTo', dir: 'asc' }] })
+      const page = await paginate(scopedBy(qb, 'settlements to file: own trips (members) only'), query, overdueFields, {
+        tieBreaker: 'a.id',
+      })
+      return c.json({ data: await toFileOf(page.data as OverdueRow[], lang(c)), meta: page.meta }, 200)
     },
   )
 

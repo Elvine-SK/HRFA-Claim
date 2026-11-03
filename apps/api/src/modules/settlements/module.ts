@@ -2,6 +2,7 @@ import { defineModule, type ModuleContext } from '@elvine-sk/platform-server'
 import { onAgreementCancelled } from '../agreements/events.ts'
 import { settlementApproval, settlementResolvers } from './approval.ts'
 import { cancelSettlementOf } from './batches.ts'
+import { settlementStats } from './dashboard.ts'
 import { keepReceipts, settlementFiles } from './files.ts'
 import { settlementsMigrations } from './migrations.ts'
 import { REMINDER_JOB, sendReminders } from './reminders.ts'
@@ -101,9 +102,11 @@ const ctx = () => {
  */
 export const settlementsModule = defineModule({
   name: 'settlements',
-  dependsOn: ['authorization', 'auth-hrm', 'hrm', 'travel-master', 'agreements', 'payments', 'audit', 'approval', 'files', 'notifications'],
+  dependsOn: ['authorization', 'auth-hrm', 'hrm', 'travel-master', 'agreements', 'payments', 'audit', 'approval', 'files', 'notifications', 'dashboard'],
   migrations: settlementsMigrations,
   permissions: { settlement: ['read', 'export'] },
+  dashboardStats: settlementStats,
+  dashboardWidgets: ['settlements_overdue', 'settlements_to_file'],
   lists: { settlements: { fields: settlementFields } },
   // No permission: members file the settlements of their own trips.
   menus: [

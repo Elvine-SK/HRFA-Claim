@@ -436,6 +436,27 @@ export const dueAgreementRows = () =>
     .where('a.hasAdvance', '=', true)
     .where((eb) => eb.or([eb('s.id', 'is', null), eb('s.status', '=', 'draft')]))
 
+/** The caller's due agreements (as a member), for "to file" on the dashboard. */
+export const toFileRows = (eid: string) =>
+  dueAgreementRows().where(({ exists, selectFrom }) =>
+    exists(
+      selectFrom('agreementMembers as me').select('me.id').whereRef('me.agreementId', '=', 'a.id').where('me.eid', '=', eid),
+    ),
+  )
+
+/** The "to file" page with each due date and lateness. */
+export async function toFileOf(rows: OverdueRow[], lang: string, today = todayHrm()) {
+  return (await overdueOf(rows, lang)).map((r) => ({
+    agreementId: r.agreementId,
+    ref: r.ref,
+    docNo: r.docNo,
+    travelTo: r.travelTo,
+    dueDate: r.dueDate,
+    settlementId: r.settlementId,
+    isLate: today > r.dueDate,
+  }))
+}
+
 /** The overdue list's rows before scope: due agreements that returned on or before `cutoff` (`overdueCutoff`). */
 export const overdueRows = (cutoff: string) => dueAgreementRows().where('a.travelTo', '<=', cutoff)
 

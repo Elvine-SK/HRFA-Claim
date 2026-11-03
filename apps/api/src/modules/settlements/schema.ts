@@ -181,6 +181,19 @@ export const OverdueSchema = z
   })
   .openapi('SettlementOverdue')
 
+export const ToFileSchema = z
+  .object({
+    agreementId: z.string().uuid(),
+    ref: z.string(),
+    docNo: z.string(),
+    travelTo: z.string(),
+    dueDate: z.string(),
+    /** The draft, when one was started. */
+    settlementId: z.string().uuid().nullable(),
+    isLate: z.boolean(),
+  })
+  .openapi('SettlementToFile')
+
 /** Filters and sort of the overdue list (agreements as `a`). */
 export const overdueFields: FieldMap = {
   ref: { type: 'string', column: 'a.ref', sortable: true, searchable: true },

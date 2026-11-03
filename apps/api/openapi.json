@@ -5513,6 +5513,52 @@
           "agreementId"
         ]
       },
+      "AgreementWithoutPayment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ref": {
+            "type": "string"
+          },
+          "docNo": {
+            "type": "string"
+          },
+          "formType": {
+            "type": "string",
+            "enum": [
+              "domestic",
+              "district",
+              "overseas",
+              "border"
+            ]
+          },
+          "subject": {
+            "type": "string"
+          },
+          "travelFrom": {
+            "type": "string"
+          },
+          "travelTo": {
+            "type": "string"
+          },
+          "branchCode": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "ref",
+          "docNo",
+          "formType",
+          "subject",
+          "travelFrom",
+          "travelTo",
+          "branchCode"
+        ]
+      },
       "PaymentLookup": {
         "type": "object",
         "properties": {
@@ -6154,6 +6200,46 @@
           "holderEid",
           "holderName",
           "settlementId"
+        ]
+      },
+      "SettlementToFile": {
+        "type": "object",
+        "properties": {
+          "agreementId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ref": {
+            "type": "string"
+          },
+          "docNo": {
+            "type": "string"
+          },
+          "travelTo": {
+            "type": "string"
+          },
+          "dueDate": {
+            "type": "string"
+          },
+          "settlementId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "isLate": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "agreementId",
+          "ref",
+          "docNo",
+          "travelTo",
+          "dueDate",
+          "settlementId",
+          "isLate"
         ]
       },
       "SettlementDraft": {
@@ -16407,7 +16493,7 @@
         "tags": [
           "Transfers"
         ],
-        "summary": "Start a CSV import (`dryRun=true` only validates)",
+        "summary": "Start a CSV import (`dryRun=true` only validates; `target` for entities that import into one)",
         "parameters": [
           {
             "schema": {
@@ -16428,6 +16514,16 @@
             },
             "required": false,
             "name": "dryRun",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "required": false,
+            "name": "target",
             "in": "query"
           }
         ],
@@ -19496,6 +19592,108 @@
         }
       }
     },
+    "/api/v1/payments/agreements-without-payment": {
+      "get": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Approved agreements with no payment yet, for Finance of their branch (dashboard, spec §14)",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "1"
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "example": "20"
+            },
+            "required": false,
+            "name": "pageSize",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "example": "-createdAt"
+            },
+            "required": false,
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "q",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Agreements",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AgreementWithoutPayment"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PageMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/payments/lookup": {
       "get": {
         "tags": [
@@ -20498,6 +20696,98 @@
           },
           "403": {
             "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/settlements/to-file": {
+      "get": {
+        "tags": [
+          "Settlements"
+        ],
+        "summary": "The caller's agreements whose advance is paid and whose settlement is not submitted yet (dashboard)",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "1"
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "example": "20"
+            },
+            "required": false,
+            "name": "pageSize",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "example": "-createdAt"
+            },
+            "required": false,
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "q",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "To file",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/SettlementToFile"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PageMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
             "content": {
               "application/json": {
                 "schema": {
