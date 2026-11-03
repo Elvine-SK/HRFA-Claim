@@ -54,6 +54,27 @@ describe('PDF renderer', () => {
     expect(pageCount(pdf)).toBeGreaterThan(1)
   })
 
+  it('keeps the five signature boxes of a settlement on one page', async () => {
+    const boxes = Array.from({ length: 5 }, (_, i) => ({ role: `Role ${i}`, name: 'A', date: '03/11/2026' }))
+    // Fill the page a little more each time, so some run leaves room for one row of boxes only.
+    for (let n = 1; n <= 40; n++) {
+      const pages: number[] = []
+      await renderPdf(
+        {
+          title: 'T',
+          mark: null,
+          date: '03/11/2026',
+          blocks: [
+            { kind: 'table', columns: [{ header: 'No.', width: 515 }], rows: Array.from({ length: n }, (_, i) => [String(i)]) },
+            { kind: 'signatures', boxes },
+          ],
+        },
+        { onSignatureRow: (page) => pages.push(page) },
+      )
+      expect(new Set(pages).size, `${n} rows`).toBe(1)
+    }
+  })
+
   it('renders a one-page form', async () => {
     const pdf = await renderPdf({ title: 'T', mark: null, date: '01/01/2026', blocks: [{ kind: 'title', text: 'x' }] })
     expect(pageCount(pdf)).toBe(1)

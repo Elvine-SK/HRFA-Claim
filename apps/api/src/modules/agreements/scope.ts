@@ -80,7 +80,17 @@ export async function scopedAgreements<O>(
   qb: SelectQueryBuilder<any, any, O>,
 ): Promise<ScopedSelect<O>> {
   const scope = await callerScope(ctx, c)
-  if (scope.kind === 'branch') qb = qb.where('a.branchCode', '=', scope.branch)
+  const me = scope.kind === 'all' ? null : await caller(ctx, c)
+  // A member always reads the trips they are on, also those of another branch than their role's.
+  const isMember = (eb: any) =>
+    eb.exists(
+      eb
+        .selectFrom('agreementMembers as m')
+        .select('m.id')
+        .whereRef('m.agreementId', '=', 'a.id')
+        .where('m.eid', '=', me?.eid ?? ''),
+    )
+  if (scope.kind === 'branch') qb = qb.where((eb) => eb.or([eb('a.branchCode', '=', scope.branch), isMember(eb)]))
   if (scope.kind === 'own') {
     const { userId, eid } = scope
     qb = qb.where((eb) =>
@@ -107,7 +117,11 @@ export async function mayRead(
 ): Promise<boolean> {
   const scope = await callerScope(ctx, c)
   if (scope.kind === 'all') return true
-  if (scope.kind === 'branch') return row.branchCode === scope.branch
+  if (scope.kind === 'branch') {
+    if (row.branchCode === scope.branch) return true
+    const { eid } = await caller(ctx, c)
+    return eid !== null && row.memberEids.includes(eid)
+  }
   return row.createdBy === scope.userId || (scope.eid !== null && row.memberEids.includes(scope.eid))
 }
 

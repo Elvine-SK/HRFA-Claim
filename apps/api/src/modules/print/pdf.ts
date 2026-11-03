@@ -20,7 +20,8 @@ export type Block =
   | { kind: 'title'; text: string }
   | { kind: 'fields'; rows: [label: string, value: string][] }
   | { kind: 'checks'; label: string; options: { text: string; checked: boolean }[] }
-  | { kind: 'table'; columns: Column[]; rows: string[][]; footer?: string[][] }
+  /** `size`: the font size of the table, default 10 (the members table of forms 1–4 needs 8 to fit its columns). */
+  | { kind: 'table'; columns: Column[]; rows: string[][]; footer?: string[][]; size?: number }
   | { kind: 'signatures'; boxes: { role: string; name: string; date: string }[] }
   | { kind: 'note'; text: string }
 
@@ -269,18 +270,37 @@ function drawChecks(doc: Doc, label: string, options: { text: string; checked: b
   return y + LINE + 6
 }
 
-function drawTable(doc: Doc, columns: Column[], rows: string[][], footer: string[][], y: number): number {
+type TableBlock = Extract<Block, { kind: 'table' }>
+
+/** Column widths of a table, scaled down to the page when they add up to more. */
+function widthsOf(columns: Column[]): number[] {
   const total = columns.reduce((s, c) => s + c.width, 0)
   const scale = total > CONTENT_WIDTH ? CONTENT_WIDTH / total : 1
-  const widths = columns.map((c) => c.width * scale)
+  return columns.map((c) => c.width * scale)
+}
+
+/** The number of lines each body cell of `table` takes, row by row (for tests of a layout's column widths). */
+export function cellLineCounts(table: TableBlock): number[][] {
+  const doc = new PDFDocument({ size: 'A4', margin: PAGE.margin, autoFirstPage: false })
+  for (const [name, data] of Object.entries(loadFonts())) doc.registerFont(name, data)
+  const widths = widthsOf(table.columns)
+  const size = table.size ?? SIZE
+  return table.rows.map((r) => r.map((cell, i) => layout(doc, cell, widths[i]! - 2 * PAD, false, size).length))
+}
+
+function drawTable(doc: Doc, table: TableBlock, y: number): number {
+  const { columns, rows } = table
+  const footer = table.footer ?? []
+  const size = table.size ?? SIZE
+  const widths = widthsOf(columns)
   const rowHeight = (cells: string[], bold: boolean) =>
-    Math.max(...cells.map((cell, i) => heightOf(doc, cell, { width: widths[i]! - 2 * PAD, bold }))) + 2 * PAD
+    Math.max(...cells.map((cell, i) => heightOf(doc, cell, { width: widths[i]! - 2 * PAD, bold, size }))) + 2 * PAD
   const drawRow = (cells: string[], top: number, h: number, bold: boolean, fill: boolean) => {
     let x = PAGE.margin
     cells.forEach((cell, i) => {
       if (fill) doc.save().rect(x, top, widths[i]!, h).fill('#eeeeee').restore()
       doc.lineWidth(0.6).rect(x, top, widths[i]!, h).stroke()
-      draw(doc, cell, x + PAD, top + PAD, { width: widths[i]! - 2 * PAD, align: columns[i]!.align, bold })
+      draw(doc, cell, x + PAD, top + PAD, { width: widths[i]! - 2 * PAD, align: columns[i]!.align, bold, size })
       x += widths[i]!
     })
   }
@@ -303,14 +323,20 @@ function drawTable(doc: Doc, columns: Column[], rows: string[][], footer: string
   return y + 10
 }
 
-function drawSignatures(doc: Doc, boxes: { role: string; name: string; date: string }[], y: number): number {
+function drawSignatures(
+  doc: Doc,
+  boxes: { role: string; name: string; date: string }[],
+  y: number,
+  onRow?: (page: number) => void,
+): number {
   const perRow = Math.min(3, Math.max(1, boxes.length))
   const width = CONTENT_WIDTH / perRow
   const height = LINE * 2 + 40 + LINE * 2
+  // The whole block moves to the next page when it does not fit: the boxes are signed together.
+  y = room(doc, y, Math.ceil(boxes.length / perRow) * (height + 6))
   for (let i = 0; i < boxes.length; i += perRow) {
     const row = boxes.slice(i, i + perRow)
-    // A row of boxes never splits across a page.
-    y = room(doc, y, height)
+    onRow?.(doc.bufferedPageRange().count - 1)
     row.forEach((b, k) => {
       const x = PAGE.margin + k * width
       draw(doc, b.role, x, y, { width: width - PAD, align: 'center', bold: true })
@@ -332,8 +358,8 @@ function drawNote(doc: Doc, text: string, y: number): number {
   return y + h + 6
 }
 
-/** The model as an A4 PDF file. */
-export function renderPdf(model: PrintModel): Promise<Uint8Array> {
+/** The model as an A4 PDF file. `onSignatureRow` hears the page of each row of signature boxes (for tests). */
+export function renderPdf(model: PrintModel, trace: { onSignatureRow?: (page: number) => void } = {}): Promise<Uint8Array> {
   const f = loadFonts()
   const doc = new PDFDocument({ size: 'A4', margin: PAGE.margin, bufferPages: true, info: { Title: model.title } })
   for (const [name, data] of Object.entries(f)) doc.registerFont(name, data)
@@ -360,8 +386,8 @@ export function renderPdf(model: PrintModel): Promise<Uint8Array> {
     if (b.kind === 'title') y = drawTitle(doc, b.text, y)
     else if (b.kind === 'fields') y = drawFields(doc, b.rows, y)
     else if (b.kind === 'checks') y = drawChecks(doc, b.label, b.options, y)
-    else if (b.kind === 'table') y = drawTable(doc, b.columns, b.rows, b.footer ?? [], y)
-    else if (b.kind === 'signatures') y = drawSignatures(doc, b.boxes, y)
+    else if (b.kind === 'table') y = drawTable(doc, b, y)
+    else if (b.kind === 'signatures') y = drawSignatures(doc, b.boxes, y, trace.onSignatureRow)
     else y = drawNote(doc, b.text, y)
   }
 

@@ -6,7 +6,7 @@ import { join } from 'node:path'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { findAgreement, membersOf, type AgreementRow, type MemberRow } from '../src/modules/agreements/queries.ts'
 import { agreementPrintModel } from '../src/modules/print/agreement.ts'
-import { renderPdf, type Block } from '../src/modules/print/pdf.ts'
+import { cellLineCounts, renderPdf, type Block } from '../src/modules/print/pdf.ts'
 import { signersOf } from '../src/modules/print/signers.ts'
 import { approve, approvedAgreement, createWorkflow, domesticBodies, roleIds } from './agreement-fixtures.ts'
 import { adminClient, API, bootApp, hrmClient } from './helpers.ts'
@@ -86,6 +86,26 @@ describe.skipIf(!dbTestsEnabled)('agreement PDF (forms 1–4)', () => {
     expect(block(model.blocks, 'table').rows[1]!.at(-2)).toBe('0131-USD')
   })
 
+  it('keeps dates, accounts and IDs on one line in the members table', async () => {
+    for (const body of [team(), team({ formType: 'overseas', countryIso2: 'FR', fromProvinceCode: undefined, toProvinceCode: undefined })]) {
+      const draft = await hr.post(`${API}/agreements`, body)
+      expect(draft.status, JSON.stringify(draft.body)).toBe(201)
+      const { agreement, members } = await rowsOf(draft.body.data.id)
+      // Thirteen-digit accounts, as the bank's are.
+      const real = members.map((m) => ({ ...m, accountLak: '0101000000001', accountUsd: '0101000000002' }))
+      const model = agreementPrintModel({ agreement, members: real, place: 'x', signers: none, today: '2026-11-03' })
+      const table = block(model.blocks, 'table')
+      const counts = cellLineCounts(table)
+      const oneLine = table.columns
+        .map((c, i) => [c.header, i] as const)
+        .filter(([h]) => /User ID|Code Rank|Account|ເດີນທາງ|ຈຳນວນ/.test(h))
+        .map(([, i]) => i)
+      for (const row of counts) for (const i of oneLine) expect(row[i], table.columns[i]!.header).toBe(1)
+      // The holder's cell breaks at its space, not inside a word.
+      expect(Math.max(...counts.map((r) => r.at(-1)!))).toBeLessThanOrEqual(2)
+    }
+  })
+
   it('renders forty members on several pages', async () => {
     const draft = await hr.post(`${API}/agreements`, team())
     const { agreement, members } = await rowsOf(draft.body.data.id)
@@ -121,5 +141,18 @@ describe.skipIf(!dbTestsEnabled)('agreement PDF (forms 1–4)', () => {
     // A member at another branch reads it; that branch's Finance does not.
     expect((await platform.app.request(`${API}/agreements/${a.id}/pdf`, { headers: member.rawHeaders() })).status).toBe(200)
     expect((await platform.app.request(`${API}/agreements/${a.id}/pdf`, { headers: brFinance.rawHeaders() })).status).toBe(404)
+  })
+
+  it('lets a member with a role at another branch open the agreement they travel on', async () => {
+    // 10130 is a finance officer at 888050 (branch scope) and travels on this 888010 trip: their reminder links here.
+    const a = await approvedAgreement(
+      platform,
+      hr,
+      domestic({ members: [{ eid: '10127', isLeader: true }, { eid: '10130' }] }),
+    )
+    expect((await brFinance.get(`${API}/agreements/${a.id}`)).status).toBe(200)
+    expect((await platform.app.request(`${API}/agreements/${a.id}/pdf`, { headers: brFinance.rawHeaders() })).status).toBe(200)
+    const list = await brFinance.get(`${API}/agreements?pageSize=100`)
+    expect(list.body.data.map((r: any) => r.id)).toContain(a.id)
   })
 })

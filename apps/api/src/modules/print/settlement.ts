@@ -117,8 +117,9 @@ export function settlementPrintModel(input: {
       { text: 'ໃບບິນ', checked: lines.some((l) => l.receiptFileId) },
     ],
   })
-  // Step 2 is skipped when the filer is the only leader: the group's box is then the filer's.
-  const group = signers.steps.leader ?? signers.submittedBy
+  // Step 2 is skipped (no leader EID) when the filer is the only leader: the group's box is then the filer's.
+  // Otherwise it stays empty until the leader or deputy approves.
+  const group = s.leaderEid ? signers.steps.leader : signers.submittedBy
   const box = (role: string, signer: { name: string; date: string } | null | undefined) => ({
     role,
     name: signer?.name ?? '',

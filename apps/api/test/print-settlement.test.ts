@@ -134,6 +134,29 @@ describe.skipIf(!dbTestsEnabled)('settlement PDF (forms 5–6)', () => {
     expect(block(model.blocks, 'note').text).toContain('sick')
   })
 
+  it("leaves the travel group's box empty until the leader signs", async () => {
+    const { settlement, agreement, members } = await filed(team())
+    const filer = { name: 'ຜູ້ສະຫຼຸບ A', date: '04/11/2026' }
+    const groupOf = (leaderEid: string | null, steps: Record<string, { name: string; date: string }>) =>
+      block(
+        settlementPrintModel({
+          settlement: { ...settlement, leaderEid },
+          lines: [],
+          totals: totalsOfRow(settlement, []),
+          agreement,
+          members,
+          place: 'x',
+          signers: { submittedBy: filer, steps },
+          today: '2026-11-04',
+        }).blocks,
+        'signatures',
+      ).boxes[0]!
+    expect(groupOf('10127', {}).name).toBe('')
+    expect(groupOf('10127', { leader: { name: 'L', date: '05/11/2026' } }).name).toBe('L')
+    // No step 2 (the filer is the only leader): the filer signs for the group.
+    expect(groupOf(null, {}).name).toBe('ຜູ້ສະຫຼຸບ A')
+  })
+
   it('renders thirty long lines on several pages', async () => {
     const { settlement, agreement, members } = await filed(team())
     const lines = Array.from({ length: 30 }, () => line({ description: 'ຄ່າໃຊ້ຈ່າຍ '.repeat(27).slice(0, 300) }))

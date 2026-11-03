@@ -94,22 +94,24 @@ export function agreementPrintModel(input: {
     },
     {
       kind: 'table',
+      // 8 pt and these widths (515 pt in all) keep a date, a 13-digit account and an EID on one line each.
+      size: 8,
       columns: [
-        { header: 'ລຳດັບ\nNo.', width: 30 },
-        { header: 'ລະຫັດ\nUser ID', width: 40 },
-        { header: 'ຊື່ ແລະ ນາມສະກຸນ\nFull Name', width: overseas ? 105 : 85 },
-        { header: 'ຕຳແໜ່ງງານ\nPosition', width: overseas ? 80 : 60 },
-        { header: 'ພາກສ່ວນ\nDepartment', width: overseas ? 85 : 60 },
-        { header: 'Code Rank', width: 35 },
-        { header: 'Account Number', width: overseas ? 85 : 65 },
+        { header: 'ລຳດັບ\nNo.', width: 24 },
+        { header: 'ລະຫັດ\nUser ID', width: 34 },
+        { header: 'ຊື່ ແລະ ນາມສະກຸນ\nFull Name', width: overseas ? 110 : 55 },
+        { header: 'ຕຳແໜ່ງງານ\nPosition', width: overseas ? 85 : 50 },
+        { header: 'ພາກສ່ວນ\nDepartment', width: overseas ? 87 : 57 },
+        { header: 'Code Rank', width: 30 },
+        { header: 'Account Number', width: 84 },
         ...(overseas
           ? []
           : [
-              { header: 'ວັນທີ\nເດີນທາງໄປ', width: 50 },
-              { header: 'ວັນທີ\nເດີນທາງກັບ', width: 50 },
-              { header: 'ຈຳນວນວັນ', width: 30, align: 'right' as const },
+              { header: 'ວັນທີ\nເດີນທາງໄປ', width: 54 },
+              { header: 'ວັນທີ\nເດີນທາງກັບ', width: 54 },
+              { header: 'ຈຳນວນ\nວັນ', width: 30, align: 'right' as const },
             ]),
-        { header: 'Advance Holder', width: overseas ? 55 : 45 },
+        { header: 'Advance Holder', width: overseas ? 61 : 43 },
       ],
       rows: members.map((m, i) => [
         String(i + 1),
