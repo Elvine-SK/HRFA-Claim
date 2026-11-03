@@ -520,6 +520,11 @@ Assumptions the build follows unless corrected:
     settlement file books the holding entry; Finance types CORE's suspense number (`RVS_NO`) when marking it
     posted; the clearing file (DR 2361800001 / CR 1362220001) carries it. Border settlements do not.
 18. The member who submits a settlement is its filer; step 2 refuses that member's own EID.
+19. Settlement reminders (in the app): "due" from the day after return, "due today" on the due date, "overdue" on
+    the first working day after it and every 5 working days, to the members who have signed in; missed days are not
+    caught up (project owner, 2026-11-03).
+20. Printable views are PDF files drawn by the API (A4, Noto Sans Lao and Noto Sans), laid out like the sheets of
+    `3. Format form HRM.xlsx`, with the signers taken from the approval history (project owner, 2026-11-03).
 
 Needed from the business (working answers for questions 3, 4, 6, 7, 9 and 14, given by the project owner on
 2026-10-29 for plan 4, and for questions 5 and 8, given on 2026-11-02 for plan 5, are in `HANDOFF.md` "Plan 4
@@ -568,4 +573,5 @@ Needed from HRM and IT:
 4. Payment calculation, checking table, upload file. Needs business questions 3, 4, 6, 7, 9 and 14.
 5. Settlement with approval chain and posting batch. Needs business questions 5 and 8. **Done** (plan 5, with
    working answers to questions 5 and 8).
-6. Dashboard, reminders, printable views, transit form.
+6. Dashboard, reminders, printable views. **Done** (plan 6). The transit form waits for business question 13
+   (plan 7).

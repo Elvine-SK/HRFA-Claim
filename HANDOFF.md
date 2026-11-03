@@ -1,11 +1,12 @@
-# Handoff — hr-fam (2026-10-29)
+# Handoff — hr-fam (2026-11-04)
 
 Travel payment app for BCEL on nelvine-platform. Working name "HR-FAM" until the business names it (ຂ9).
-**Plans 1–5 are built** (local git only): plan 1 the app scaffold, the HRM read layer and sign-in from HRM;
+**Plans 1–6 are built** (local git only): plan 1 the app scaffold, the HRM read layer and sign-in from HRM;
 plan 2 the master data and the PM2 bundle; plan 3 the agreements (forms 1–4, REF, Doc.no, approval, cancel);
 plan 4 the payments (calculation, checking table, approval, posting batch and upload file); plan 5 the advance
-settlement (forms 5–6, approval chain, settlement and clearing files).
-Next: plan 6 (dashboard, reminders, printable views, transit form).
+settlement (forms 5–6, approval chain, settlement and clearing files); plan 6 the dashboard, settlement reminders,
+PDF forms 1–6 and the carried fixes.
+Next: plan 7 (the transit form of regulation 4.7, once the business supplies its layout: question 13).
 
 ## Start here
 
@@ -20,7 +21,8 @@ Next: plan 6 (dashboard, reminders, printable views, transit form).
   [plan 2](docs/superpowers/plans/2026-10-21-plan-2-master-data.md),
   [plan 3](docs/superpowers/plans/2026-10-29-plan-3-agreements.md),
   [plan 4](docs/superpowers/plans/2026-10-29-plan-4-payments.md),
-  [plan 5](docs/superpowers/plans/2026-11-02-plan-5-settlements.md). **Next:** write plan 6.
+  [plan 5](docs/superpowers/plans/2026-11-02-plan-5-settlements.md),
+  [plan 6](docs/superpowers/plans/2026-11-03-plan-6-dashboard-reminders-print.md). **Next:** plan 7 (transit form).
 - **HRM team kit:** [`docs/hrm-handoff.md`](docs/hrm-handoff.md) (handoff table, redirect script, grants, errors).
 
 ## Run it
@@ -32,7 +34,7 @@ pnpm install && pnpm migrate
 pnpm dev:api                         # :3335
 pnpm dev:web                         # :3336
 tooling/deploy/bundle.sh --hrm-login-url <URL>   # build/hr-fam-<sha>.tar.gz for the testing server
-RUN_DB_TESTS=1 pnpm test             # 264 tests; the test DBs are built on :3308 by global-setup
+RUN_DB_TESTS=1 pnpm test             # 300 tests; the test DBs are built on :3308 by global-setup
 ```
 
 `http://localhost:3335/api/v1/auth/hrm?code=valid-10001` signs in as fixture employee `10001` once per load of the
@@ -198,6 +200,32 @@ Reviews: a security review of the sign-in (0 Critical, 5 Important, all fixed) a
 - Not checked in a browser yet: the dev `.env` points at another database and HRM. Try the settlement screens in en
   and lo, domestic and overseas through the clearing file.
 
+## What plan 6 built
+
+- Overdue cutoff: `latestReturnFor` (`shared/dates.ts`) and `overdueCutoff()` give the latest return date that is
+  overdue today, so `GET /settlements/overdue` filters in SQL and pages exactly (one holidays read).
+- Reminders (spec §10, §13): job `settlements.reminders`, recurring every hour. Per due agreement (advance paid, no
+  settlement or a draft): `settlements.due` from the day after return, `settlements.due_today` on the due date,
+  `settlements.overdue` on the first working day after it and every 5 working days. Sent to the members who have
+  signed in once. Table `settlement_reminders` (unique agreement, kind, occurrence) makes reruns send nothing; missed
+  days are not caught up.
+- Dashboard: lists `GET /payments/agreements-without-payment` (Finance, branch scope) and `GET /settlements/to-file`
+  (the caller's trips); stats `payments.agreements_without_payment`, `settlements.overdue`, `settlements.to_file`;
+  widgets `agreements_without_payment`, `settlements_overdue`, `settlements_to_file` (web `plugins/app-widgets.ts`).
+  Migration `202611030200_settlements_widget_grants` grants `widget.*` per role (only missing rows).
+- PDF forms: module folder `print/` (plain functions, not a module). `pdf.ts` draws blocks with pdfkit 0.17.2 and
+  bundled Noto Sans Lao + Noto Sans (`print/fonts`, SIL OFL): Noto Sans Lao has no Latin, digits, `-` or `/`, so text
+  is split by script and laid out by the app (long Lao words break between letter clusters). `agreement.ts` (forms
+  1–4) and `settlement.ts` (forms 5–6) are pure models of the paper sheets; `signers.ts` reads who submitted and who
+  approved each step from the platform's approval tables. Routes `GET /agreements/{id}/pdf` and
+  `GET /settlements/{id}/pdf` (who may read the record; audited `*.printed`), "Print (PDF)" buttons on both pages.
+  Marks: `ຮ່າງ / DRAFT` before approval, `ຍົກເລີກ / CANCELLED` once cancelled.
+- Carried fixes: REMARK without double spaces; `posting.entry_invalid` for a GL entry without account, SEQ or name;
+  `posting.amount_negative`; a payment netting to zero is not exported; `settlements.not_member` (403) for a reader
+  who is not a member; submit errors inside the modal, stable line keys, "no payment" as info.
+- Test fixtures: people `10120`–`10129` (head office) and `10130`–`10131` (888050); Doc.no years 2037–2040.
+- Not checked in a browser yet (same dev `.env` problem as plan 5): the widgets, and the PDF downloads.
+
 ## Approach: app first, platform later
 
 nelvine-platform is at `1.0.0` and has none of the proposal's items released
@@ -233,9 +261,10 @@ PascalCase upstream columns do not survive `CamelCasePlugin`.
 | 3    | Agreements: forms 1–4, REF, Doc.no, approval             | Done         |
 | 4    | Payment calculation, checking table, upload file         | Done         |
 | 5    | Settlement, approval chain, posting batch                | Done         |
-| 6    | Dashboard, reminders, printable views, transit form      | To write     |
+| 6    | Dashboard, reminders, PDF forms, carried fixes           | Done         |
+| 7    | Transit form (regulation 4.7)                            | Waits on question 13 |
 
-Plan 6 is next. Write each plan when the previous one is done, so it can use the real code.
+Plan 7 is next, once the transit form's layout is supplied. Write each plan when the previous one is done, so it can use the real code.
 
 ## Decisions
 
@@ -302,7 +331,15 @@ Plan 5 working answers (user, 2026-11-02; to confirm with Finance, may change la
 - My calls: the overdue list is a filter of the settlements list (reminder notifications in plan 6); cancelling an
   agreement after its settlement is exported marks the settlement `cancelled_after_export`, like a payment.
 
-Carry into plan 6 (from plan 4, still open unless struck):
+Carry into plan 7 (struck where plan 6 did it):
+
+- The transit form (regulation 4.7, ກ9 item 3), when the business supplies its layout (question 13).
+- Plan 6 calls to confirm: the reminder days, the PDF signature boxes, the Lao wording of the case labels 2–4 on
+  forms 5–6 (cell B5 of the sheet is cut off), and that the Attach File line of forms 1–4 always ticks ຂໍ້ຕົກລົງ.
+- Still open from plan 5: draft cancel and a real request cancel untested; the role migration of plan 5 is not
+  idempotent; editor and overdue items are done (plan 6).
+
+Carried from plan 4 (still open unless struck):
 
 - Deferred minors of plan 4, grouped:
   - Calculation: `compareAmounts` in the meal cap can throw before the `amount_too_large` guard (unreachable with real

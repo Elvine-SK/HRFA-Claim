@@ -159,6 +159,18 @@ Once, after the first migration that includes plan 5:
 4. Overseas settlements that used money pass through 2361800001: after uploading the settlement file, Finance
    marks it posted with CORE's suspense number (`RVS_NO`), then creates the clearing file and marks that posted.
 
+## Dashboard, reminders and PDF forms
+
+From plan 6:
+
+- The migration `202611030200_settlements_widget_grants` gives each role its dashboard widgets (employees: stats,
+  approvals, settlements to file; Finance roles also agreements without payment and overdue settlements; HR roles
+  and management: stats and approvals). Change them in Administration → Roles (resource "Dashboard widgets").
+- The job `settlements.reminders` runs every hour (Administration → Jobs). It needs nothing set up; it sends a day's
+  reminders once, so a restart does not repeat them.
+- The PDF fonts are files under `apps/api/src/modules/print/fonts/` and travel in the bundle with `src`; the server
+  needs no font installed.
+
 ## Upgrade
 
 1. Unpack the new bundle (keep `apps/api/.env` and the files folder).
