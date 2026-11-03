@@ -273,8 +273,13 @@ export async function assertBillsComplete(id: string): Promise<void> {
 }
 
 /** 422 `payments.nothing_to_pay` when the payment has no items (e.g. the host pays everything). */
+/** No item, or items that net to zero in every currency (a deduction as large as the allowance): nothing to pay. */
+export function nothingToPay(items: { currency: string; amount: Amount }[]): boolean {
+  return Object.values(totalsOf(items)).every((t) => toCents(t.replace(/^-/, '')) === 0n)
+}
+
 export async function assertSomethingToPay(id: string): Promise<void> {
-  if ((await itemsOf(id)).length === 0)
+  if (nothingToPay(await itemsOf(id)))
     throw new AppError('payments.nothing_to_pay', 'The payment has nothing to pay', { status: 422 })
 }
 

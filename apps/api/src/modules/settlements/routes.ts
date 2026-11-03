@@ -64,7 +64,14 @@ import {
   SettlementVersionSchema,
   ToFileSchema,
 } from './schema.ts'
-import { isMember, maySeeSettlement, requireMember, requireSettlementExport, scopedSettlements } from './scope.ts'
+import {
+  isMember,
+  maySeeSettlement,
+  requireMember,
+  requireMemberToChange,
+  requireSettlementExport,
+  scopedSettlements,
+} from './scope.ts'
 
 const tags = ['Settlements']
 
@@ -262,7 +269,7 @@ export function settlementRoutes(api: ApiRouter, ctx: ModuleContext) {
       requireUser(c)
       const id = c.req.valid('param').id
       const row = await readable(ctx, c, id)
-      await requireMember(ctx, c, row.agreementId)
+      await requireMemberToChange(ctx, c, row.agreementId)
       const { version, caseKind, lines } = c.req.valid('json')
       await saveDraft(id, version, { caseKind, lines })
       return c.json({ data: await loadSettlement(id, lang(c)) }, 200)
@@ -283,7 +290,7 @@ export function settlementRoutes(api: ApiRouter, ctx: ModuleContext) {
       const { user } = requireUser(c)
       const id = c.req.valid('param').id
       const row = await readable(ctx, c, id)
-      const eid = await requireMember(ctx, c, row.agreementId)
+      const eid = await requireMemberToChange(ctx, c, row.agreementId)
       await submitSettlement(ctx, id, c.req.valid('json'), { userId: user.id, eid })
       return c.json({ data: await loadSettlement(id, lang(c)) }, 200)
     },

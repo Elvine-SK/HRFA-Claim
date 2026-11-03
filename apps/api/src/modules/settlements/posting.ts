@@ -1,5 +1,5 @@
 import { AppError } from '@elvine-sk/platform-core'
-import type { PostingMember, UploadLine } from '../payments/posting.ts'
+import { glEntryInvalid, type PostingMember, type UploadLine } from '../payments/posting.ts'
 import type { Currency, PostingEntry, ZoneKind } from '../travel-master/lookups.ts'
 import { fromCents, toCents, type Amount } from '../travel-master/money.ts'
 import type { Totals } from './totals.ts'
@@ -39,11 +39,12 @@ function linesFor(
     if (amount === 0n) continue
     const base = { ccy: currency, chequeNo: '', amount: fromCents(amount), side: e.side, remark }
     if (e.accountKind === 'gl') {
+      if (!e.gl || !e.seq || !e.glNameEn) throw glEntryInvalid(e.component)
       out[e.side].gl.push({
         ...base,
-        account: `${branch}${currency}${e.gl ?? ''}${e.seq ?? ''}`,
+        account: `${branch}${currency}${e.gl}${e.seq}`,
         branch,
-        name: e.glNameEn ?? '',
+        name: e.glNameEn,
         // The suspense number goes on the holding account's line of the clearing file only (ກ25).
         rvsNo: e.component === 'holding' && e.side === 'DR' ? (input.rvsNo ?? '') : '',
       })

@@ -210,7 +210,10 @@ describe.skipIf(!dbTestsEnabled)('settlements (submit and approval chain)', () =
 
   it('refuses a submission by someone who is not a member', async () => {
     const s = await drafted(holder)
-    expect((await finance.post(url(`/${s.id}/submit`), { version: s.version, leaderEid: '10102' })).status).toBe(404)
+    // Finance reads the settlement, so the refusal says why (plan 6; it was 404 before).
+    const res = await finance.post(url(`/${s.id}/submit`), { version: s.version, leaderEid: '10102' })
+    expect(res.status).toBe(403)
+    expect(res.body.error.code).toBe('settlements.not_member')
   })
 })
 

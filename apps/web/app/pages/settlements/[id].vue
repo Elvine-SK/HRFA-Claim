@@ -32,6 +32,8 @@ const { save, submit, exportFile, markPosted, exportClearing, markCleared, downl
 
 // The lines as typed: strings the API takes, refilled from the server unless there are unsaved edits.
 interface LineDraft {
+  /** Stable for the list's `:key`, so removing a line keeps each field with its own line. */
+  key: number
   description: string
   expenseType: 'fuel' | 'fare' | undefined
   currency: string
@@ -46,7 +48,9 @@ const NONE = 'none'
 const lines = ref<LineDraft[]>([])
 const caseKind = ref<CaseKind | undefined>(undefined)
 const dirty = ref(false)
+let nextKey = 0
 const toDraft = (l: SettlementLine): LineDraft => ({
+  key: nextKey++,
   description: l.description,
   expenseType: l.expenseType ?? undefined,
   currency: l.currency,
@@ -74,6 +78,7 @@ function fill(x: Settlement) {
 const reset = () => s.value && fill(s.value)
 function addLine() {
   lines.value.push({
+    key: nextKey++,
     description: '',
     expenseType: undefined,
     currency: s.value?.currency ?? 'LAK',
@@ -134,20 +139,28 @@ const submitting = ref(false)
 const leaderEid = ref('')
 const lateReason = ref('')
 const leaderItems = computed(() => (s.value?.candidates ?? []).map((c) => ({ label: `${c.name} (${c.eid})`, value: c.eid })))
+// The submit modal shows its own error: a toast would sit behind it.
+const submitError = ref<string | null>(null)
+watch(submitting, () => (submitError.value = null))
 async function onSubmit() {
   const x = s.value
   if (!x) return
-  const done = await run(
-    () =>
-      submit.mutateAsync({
-        id: x.id,
-        version: x.version,
-        leaderEid: leaderEid.value || undefined,
-        lateReason: lateReason.value.trim() || undefined,
-      }),
-    t('settlements.detail.submitted'),
-  )
-  if (done) submitting.value = false
+  form.clear()
+  submitError.value = null
+  try {
+    await submit.mutateAsync({
+      id: x.id,
+      version: x.version,
+      leaderEid: leaderEid.value || undefined,
+      lateReason: lateReason.value.trim() || undefined,
+    })
+    notify.success(t('settlements.detail.submitted'))
+    submitting.value = false
+  } catch (error) {
+    // Line problems also mark their fields, seen once the modal is closed.
+    form.apply(error, known.value)
+    submitError.value = notify.messageOf(error)
+  }
 }
 
 async function onExport() {
@@ -312,7 +325,7 @@ const remainingText = computed(() => {
 
           <div v-if="editable" class="grid gap-4 p-4">
             <p v-if="!lines.length" class="text-sm text-[var(--ui-text-muted)]">{{ t('settlements.lines.none') }}</p>
-            <div v-for="(l, n) in lines" :key="n" class="grid gap-3 rounded-md border border-default p-3 sm:grid-cols-2">
+            <div v-for="(l, n) in lines" :key="l.key" class="grid gap-3 rounded-md border border-default p-3 sm:grid-cols-2">
               <UFormField class="sm:col-span-2" :label="t('settlements.lines.description')" :error="fieldError(n, 'description')">
                 <UInput v-model="l.description" class="w-full" maxlength="300" />
               </UFormField>
@@ -447,6 +460,7 @@ const remainingText = computed(() => {
     <UModal v-model:open="submitting" :title="t('settlements.detail.submitTitle', { ref: s.ref })">
       <template #body>
         <div class="grid gap-3">
+          <UAlert v-if="submitError" color="error" variant="subtle" icon="i-lucide-circle-alert" :title="submitError" />
           <UFormField v-if="leaderItems.length" :label="t('settlements.field.leader')" :hint="t('settlements.detail.leaderHint')">
             <USelect v-model="leaderEid" class="w-full" :items="leaderItems" />
           </UFormField>

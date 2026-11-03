@@ -52,7 +52,7 @@ async function find() {
     if (found.paymentId) return await router.push(`/payments/${found.paymentId}`)
     const agreement = (await api<DataResponse<Agreement>>(`/agreements/${found.agreementId}`)).data
     if (agreement.status === 'approved' && canCalculate.value) pending.value = agreement
-    else notify.error(new Error(t('payments.list.noPayment', { ref: agreement.ref })))
+    else notify.info(t('payments.list.noPayment', { ref: agreement.ref }))
   } catch (error) {
     notify.error(error)
   }

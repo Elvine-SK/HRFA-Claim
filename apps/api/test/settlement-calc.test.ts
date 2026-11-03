@@ -241,5 +241,12 @@ describe('settlement upload lines', () => {
     expect(code(() => buildSettlementLines({ ...base, entries: OVERSEAS, holder: { ...holder, accountUsd: null } }))).toBe(
       'posting.account_missing',
     )
+    const noGl = OVERSEAS.map((e) => (e.component === 'holding' ? { ...e, gl: null } : e))
+    expect(code(() => buildSettlementLines({ ...base, entries: noGl }))).toBe('posting.entry_invalid')
+    expect(
+      code(() =>
+        buildClearingLines({ currency: 'USD', holding: '600.00', entries: CLEARING.map((e) => ({ ...e, seq: null })), branch: '888010', remark: 'R', rvsNo: 'S' }),
+      ),
+    ).toBe('posting.entry_invalid')
   })
 })

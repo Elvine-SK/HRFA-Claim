@@ -50,6 +50,24 @@ function entryInvalid(component: string): AppError {
   })
 }
 
+/** A GL entry without its account, SEQ or English name cannot make a line of the upload file. */
+export function glEntryInvalid(component: string): AppError {
+  const message = `The GL entry of "${component}" has no account, SEQ or name`
+  return new AppError('posting.entry_invalid', message, {
+    status: 422,
+    details: [{ path: 'entries', code: 'posting.entry_invalid', message }],
+  })
+}
+
+/** A component whose items sum below zero (a deduction larger than what it lowers). */
+export function amountNegative(component: string, total: bigint): AppError {
+  const message = `The total of "${component}" is below zero: ${fromCents(total)}`
+  return new AppError('posting.amount_negative', message, {
+    status: 422,
+    details: [{ path: 'items', code: 'posting.amount_negative', message }],
+  })
+}
+
 function accountMissing(eid: string, ccy: Currency): AppError {
   const message = `Member ${eid} has no ${ccy} account to post to`
   return new AppError('posting.account_missing', message, {
@@ -96,11 +114,13 @@ export function buildPaymentLines(input: {
     for (const ccy of CURRENCIES) {
       const total = byComponent.get(`${e.component}|${ccy}`) ?? 0n
       if (total === 0n) continue
-      if (total < 0n || !fitsAmount(fromCents(total))) throw tooLarge(total)
+      if (total < 0n) throw amountNegative(e.component, total)
+      if (!fitsAmount(fromCents(total))) throw tooLarge(total)
+      if (!e.gl || !e.seq || !e.glNameEn) throw glEntryInvalid(e.component)
       glLines[e.side].push({
-        account: `${branch}${ccy}${e.gl ?? ''}${e.seq ?? ''}`,
+        account: `${branch}${ccy}${e.gl}${e.seq}`,
         branch,
-        name: e.glNameEn ?? '',
+        name: e.glNameEn,
         ccy,
         chequeNo: '',
         amount: fromCents(total),
@@ -119,7 +139,8 @@ export function buildPaymentLines(input: {
       for (const ccy of CURRENCIES) {
         const total = components.reduce((s, c) => s + (byMember.get(`${c}|${ccy}|${eid}`) ?? 0n), 0n)
         if (total === 0n) continue
-        if (total < 0n || !fitsAmount(fromCents(total))) throw tooLarge(total)
+        if (total < 0n) throw amountNegative(components.join(', '), total)
+        if (!fitsAmount(fromCents(total))) throw tooLarge(total)
         const m = memberOf.get(eid)
         const account = ccy === 'LAK' ? m?.accountLak : m?.accountUsd
         if (!m || !account) throw accountMissing(eid, ccy)
@@ -160,6 +181,7 @@ export function paymentRemark(input: {
   const { zoneCode, leaderName, days, placeLo, docNo, travelFrom, travelTo, ref } = input
   return [zoneCode, leaderName, String(days), placeLo, docNo, `${dmy(travelFrom)}-${dmy(travelTo)}`, ref]
     .map((p) => p.trim())
+    .filter(Boolean)
     .join(' ')
 }
 

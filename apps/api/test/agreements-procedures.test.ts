@@ -107,6 +107,8 @@ describe.skipIf(!dbTestsEnabled)('agreement procedures', () => {
         .innerJoin('roles', 'roles.id', 'rolePermissions.roleId')
         .select('rolePermissions.permissionKey')
         .where('roles.key', '=', 'hr_officer')
+        // Dashboard widgets are granted by plan 6 (see dashboard.test.ts).
+        .where('rolePermissions.permissionKey', 'not like', 'widget.%')
         .execute(),
     )
     expect(keys.map((k) => k.permissionKey).sort()).toEqual([

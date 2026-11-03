@@ -67,6 +67,19 @@ export async function requireMember(ctx: ModuleContext, c: C, agreementId: strin
 }
 
 /**
+ * The caller's EID when they are a member of the trip, for changing or submitting its settlement. A reader who is
+ * not a member (Finance, a branch reader) gets 403 `settlements.not_member`: they see it but may not change it.
+ */
+export async function requireMemberToChange(ctx: ModuleContext, c: C, agreementId: string): Promise<string> {
+  const { eid } = await caller(ctx, c)
+  if (!eid || !(await isMember(agreementId, eid)))
+    throw new AppError('settlements.not_member', 'Only a member of the trip can change or submit its settlement', {
+      status: 403,
+    })
+  return eid
+}
+
+/**
  * `settlement.export` (the upload files and posting confirmations) for a settlement of `branchCode`: 403 without the
  * permission, 404 for another branch's settlement (head office works for every branch).
  */

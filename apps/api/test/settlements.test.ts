@@ -280,6 +280,18 @@ describe.skipIf(!dbTestsEnabled)('settlements (draft, lines, receipts)', () => {
     expect((await leader.get(url('/overdue'))).status).toBe(403)
   })
 
+  it('lets only members change or submit it, readers are refused with a reason', async () => {
+    const { settlement: s } = await filed(deputy)
+    // Finance at head office reads every settlement but is not on this trip.
+    expect((await finance.get(url(`/${s.id}`))).status).toBe(200)
+    const put = await finance.put(url(`/${s.id}`), { version: 1, lines: [] })
+    expect(put.status).toBe(403)
+    expect(put.body.error.code).toBe('settlements.not_member')
+    const submit = await finance.post(url(`/${s.id}/submit`), { version: 1 })
+    expect(submit.status).toBe(403)
+    expect(submit.body.error.code).toBe('settlements.not_member')
+  })
+
   it('pages the overdue list exactly', async () => {
     // Returned five calendar days ago: due today at the earliest, so never overdue yet.
     const today = todayHrm()

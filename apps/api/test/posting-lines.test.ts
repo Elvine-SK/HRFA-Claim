@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { PaymentItem } from '../src/modules/payments/calculate.ts'
 import { buildPaymentLines, paymentRemark, unbalancedCurrencies, type PostingMember } from '../src/modules/payments/posting.ts'
+import { nothingToPay } from '../src/modules/payments/queries.ts'
 import type { PostingEntry } from '../src/modules/travel-master/lookups.ts'
 
 const GL: Record<string, [string, string, string]> = {
@@ -109,6 +110,40 @@ describe('paymentRemark', () => {
         travelFrom: '2030-11-02', travelTo: '2030-11-05', ref: 'TA-2030-000004',
       }),
     ).toBe('D ວັນ ໄຊ 4 ຫຼວງພະບາງ 0101.BCEL.888010.2030 02/11/2030-05/11/2030 TA-2030-000004')
+  })
+  it('leaves out an empty part instead of doubling the space', () => {
+    expect(
+      paymentRemark({
+        zoneCode: 'D', leaderName: '', days: 4, placeLo: ' ', docNo: '0101.BCEL.888010.2030',
+        travelFrom: '2030-11-02', travelTo: '2030-11-05', ref: 'TA-2030-000004',
+      }),
+    ).toBe('D 4 0101.BCEL.888010.2030 02/11/2030-05/11/2030 TA-2030-000004')
+  })
+})
+
+describe('posting entries that cannot make a line', () => {
+  const code = (fn: () => unknown) => {
+    try {
+      fn()
+    } catch (e) {
+      return (e as { code: string }).code
+    }
+  }
+  it('refuses a GL entry without its account, SEQ or name', () => {
+    for (const broken of [{ gl: null }, { seq: null }, { glNameEn: null }]) {
+      const bad = entries.map((e) => (e.component === 'daily' && e.accountKind === 'gl' ? { ...e, ...broken } : e))
+      expect(
+        code(() => buildPaymentLines({ items: [item('E1', 'daily', 'LAK', '10')], entries: bad, members, branch: '888010', remark: 'R' })),
+      ).toBe('posting.entry_invalid')
+    }
+  })
+  it('refuses a total below zero', () => {
+    expect(code(() => build([item('E1', 'daily', 'LAK', '-10')]))).toBe('posting.amount_negative')
+  })
+  it('knows a payment that nets to nothing', () => {
+    expect(nothingToPay([])).toBe(true)
+    expect(nothingToPay([{ currency: 'LAK', amount: '100.00' }, { currency: 'LAK', amount: '-100.00' }])).toBe(true)
+    expect(nothingToPay([{ currency: 'LAK', amount: '100.00' }, { currency: 'USD', amount: '0.00' }])).toBe(false)
   })
 })
 
