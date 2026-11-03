@@ -9,6 +9,7 @@ const confirm = useConfirm()
 const id = computed(() => String(route.params.id))
 const settlement = useSettlement(id)
 const s = computed(() => settlement.data.value)
+const pdf = usePdf()
 useHead({ title: () => s.value?.ref ?? t('settlements.detail.title') })
 
 // Members file and edit the draft (ກ13): the caller's EID against the agreement's members.
@@ -247,6 +248,14 @@ const remainingText = computed(() => {
       <template #actions>
         <UBadge :color="SETTLEMENT_TONE[s.status]" variant="subtle" size="lg">{{ t(`settlements.status.${s.status}`) }}</UBadge>
         <UBadge v-if="s.isLate && isDraft" color="warning" variant="subtle" size="lg">{{ t('settlements.detail.late') }}</UBadge>
+        <UButton
+          icon="i-lucide-printer"
+          variant="soft"
+          color="neutral"
+          :loading="pdf.busy.value"
+          @click="pdf.download(`/settlements/${s.id}/pdf`, `${s.ref}-settlement.pdf`)"
+          >{{ t('settlements.detail.pdf') }}</UButton
+        >
         <UButton v-if="editable" icon="i-lucide-send" :disabled="dirty" @click="submitting = true">{{ t('settlements.detail.submit') }}</UButton>
         <UButton v-if="s.status === 'approved' && canExport" icon="i-lucide-file-spreadsheet" :loading="exportFile.isPending.value" @click="onExport">{{
           t('settlements.detail.export')

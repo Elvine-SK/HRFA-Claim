@@ -16,10 +16,15 @@ import {
   type ModuleContext,
   z,
 } from '@elvine-sk/platform-server'
-import { findAgreement, findByNumber } from '../agreements/queries.ts'
+import { todayHrm } from '../../shared/dates.ts'
+import { findAgreement, findByNumber, membersOf } from '../agreements/queries.ts'
 import { caller, callerScope, type C } from '../agreements/scope.ts'
 import { linesOf as batchLines } from '../payments/batches.ts'
 import { xlsxWriter } from '../payments/xlsx.ts'
+import { printPlace } from '../print/agreement.ts'
+import { pdfHeaders, renderPdf } from '../print/pdf.ts'
+import { settlementPrintModel } from '../print/settlement.ts'
+import { signersOf } from '../print/signers.ts'
 import { submitSettlement } from './approval.ts'
 import { batchOfKind, exportClearing, exportSettlement, markPosted } from './batches.ts'
 import { transition } from './procedures.ts'
@@ -27,6 +32,7 @@ import {
   canFile,
   createSettlement,
   findSettlement,
+  linesOf,
   liveSettlementOf,
   loadSettlement,
   overdueCutoff,
@@ -34,6 +40,7 @@ import {
   overdueRows,
   toFileOf,
   toFileRows,
+  totalsOfRow,
   saveDraft,
   settlementRows,
   toListItem,
@@ -199,6 +206,46 @@ export function settlementRoutes(api: ApiRouter, ctx: ModuleContext) {
       const id = c.req.valid('param').id
       await readable(ctx, c, id)
       return c.json({ data: await loadSettlement(id, lang(c)) }, 200)
+    },
+  )
+
+  api.openapi(
+    createRoute({
+      method: 'get',
+      path: '/settlements/{id}/pdf',
+      tags,
+      summary: 'The settlement as a PDF laid out like the paper form (forms 5–6), with its signers',
+      request: { params: IdParam },
+      responses: {
+        200: { description: 'PDF', content: { 'application/pdf': { schema: z.string().openapi({ format: 'binary' }) } } },
+        ...errorResponses(401, 404),
+      },
+    }),
+    async (c) => {
+      requireUser(c)
+      const row = await readable(ctx, c, c.req.valid('param').id)
+      const agreement = await findAgreement(row.agreementId)
+      if (!agreement) throw AppError.notFound()
+      const lines = await linesOf(row.id)
+      const pdf = await renderPdf(
+        settlementPrintModel({
+          settlement: row,
+          lines,
+          totals: totalsOfRow(row, lines),
+          agreement,
+          members: await membersOf(row.agreementId),
+          place: await printPlace(agreement),
+          signers: await signersOf('settlement', row.id),
+          today: todayHrm(),
+        }),
+      )
+      await getAudit(ctx).record({
+        action: 'settlements.printed',
+        targetType: 'settlement',
+        targetId: row.id,
+        details: { ref: row.ref },
+      })
+      return c.body(pdf as Uint8Array<ArrayBuffer>, 200, pdfHeaders(pdf, `${row.ref}-settlement.pdf`))
     },
   )
 

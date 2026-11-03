@@ -607,7 +607,8 @@
       "markCleared": "Mark clearing posted",
       "markClearedTitle": "Mark the clearing of {ref} as posted",
       "rvsHint": "The number CORE gave the holding entry; the clearing file needs it",
-      "postedDone": "Marked as posted"
+      "postedDone": "Marked as posted",
+      "pdf": "Print (PDF)"
     },
     "stats": {
       "overdue": "Settlements overdue",

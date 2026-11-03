@@ -133,6 +133,7 @@ export const settlementsModule = defineModule({
     'settlements.clearing_exported',
     'settlements.cleared',
     'settlements.downloaded',
+    'settlements.printed',
     'settlements.cancelled_after_export',
   ],
   messages,
