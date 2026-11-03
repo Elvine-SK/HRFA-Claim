@@ -227,6 +227,14 @@ export interface SettlementLinesTable {
   noReceiptReason: string | null
   rateProofFileId: string | null
 }
+export interface SettlementRemindersTable {
+  id: string
+  agreementId: string
+  kind: 'due' | 'due_today' | 'overdue'
+  occurrence: string
+  recipients: number
+  sentAt: Date
+}
 export interface PostingBatchesTable {
   id: string
   agreementId: string
@@ -308,6 +316,7 @@ export interface AppTables {
   postingBatches: PostingBatchesTable
   settlements: SettlementsTable
   settlementLines: SettlementLinesTable
+  settlementReminders: SettlementRemindersTable
   postingLines: PostingLinesTable
   roles: RolesTable
   rolePermissions: RolePermissionsTable

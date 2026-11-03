@@ -412,8 +412,11 @@ export async function loadSettlement(id: string, lang: string) {
 }
 
 
-/** The overdue list's rows before scope (`a` agreements, `p` payments, `m` the holder, `s` the live settlement). */
-export const overdueRows = (cutoff: string) =>
+/**
+ * Agreements whose settlement is due and not submitted (`a` agreements, `p` payments, `m` the holder, `s` the live
+ * settlement): an advance, its payment exported or posted, and no settlement or a draft one.
+ */
+export const dueAgreementRows = () =>
   appDb()
     .selectFrom('agreements as a')
     .innerJoin('payments as p', (j) => j.onRef('p.agreementId', '=', 'a.id').on('p.status', 'in', ['exported', 'posted']))
@@ -432,7 +435,9 @@ export const overdueRows = (cutoff: string) =>
     ])
     .where('a.hasAdvance', '=', true)
     .where((eb) => eb.or([eb('s.id', 'is', null), eb('s.status', '=', 'draft')]))
-    .where('a.travelTo', '<=', cutoff)
+
+/** The overdue list's rows before scope: due agreements that returned on or before `cutoff` (`overdueCutoff`). */
+export const overdueRows = (cutoff: string) => dueAgreementRows().where('a.travelTo', '<=', cutoff)
 
 export interface OverdueRow {
   agreementId: string

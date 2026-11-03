@@ -4,6 +4,7 @@ import { settlementApproval, settlementResolvers } from './approval.ts'
 import { cancelSettlementOf } from './batches.ts'
 import { keepReceipts, settlementFiles } from './files.ts'
 import { settlementsMigrations } from './migrations.ts'
+import { REMINDER_JOB, sendReminders } from './reminders.ts'
 import { settlementRoutes } from './routes.ts'
 import { settlementFields } from './schema.ts'
 
@@ -40,6 +41,12 @@ const messages = {
     'notify.settlements.returned.body': 'Correct it and submit it again.',
     'notify.settlements.cancelled_after_export.title': 'Settlement {ref} was cancelled after its upload file',
     'notify.settlements.cancelled_after_export.body': 'The agreement was cancelled: {reason}. No reversal file is made; settle it with the bank.',
+    'notify.settlements.due.title': 'Settlement of {ref} is due by {dueDate}',
+    'notify.settlements.due.body': 'Open the agreement and file the settlement.',
+    'notify.settlements.due_today.title': 'Settlement of {ref} is due today',
+    'notify.settlements.due_today.body': 'Open the agreement and file the settlement.',
+    'notify.settlements.overdue.title': 'Settlement of {ref} is overdue since {dueDate}',
+    'notify.settlements.overdue.body': 'Open the agreement and file the settlement.',
   },
   lo: {
     'settlements.bad_transition': 'ການສະສາງບໍ່ສາມາດປ່ຽນໄປເປັນສະຖານະນີ້ຈາກສະຖານະປັດຈຸບັນໄດ້',
@@ -73,6 +80,12 @@ const messages = {
     'notify.settlements.returned.body': 'ກະລຸນາແກ້ໄຂ ແລະ ສົ່ງໃໝ່.',
     'notify.settlements.cancelled_after_export.title': 'ການສະສາງ {ref} ຖືກຍົກເລີກຫຼັງສ້າງໄຟລ໌ອັບໂຫຼດ',
     'notify.settlements.cancelled_after_export.body': 'ສັນຍາຖືກຍົກເລີກ: {reason}. ບໍ່ມີໄຟລ໌ກັບລາຍການ; ໃຫ້ແກ້ໄຂກັບທະນາຄານ.',
+    'notify.settlements.due.title': 'ກະລຸນາສະສາງເງິນແຮ {ref} ພາຍໃນ {dueDate}',
+    'notify.settlements.due.body': 'ເປີດຂໍ້ຕົກລົງ ແລະ ສະສາງເງິນແຮ.',
+    'notify.settlements.due_today.title': 'ມື້ນີ້ແມ່ນມື້ສຸດທ້າຍ ສະສາງເງິນແຮ {ref}',
+    'notify.settlements.due_today.body': 'ເປີດຂໍ້ຕົກລົງ ແລະ ສະສາງເງິນແຮ.',
+    'notify.settlements.overdue.title': 'ການສະສາງເງິນແຮ {ref} ກາຍກຳນົດແລ້ວ ແຕ່ {dueDate}',
+    'notify.settlements.overdue.body': 'ເປີດຂໍ້ຕົກລົງ ແລະ ສະສາງເງິນແຮ.',
   },
 }
 
@@ -99,7 +112,17 @@ export const settlementsModule = defineModule({
   approvalEntities: [settlementApproval(ctx)],
   approvalResolvers: settlementResolvers,
   fileEntities: [settlementFiles(ctx)],
-  notificationTypes: { 'settlements.approved': {}, 'settlements.returned': {}, 'settlements.cancelled_after_export': {} },
+  notificationTypes: {
+    'settlements.approved': {},
+    'settlements.returned': {},
+    'settlements.cancelled_after_export': {},
+    'settlements.due': {},
+    'settlements.due_today': {},
+    'settlements.overdue': {},
+  },
+  jobs: [{ name: REMINDER_JOB, maxAttempts: 1, handler: async () => ({ sent: await sendReminders(ctx()) }) }],
+  // Hourly: a day's reminders go out within the hour after midnight HRM time, and a restart loses at most an hour.
+  recurringJobs: [{ name: REMINDER_JOB, job: REMINDER_JOB, every: '1h' }],
   auditActions: [
     'settlements.submitted_late',
     'settlements.exported',

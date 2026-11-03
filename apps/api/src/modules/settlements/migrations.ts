@@ -10,6 +10,7 @@ import {
   type Kysely,
   type MigrationSet,
 } from '@elvine-sk/platform-db'
+import { REMINDER_KINDS } from './reminders.ts'
 import { CASE_KINDS, EXPENSE_TYPES, SETTLEMENT_STATUSES } from './types.ts'
 
 const STAMP_IN = `IN p_actor BINARY(16), IN p_at DATETIME(3), IN p_request_id VARCHAR(64), IN p_history_id BINARY(16)`
@@ -183,6 +184,21 @@ export const settlementsMigrations: MigrationSet = {
           .values(permissions.map((permission_key) => ({ role_id: uuidBin(role.id as string), permission_key })))
           .execute()
       }
+    },
+  },
+  '202611030100_settlements_reminders': {
+    async up(db: Kysely<any>) {
+      // One row per reminder sent (plan 6): a rerun of the job finds it and sends nothing.
+      await createTable(db, 'settlement_reminders')
+        .addColumn('id', uuidType, (c) => c.primaryKey().notNull())
+        .addColumn('agreement_id', uuidType, (c) => c.notNull().references('agreements.id'))
+        .addColumn('kind', sql`varchar(16)`, (c) => c.notNull())
+        .addColumn('occurrence', sql`date`, (c) => c.notNull())
+        .addColumn('recipients', sql`smallint unsigned`, (c) => c.notNull())
+        .addColumn('sent_at', datetimeType, (c) => c.notNull())
+        .addCheckConstraint('ck_settlement_reminders_kind', inCheck('kind', REMINDER_KINDS))
+        .addUniqueConstraint('uq_settlement_reminders', ['agreement_id', 'kind', 'occurrence'])
+        .execute()
     },
   },
 }
