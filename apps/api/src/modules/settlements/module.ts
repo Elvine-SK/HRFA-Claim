@@ -1,4 +1,5 @@
 import { defineModule, type ModuleContext } from '@elvine-sk/platform-server'
+import { shippedWorkflowFrom } from '../../shared/shipped-workflow.ts'
 import { onAgreementCancelled } from '../agreements/events.ts'
 import { settlementApproval, settlementResolvers } from './approval.ts'
 import { cancelSettlementOf } from './batches.ts'
@@ -115,6 +116,7 @@ export const settlementsModule = defineModule({
     { key: 'settlements', label: 'settlements.nav.title', to: '/settlements', icon: 'i-lucide-receipt', group: 'workspace' },
   ],
   approvalEntities: [settlementApproval(ctx)],
+  approvalWorkflows: [shippedWorkflowFrom(new URL('./workflow.json', import.meta.url))],
   approvalResolvers: settlementResolvers,
   fileEntities: [settlementFiles(ctx)],
   notificationTypes: {

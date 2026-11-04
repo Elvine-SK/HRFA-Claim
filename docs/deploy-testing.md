@@ -111,11 +111,10 @@ It prints an invite link: open it to set the password. Then assign roles to HRM 
 
 Once, after the first migration that includes plan 3:
 
-1. Administration → Approvals → New workflow: key `agreement`, record type "Travel agreement", name as in
-   `apps/api/src/modules/agreements/workflow.json`. Add the three stages of that file (section head, department
-   head, management; each one step whose approvers are the resolver of the same name), publish it and make it the
-   default. The same file can be posted to `POST /api/v1/approval/workflows` and `.../{id}/versions` with
-   `activate: true`.
+1. Nothing to create: `migrate` creates the workflow `agreement` from
+   `apps/api/src/modules/agreements/workflow.json` (section head, department head, management), publishes it and
+   makes it the default (it prints `approval: created workflow "agreement"`). Edits made later in Administration →
+   Approvals are kept; `... src/cli.ts approval:apply agreement --force` puts the file's version back.
 2. Administration → Users: give HRM users the roles the migration created: `hr_officer` (enters and submits),
    `hr_section_head`, `hr_department_head`, `management` (approval steps of their own HRM branch), and
    `finance_officer` (told when an agreement of their branch is approved). An approver is found by their HRM
@@ -128,10 +127,8 @@ Once, after the first migration that includes plan 3:
 
 Once, after the first migration that includes plan 4:
 
-1. Administration → Approvals → New workflow: key `payment`, record type "Payment", name as in
-   `apps/api/src/modules/payments/workflow.json`. Add the one stage of that file (finance section head; one step
-   whose approvers are the resolver `payment.finance_section_head`), publish it and make it the default. The same
-   file can be posted to `POST /api/v1/approval/workflows` and `.../{id}/versions` with `activate: true`.
+1. Nothing to create: `migrate` creates the workflow `payment` from
+   `apps/api/src/modules/payments/workflow.json` (finance section head), publishes it and makes it the default.
 2. Administration → Users: give Finance users their roles per HRM branch: `finance_officer` (calculates, enters
    bills, submits, exports the upload file, confirms posted) and `finance_section_head` (approves the payments of
    their branch). A branch without a `finance_section_head` user cannot submit a payment (`no eligible approver`).
@@ -142,12 +139,9 @@ Once, after the first migration that includes plan 4:
 
 Once, after the first migration that includes plan 5:
 
-1. Administration → Approvals → New workflow: key `settlement`, record type "Settlement", name as in
-   `apps/api/src/modules/settlements/workflow.json`. Add its four stages: the leader or deputy (resolver
-   `settlement.leader`, with the condition `hasLeaderStep` equals true, so the stage is skipped when the filer is
-   the only leader), then `settlement.finance_officer`, `settlement.finance_section_head` and `settlement.final`.
-   Publish it and make it the default. The same file can be posted to `POST /api/v1/approval/workflows` and
-   `.../{id}/versions` with `activate: true`.
+1. Nothing to create: `migrate` creates the workflow `settlement` from
+   `apps/api/src/modules/settlements/workflow.json` (leader or deputy, skipped when the filer is the only leader;
+   finance officer; finance section head; final), publishes it and makes it the default.
 2. Administration → Users, per HRM branch (ກ19):
    - head office: `finance_officer` (step 3, exports the files, confirms posted), `finance_section_head` (step 4),
      `finance_department_head` (step 5, the head of the Administration–Finance department);

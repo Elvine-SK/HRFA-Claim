@@ -1,4 +1,5 @@
 import { defineModule, type ModuleContext } from '@elvine-sk/platform-server'
+import { shippedWorkflowFrom } from '../../shared/shipped-workflow.ts'
 import { onAgreementCancelled } from '../agreements/events.ts'
 import { paymentApproval, paymentResolvers } from './approval.ts'
 import { cancelPaymentOf } from './batches.ts'
@@ -91,6 +92,7 @@ export const paymentsModule = defineModule({
     },
   ],
   approvalEntities: [paymentApproval(ctx)],
+  approvalWorkflows: [shippedWorkflowFrom(new URL('./workflow.json', import.meta.url))],
   approvalResolvers: paymentResolvers,
   notificationTypes: { 'payments.approved': {}, 'payments.cancelled_after_export': {} },
   auditActions: ['payments.exported', 'payments.downloaded', 'payments.posted', 'payments.cancelled_after_export'],

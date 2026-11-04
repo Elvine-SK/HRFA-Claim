@@ -1,4 +1,5 @@
 import { defineModule, type ModuleContext } from '@elvine-sk/platform-server'
+import { shippedWorkflowFrom } from '../../shared/shipped-workflow.ts'
 import { agreementApproval, agreementResolvers } from './approval.ts'
 import { agreementFiles, keepSignedCopies } from './files.ts'
 import { agreementsMigrations } from './migrations.ts'
@@ -49,6 +50,7 @@ export const agreementsModule = defineModule({
   // No permission: every signed-in user has the agreements they are a member of.
   menus: [{ key: 'agreements', label: 'agreements.nav.title', to: '/agreements', icon: 'i-lucide-plane', group: 'workspace' }],
   approvalEntities: [agreementApproval(ctx)],
+  approvalWorkflows: [shippedWorkflowFrom(new URL('./workflow.json', import.meta.url))],
   approvalResolvers: agreementResolvers,
   fileEntities: [agreementFiles(ctx)],
   notificationTypes: { 'agreements.approved': {}, 'agreements.cancelled': {} },
