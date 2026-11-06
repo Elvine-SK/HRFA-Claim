@@ -631,5 +631,22 @@
         "empty": "No settlement is overdue."
       }
     }
+  },
+  "profile": {
+    "open": "Open my HRM profile",
+    "branch": "Branch",
+    "unit": "Department · Section",
+    "roles": {
+      "title": "My roles in this system",
+      "employee": "Employee",
+      "super_admin": "System administrator",
+      "hr_officer": "HR officer",
+      "hr_section_head": "HR section head",
+      "hr_department_head": "HR department head",
+      "management": "Management",
+      "finance_officer": "Finance officer",
+      "finance_section_head": "Finance section head",
+      "finance_department_head": "Finance department head"
+    }
   }
 }

@@ -631,5 +631,22 @@
         "empty": "ບໍ່ມີການສະສາງທີ່ກາຍກຳນົດ."
       }
     }
+  },
+  "profile": {
+    "open": "ເປີດຂໍ້ມູນຂອງຂ້ອຍໃນ HRM",
+    "branch": "ສາຂາ",
+    "unit": "ພະແນກ · ຂະແໜງ",
+    "roles": {
+      "title": "ບົດບາດຂອງຂ້ອຍໃນລະບົບນີ້",
+      "employee": "ພະນັກງານ",
+      "super_admin": "ຜູ້ດູແລລະບົບ",
+      "hr_officer": "ພະນັກງານບຸກຄະລາກອນ",
+      "hr_section_head": "ຫົວໜ້າຂະແໜງບຸກຄະລາກອນ",
+      "hr_department_head": "ຫົວໜ້າພະແນກບຸກຄະລາກອນ",
+      "management": "ຄະນະອຳນວຍການ",
+      "finance_officer": "ພະນັກງານການເງິນ",
+      "finance_section_head": "ຫົວໜ້າຂະແໜງການເງິນ",
+      "finance_department_head": "ຫົວໜ້າພະແນກການເງິນ"
+    }
   }
 }
