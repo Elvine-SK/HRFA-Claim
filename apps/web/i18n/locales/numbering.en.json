@@ -1,0 +1,54 @@
+{
+  "numbering": {
+    "nav": {
+      "numbering": "Document numbers"
+    },
+    "admin": {
+      "subtitle": "How document numbers are made and where each counter stands.",
+      "entities": "number sequences",
+      "counters": "Counters",
+      "noCounters": "Nothing has been issued yet.",
+      "typedHint": "Numbers of this sequence are typed in by people, so it has no counter to move.",
+      "allScopes": "All documents",
+      "move": "Move forward",
+      "never": "Never",
+      "scopeHint": "Values of the sequence's parts in order, then the year (2026) or month (2026-05), joined with {'|'}. For example north{'|'}2026.",
+      "newCounter": "Set a new counter",
+      "limit": "Showing the first {n} counters."
+    },
+    "fields": {
+      "label": "Name",
+      "key": "Key",
+      "kind": "Kind",
+      "format": "Format",
+      "reset": "Starts again",
+      "lastIssued": "Last issued",
+      "scope": "Scope",
+      "lastValue": "Last value",
+      "updated": "Updated"
+    },
+    "kind": {
+      "issued": "Issued",
+      "typed": "Typed"
+    },
+    "reset": {
+      "yearly": "Every year",
+      "monthly": "Every month",
+      "never": "Never"
+    },
+    "move": {
+      "title": "Move {scope} forward",
+      "text": "The counter is at {value}. The next number issued will be one above the value you enter.",
+      "value": "New last value",
+      "min": "At least {min}",
+      "warning": "Numbers between are skipped and never issued.",
+      "confirm": "I understand the skipped numbers cannot be used",
+      "newText": "Starts a counter at the number you enter. If the scope already has one, it can only move forward.",
+      "done": "Counter moved to {value}"
+    }
+  },
+  "errors": {
+    "numbering_counter_backwards": "Enter a number above the current value.",
+    "numbering_invalid_scope": "This period or value does not match the sequence."
+  }
+}

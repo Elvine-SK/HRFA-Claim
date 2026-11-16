@@ -21,6 +21,13 @@ const ASSIGNMENT_TONES = {
   rejected: 'danger',
   returned: 'warning',
   superseded: 'neutral',
+  withdrawn: 'neutral',
+} as const
+const ORIGIN_ICONS = {
+  resolved: 'i-lucide-user',
+  delegated: 'i-lucide-forward',
+  reassigned: 'i-lucide-shuffle',
+  escalated: 'i-lucide-arrow-up-right',
 } as const
 </script>
 
@@ -46,6 +53,9 @@ const ASSIGNMENT_TONES = {
           >
             <i aria-hidden="true" />
             <span class="truncate">{{ a.user.displayName }}</span>
+            <UTooltip v-if="a.origin !== 'resolved'" :text="t(`approval.origin.${a.origin}`)">
+              <UIcon :name="ORIGIN_ICONS[a.origin]" class="size-3.5 shrink-0 text-muted" />
+            </UTooltip>
             <span class="sr-only">— {{ t(`approval.assignment.${a.status}`) }}</span>
             <UTooltip v-if="a.decidedAt" :text="t(`approval.assignment.${a.status}`)">
               <time class="muted" :datetime="a.decidedAt">{{ relative(a.decidedAt) }}</time>

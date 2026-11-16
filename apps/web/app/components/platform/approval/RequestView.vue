@@ -12,7 +12,21 @@ const entities = useApprovalEntityRegistry()
 
 const detail = useApprovalRequest(() => props.id)
 const request = computed(() => detail.data.value)
-const { act } = useApprovalActions()
+const { act, recalculate } = useApprovalActions()
+const access = useAccess()
+const canRecalculate = computed(
+  () => request.value?.status === 'pending' && access.can('approval_workflow.manage'),
+)
+async function onRecalculate() {
+  if (!request.value) return
+  try {
+    const { changed, stuck, reason } = await recalculate.mutateAsync({ id: request.value.id })
+    if (stuck) notify.warning(t('approval.recalculate.stuck', { reason: reason ?? '' }))
+    else notify.success(changed ? t('approval.recalculate.changed') : t('approval.recalculate.same'))
+  } catch (error) {
+    notify.error(error)
+  }
+}
 const busy = ref<RequestAction | null>(null)
 const decide = useTemplateRef<{ run: (a: RequestAction) => void; clear: () => void; focus: () => void }>(
   'decide',
@@ -165,7 +179,21 @@ defineExpose({
       </dl>
 
       <section class="sec">
-        <h3>{{ t('approval.detail.progress') }}</h3>
+        <div class="flex items-center justify-between gap-2">
+          <h3>{{ t('approval.detail.progress') }}</h3>
+          <UButton
+            v-if="canRecalculate"
+            size="xs"
+            color="neutral"
+            variant="outline"
+            icon="i-lucide-refresh-cw"
+            :loading="recalculate.isPending.value"
+            :title="t('approval.recalculate.hint')"
+            @click="onRecalculate"
+          >
+            {{ t('approval.recalculate.label') }}
+          </UButton>
+        </div>
         <PlatformApprovalFlow :steps="request.steps" :round="request.round" />
       </section>
 

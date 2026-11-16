@@ -1,0 +1,108 @@
+{
+  "refdata": {
+    "nav": {
+      "refdata": "Reference data"
+    },
+    "admin": {
+      "subtitle": "Code lists and rates the app looks up. Each sheet applies from its start date until the next one.",
+      "entities": "reference tables",
+      "since": "Since {date}",
+      "from": "From {date}",
+      "none": "None"
+    },
+    "fields": {
+      "label": "Name",
+      "key": "Key",
+      "kind": "Kind",
+      "scope": "Scope",
+      "current": "In force",
+      "next": "Next"
+    },
+    "kind": {
+      "codes": "Code list",
+      "rates": "Rates"
+    },
+    "scope": {
+      "global": "Same everywhere",
+      "workspace": "Per workspace"
+    },
+    "level": {
+      "label": "Level",
+      "global": "Global",
+      "workspace": "Workspace"
+    },
+    "history": {
+      "open": "History is open: past sheets can still be edited",
+      "openText": "Fill in the past while you set the table up. Close history once the data is right: from then on only future sheets change, and the sheet in force only through a correction.",
+      "close": "Close history",
+      "confirmTitle": "Close history?",
+      "confirmText": "Past sheets and the sheet in force become read-only for good. Changes from today on need a correction with a reason.",
+      "closed": "History closed"
+    },
+    "timeline": {
+      "title": "Sheets",
+      "future": "Future",
+      "inForce": "In force",
+      "past": "Past",
+      "none": "No sheets yet. Start one with New sheet.",
+      "noneWorkspace": "This workspace has no sheets of its own: the global sheets apply.",
+      "globalApplies": "No sheet of this workspace is in force yet: the global sheet applies until then."
+    },
+    "sheet": {
+      "title": "Sheet from {date}",
+      "new": "New sheet",
+      "newText": "The new sheet starts as a copy of the latest sheet at this level.",
+      "startsOn": "Starts on",
+      "fromTomorrow": "Tomorrow or later.",
+      "anyDay": "Any day while history is open.",
+      "created": "Sheet created",
+      "redate": "Change date",
+      "redateText": "Move the sheet to another start date.",
+      "redated": "Date changed",
+      "delete": "Delete",
+      "deleteTitle": "Delete the sheet from {date}?",
+      "deleteText": "The sheet and its rows are removed. Lookups on its days use the sheet before it.",
+      "deleted": "Sheet deleted",
+      "import": "Import CSV",
+      "lockedInForce": "Locked: in force since {date}",
+      "lockedPast": "Locked: this sheet is in the past",
+      "readOnly": "Read-only: you can't change sheets at this level.",
+      "revision": "correction {n}",
+      "reason": "Reason",
+      "rows": "no rows | 1 row | {n} rows"
+    },
+    "rows": {
+      "add": "Add row",
+      "save": "Save rows",
+      "saved": "Rows saved",
+      "remove": "Remove row",
+      "active": "Active",
+      "yes": "Yes",
+      "no": "No",
+      "empty": "No rows.",
+      "newRow": "new row",
+      "keyColumn": "Key column",
+      "search": "Filter by key",
+      "page": "Page {page} of {pages}",
+      "previous": "Previous page",
+      "next": "Next page"
+    },
+    "correct": {
+      "open": "Correct from today",
+      "title": "Correct from today",
+      "text": "Saves a new sheet from today with these rows. The sheet in force stays as it was for the days before.",
+      "warning": "Applies to every lookup from now on.",
+      "reason": "Reason",
+      "save": "Save correction",
+      "done": "Correction saved"
+    }
+  },
+  "errors": {
+    "refdata_sheet_locked": "This sheet is locked: it is in force or in the past.",
+    "refdata_date_taken": "Another sheet at this level already starts on that day.",
+    "refdata_date_in_past": "History is closed: pick tomorrow or a later day.",
+    "refdata_reason_required": "Give a reason for the correction.",
+    "refdata_ref_inactive": "This code is not active on the sheet's start date.",
+    "refdata_invalid": "Check this value."
+  }
+}

@@ -1,6 +1,6 @@
 # HR-FAM
 
-Built on the Nelvine platform 1.1.0.
+Built on the Nelvine platform 1.3.0.
 
 ## Develop
 

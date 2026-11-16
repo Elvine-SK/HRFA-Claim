@@ -6,6 +6,8 @@
     "mainNav": "Main navigation",
     "collapse": "Collapse sidebar",
     "expand": "Expand sidebar",
+    "navExpand": "Show {name}",
+    "navCollapse": "Hide {name}",
     "openMenu": "Open menu",
     "searchTrigger": "Search or jump to…",
     "appearance": "Appearance",

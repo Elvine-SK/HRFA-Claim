@@ -248,12 +248,15 @@ The app builds what the platform lacks in its own modules, behind interfaces sha
 ([`docs/proposals/2026-10-15-nelvine-platform-gaps.md`](docs/proposals/2026-10-15-nelvine-platform-gaps.md)),
 and swaps each for the platform package once released.
 
-**Platform version (checked 2026-11-16).** `.nelvrc.json` says `platformVersion: 1.1.0` (templates, copied files,
-`docs/platform/`). The packages are `link:`ed to the checkout `../nelvine-platform`, which is at **1.3.0** (tag
-`v1.3.0`, 2026-11-09, plus 2 commits), so the app runs 1.3.0 package code against 1.1.0 copied files. The
-shipped-workflow change above already depends on 1.2.0. Next step: `nelv update` to 1.3.0 (merges copied files
-and `docs/platform/`, adds new template dependencies since 1.3.0), then typecheck and the DB tests. Released since
-1.1.0: 1.2.0 (2026-11-03/04) `platform-numbering`, `platform-refdata`, `platform-org` with `unitRole`/supervisor
+**Platform version: 1.3.0 (2026-11-16).** The packages are `link:`ed to the checkout `../nelvine-platform` (tag
+`v1.3.0` plus 2 commits). The copied files were at 1.1.0 until 2026-11-16, when `nelv update --source=github --to=1.3.0`
+brought them to 1.3.0: 52 updated, 4 merged without conflict (`RecordStatus.vue`, `RequestView.vue`, `useNotify.ts`,
+`nuxt.config.ts`). `--source=github` is needed because the local checkout cannot give the 1.1.0 base for the 3-way
+merge (it would mark every edited file as a conflict). `platform.modules.ts` was deleted and regenerated (it differed
+only by `approval(platformOptions.approval)`). The update added `@elvine-sk/platform-numbering`, `-org` and `-refdata`
+to `apps/web/package.json`; the capabilities themselves are not installed (`nelv add` when the app swaps to them),
+nor is `brand` (the app shows what it ships). The AGENTS.md exception for missing web template dependencies is no
+longer needed from 1.3.0 on. Released since 1.1.0: 1.2.0 (2026-11-03/04) `platform-numbering`, `platform-refdata`, `platform-org` with `unitRole`/supervisor
 approvers and re-resolve, shipped workflows, `PlatformEntityDialog`; 1.3.0 (2026-11-07/09) `platform-brand`, side
 nav submenus, menu map, `PlatformFormWizard`, `useRecordSubmit`.
 
@@ -406,3 +409,8 @@ Carried from plan 4 (still open unless struck):
   are still to do.
 - Plan 5 working answers (above) to confirm with Finance: questions 5 and 8. The full list, with the build step each blocks, is spec v3 §17–18.
 - Deployment: PM2 bundle built (see above); not yet installed on the testing server.
+- **Test fixtures went stale on 2026-11-13** (found 2026-11-16, 300 of 306 pass): `domesticBodies` in
+  `test/agreement-fixtures.ts` travels 2026-11-02 to 2026-11-05, due 2026-11-12, so default settlements are now late.
+  Five tests in `settlements-approval.test.ts` get 422 `settlements.late_reason_required`, and `lists overdue
+  settlements for Finance` sees the "future" trip as overdue. Fix: dates relative to `todayHrm()`, or a fixed year far
+  ahead (rates, fuel and bands must be effective on it).

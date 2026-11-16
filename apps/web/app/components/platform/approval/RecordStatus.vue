@@ -1,8 +1,4 @@
 <script setup lang="ts">
-import type { DataResponse } from '@elvine-sk/platform-core'
-import { useQueryClient } from '@tanstack/vue-query'
-import type { AvailableWorkflow } from '../../../types/approval'
-
 const props = defineProps<{
   entityType: string
   entityId: string
@@ -14,10 +10,6 @@ const props = defineProps<{
 const emit = defineEmits<{ submitted: [requestId: string] }>()
 const { t } = useI18n()
 const { relative, dateTime } = useDates()
-const notify = useNotify()
-const confirm = useConfirm()
-const api = useApi()
-const client = useQueryClient()
 
 const requests = useEntityApprovals(props.entityType, () => props.entityId)
 const latest = computed(() => requests.data.value?.[0])
@@ -25,68 +17,21 @@ const latest = computed(() => requests.data.value?.[0])
 const open = computed(() => latest.value?.status === 'pending' || latest.value?.status === 'returned')
 const returned = computed(() => latest.value?.status === 'returned')
 const canSubmit = computed(() => !!props.submitPath && props.submittable && !open.value)
-const submitting = ref(false)
-const choosing = ref(false)
-const choices = ref<AvailableWorkflow[]>([])
 const submitLabel = computed(() =>
   latest.value ? t('approval.record.submitAgain') : t('approval.record.submit'),
 )
-
-async function loadChoices() {
-  const res = await api<DataResponse<AvailableWorkflow[]>>(
-    `/approval/workflows/available?entityType=${encodeURIComponent(props.entityType)}`,
-  )
-  choices.value = res.data
-  return res.data
-}
-
-async function send(workflow: string) {
-  if (!props.submitPath) return
-  submitting.value = true
-  try {
-    const res = await api<DataResponse<{ requestId: string }>>(props.submitPath, {
-      method: 'POST',
-      body: { workflow },
-    })
-    choosing.value = false
-    await client.invalidateQueries({ queryKey: [APPROVAL_KEY] })
-    notify.success(t('approval.record.submitted'))
-    emit('submitted', res.data.requestId)
-  } catch (error) {
-    notify.error(error)
-    // The workflow was deactivated or narrowed while the dialog was open: show the current list.
-    const code = isApiError(error) ? error.code : undefined
-    if (code === 'approval.workflow_unavailable' || code === 'approval.workflow_required') {
-      const list = await loadChoices().catch(() => [])
-      if (!list.length) choosing.value = false
-    }
-  } finally {
-    submitting.value = false
-  }
-}
+const {
+  submitting,
+  choosing,
+  choices,
+  submit: startSubmit,
+  confirmChoice,
+} = useRecordSubmit(() => props.entityType)
 
 async function submit() {
-  let list: AvailableWorkflow[]
-  try {
-    list = await loadChoices()
-  } catch (error) {
-    notify.error(error)
-    return
-  }
-  if (!list.length) {
-    notify.error(new Error(t('approval.record.noWorkflow')))
-    return
-  }
-  if (list.length > 1) {
-    choosing.value = true
-    return
-  }
-  const ok = await confirm({
-    title: t('approval.record.submitTitle'),
-    description: `${t('approval.record.submitText')} ${t('approval.record.submitWith', { name: list[0]!.name })}`,
-    confirmLabel: submitLabel.value,
-  })
-  if (ok) await send(list[0]!.key)
+  if (!props.submitPath) return
+  const requestId = await startSubmit(props.submitPath, { label: submitLabel.value })
+  if (requestId) emit('submitted', requestId)
 }
 </script>
 
@@ -129,7 +74,7 @@ async function submit() {
       :workflows="choices"
       :busy="submitting"
       :submit-label="submitLabel"
-      @confirm="send"
+      @confirm="confirmChoice"
     />
   </div>
 </template>

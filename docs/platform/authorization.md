@@ -52,6 +52,10 @@ Apply the scope last: any further builder call returns a plain select again. Sin
 signed-in user gets up to 10 active colleagues (`id`, `displayName`, never email) matching a 2+ character term,
 rate-limited per user (60 a minute), because delegating approvals needs a name and `GET /users` needs `user.read`.
 
+## Units, not workspaces
+
+Model branches and departments as organisation units (`platform-org`, `docs/platform/org.md`), not as workspaces: one tree serves the whole install. `platform-org` adds `subject.personCode`, `subject.unitCode` and `subject.unitTree` (the user's unit and every unit below it, left out above 1,000 codes), so a policy reads `{ field: 'branchCode', op: 'in', value: { var: 'subject.unitTree' } }`. Without a policy, `unitRows(ctx, qb, 'res.branchCode', userId)` (`platform-org`) returns a `ScopedSelect` of rows in the caller's unit tree (no active person, no rows). `unitTree` can lag an org change by about 2 minutes (subject cache 60 s plus org cache 60 s). Conditions do not trim leading spaces in stored codes; `unitRows` does, with `TRIM(column)`, which skips the column's index.
+
 ## Three-valued conditions
 
 - Evaluation follows SQL: `true`, `false` or unknown (`null`). Unknown comes from a missing field or variable, `null` compared with anything other than `eq`/`ne` `null`, and incomparable types; it propagates through `not`/`all`/`any`. Booleans compare as `1`/`0`, strings case-insensitively with trailing spaces ignored (`utf8mb4_general_ci`), so the in-memory evaluator and `compileCondition` agree.

@@ -154,6 +154,15 @@ importers:
       '@elvine-sk/platform-notifications':
         specifier: link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/notifications
         version: link:../../../nelvine-platform/packages/notifications
+      '@elvine-sk/platform-numbering':
+        specifier: link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/numbering
+        version: link:../../../nelvine-platform/packages/numbering
+      '@elvine-sk/platform-org':
+        specifier: link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/org
+        version: link:../../../nelvine-platform/packages/org
+      '@elvine-sk/platform-refdata':
+        specifier: link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/refdata
+        version: link:../../../nelvine-platform/packages/refdata
       '@elvine-sk/platform-tenancy':
         specifier: link:C:/Users/Tom Soulivong/Desktop/Projects/nelvine-platform/packages/tenancy
         version: link:../../../nelvine-platform/packages/tenancy

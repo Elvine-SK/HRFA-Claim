@@ -1,6 +1,6 @@
 # Building on the Nelvine platform
 
-These guides describe how HR-FAM is meant to be built on the platform (1.1.0). They are
+These guides describe how HR-FAM is meant to be built on the platform (1.3.0). They are
 recommendations, not rules the build enforces: following them keeps your code secure by default, consistent
 with the platform's own screens, and easy to upgrade. Where the platform does enforce something (a list that
 skips its scope doesn't compile, an undeclared event throws outside production), the guide says so.
@@ -8,18 +8,22 @@ skips its scope doesn't compile, an undeclared event throws outside production),
 `nelv update` keeps this folder in step with the platform version you upgrade to. Put your team's own
 conventions in `AGENTS.md` at the app root, not here: edits here are merged on update and can conflict.
 
-| Guide                                | Read before                                                                     |
-| ------------------------------------ | ------------------------------------------------------------------------------- |
-| [modules.md](modules.md)             | writing an API module: migrations, records, permissions, events, jobs, approval |
-| [authorization.md](authorization.md) | guarding a route, writing a list query, or adding policy fields                 |
-| [web.md](web.md)                     | adding a page, a menu item, UI strings, or a live-updating form                 |
-| [testing.md](testing.md)             | writing or running a test                                                       |
-| [files.md](files.md)                 | attaching files to records or choosing storage                                  |
-| [security.md](security.md)           | settings for lockout, CAPTCHA, request limits, live updates and webhooks        |
-| [data-sources.md](data-sources.md)   | reading another system's database (an HR system): config, types, lists, pickers |
-| [oidc.md](oidc.md)                   | setting up single sign-on                                                       |
-| [handoff.md](handoff.md)             | signing in from a host portal (tiles), and what the host team builds            |
-| [deployment.md](deployment.md)       | running several instances, PM2, Redis, the proxy in front of the API            |
+| Guide                                | Read before                                                                                                 |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| [modules.md](modules.md)             | writing an API module: migrations, records, permissions, events, jobs, approval                             |
+| [authorization.md](authorization.md) | guarding a route, writing a list query, or adding policy fields                                             |
+| [web.md](web.md)                     | adding a page, a menu item, UI strings, or a live-updating form                                             |
+| [testing.md](testing.md)             | writing or running a test                                                                                   |
+| [files.md](files.md)                 | attaching files to records or choosing storage                                                              |
+| [security.md](security.md)           | settings for lockout, CAPTCHA, request limits, live updates and webhooks                                    |
+| [data-sources.md](data-sources.md)   | reading another system's database (an HR system): config, types, lists, pickers                             |
+| [numbering.md](numbering.md)         | giving records document numbers (issued or typed), finding by number                                        |
+| [refdata.md](refdata.md)             | adding code lists or rate tables with effective dates (tax rates, categories), looking them up as of a date |
+| [org.md](org.md)                     | approving by organisation (units, unit-role and supervisor approvers), scoping records by unit              |
+| [brand.md](brand.md)                 | changing the app name, logo, slogan, favicon or title, in code or as an admin                               |
+| [oidc.md](oidc.md)                   | setting up single sign-on                                                                                   |
+| [handoff.md](handoff.md)             | signing in from a host portal (tiles), and what the host team builds                                        |
+| [deployment.md](deployment.md)       | running several instances, PM2, Redis, the proxy in front of the API                                        |
 
 ## Where things go
 

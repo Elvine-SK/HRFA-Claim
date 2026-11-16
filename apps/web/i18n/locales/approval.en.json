@@ -60,7 +60,8 @@
       "approved": "Approved",
       "rejected": "Rejected",
       "returned": "Returned",
-      "superseded": "No longer needed"
+      "superseded": "No longer needed",
+      "withdrawn": "No longer an approver"
     },
     "completion": {
       "any": "any one approver",
@@ -92,7 +93,8 @@
       "cancelled": "{actor} cancelled the request",
       "completed": "Finished: {status}",
       "delegated": "{actor} delegated the decision",
-      "escalated": "Escalated in {stage}"
+      "escalated": "Escalated in {stage}",
+      "approvers_updated": "Approvers in {stage} changed with the organisation"
     },
     "decide": {
       "comment": "Comment",
@@ -172,6 +174,19 @@
       "many": "You have {n} delegations running",
       "text": "New approvals assigned to you are sent to your delegate. What is listed here still waits for you.",
       "manage": "Manage delegations"
+    },
+    "origin": {
+      "resolved": "Chosen by the workflow",
+      "delegated": "Delegated by the approver",
+      "reassigned": "Reassigned by an administrator",
+      "escalated": "Escalated because the step was overdue"
+    },
+    "recalculate": {
+      "label": "Recalculate approvers",
+      "hint": "Choose the approvers again from the current organisation",
+      "changed": "Approvers updated",
+      "same": "Approvers are up to date",
+      "stuck": "Nobody can approve this step: {reason}"
     }
   }
 }

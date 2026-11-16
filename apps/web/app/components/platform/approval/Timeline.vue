@@ -20,6 +20,7 @@ const KINDS: Record<ApprovalEventType, { icon: string; tone: Tone }> = {
   completed: { icon: 'i-lucide-flag-triangle-right', tone: 'success' },
   delegated: { icon: 'i-lucide-forward', tone: 'chart-3' },
   escalated: { icon: 'i-lucide-siren', tone: 'warning' },
+  approvers_updated: { icon: 'i-lucide-users', tone: 'chart-3' },
 }
 
 const stepOf = (id: string | null) => (id ? props.steps?.find((s) => s.id === id) : undefined)

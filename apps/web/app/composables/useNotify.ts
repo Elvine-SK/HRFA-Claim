@@ -2,6 +2,7 @@ import type { ToastProps } from '@nuxt/ui'
 
 const SUCCESS_MS = 4000
 const UNDO_MS = 6000
+const WARNING_MS = 8000
 
 type ToastAction = NonNullable<ToastProps['actions']>[number]
 
@@ -22,6 +23,10 @@ export function useNotify() {
 
   function info(title: string, description?: string) {
     toast.add({ title, description, color: 'info', icon: 'i-lucide-info', duration: SUCCESS_MS })
+  }
+
+  function warning(title: string, description?: string) {
+    toast.add({ title, description, color: 'warning', icon: 'i-lucide-triangle-alert', duration: WARNING_MS })
   }
 
   function messageOf(error: unknown): string {
@@ -80,5 +85,5 @@ export function useNotify() {
     })
   }
 
-  return { success, info, error, undoable, fixFields, messageOf }
+  return { success, info, warning, error, undoable, fixFields, messageOf }
 }

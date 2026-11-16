@@ -12,7 +12,8 @@ const tiles = computed(() =>
   [
     ...quick.list().filter((action) => !action.permission || access.canSome(action.permission)),
     ...nav.items.value
-      .filter((item) => item.to && item.to !== '/')
+      // A child page can share its parent's route (Notes and All notes): one tile per route.
+      .filter((item, i, all) => item.to && item.to !== '/' && all.findIndex((o) => o.to === item.to) === i)
       .map((item) => ({
         id: `nav-${item.id}`,
         label: item.label,

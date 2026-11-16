@@ -38,7 +38,8 @@ watch(
 )
 
 const label = (text: string) => (te(text) ? t(text) : text)
-const appTitle = computed(() => props.appName ?? t('shell.appName'))
+const { brand } = useBrand()
+const appTitle = computed(() => props.appName ?? brand.value.name)
 
 // The brand block names the workspace I work in and, with several, switches between them (platform-tenancy).
 const workspaces = useWorkspaces()
@@ -92,8 +93,27 @@ watch(
   () => (mobileOpen.value = false),
 )
 
-const activeItem = computed(() => nav.match(route.path))
-const isActive = (item: NavItem) => activeItem.value?.id === item.id
+const activeTrail = computed(() => nav.trail(route.path))
+const activeItem = computed<NavItem | undefined>(() => activeTrail.value.at(-1))
+const trailIds = computed(() => new Set(activeTrail.value.slice(0, -1).map((i) => i.id)))
+
+// Open parents, remembered per browser; landing on a child page opens its branch.
+const storedOpen = useLocalStorage<string[]>('nelvine:nav-open', [])
+const openSet = computed(() => openIds(storedOpen.value, nav.visibleGroups.value))
+// Keyed on the ids: the trail is rebuilt whenever the menu changes (counts, late items), and the shell's
+// route lags a navigation, so watching the array would reopen a branch the user just closed.
+watch(
+  () => activeTrail.value.map((i) => i.id).join('/'),
+  () => {
+    const next = withTrail([...openSet.value], activeTrail.value)
+    if (next.length !== openSet.value.size) storedOpen.value = next
+  },
+  { immediate: true },
+)
+function toggleOpen(id: string) {
+  const open = [...openSet.value]
+  storedOpen.value = open.includes(id) ? open.filter((o) => o !== id) : [...open, id]
+}
 
 const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
   const items: BreadcrumbItem[] = [{ label: t('shell.home'), to: '/' }]
@@ -111,9 +131,15 @@ const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
 const accountItems = computed<DropdownMenuItem[][]>(() => [
   [{ label: userLabel.value, description: userSub.value, type: 'label' }],
   [
-    { label: t('shell.profile'), icon: 'i-lucide-user', to: '/account' },
-    { label: t('shell.security'), icon: 'i-lucide-shield', to: '/account?tab=security' },
-    { label: t('shell.sessions'), icon: 'i-lucide-monitor-smartphone', to: '/account?tab=sessions' },
+    // Same path, the tab in the query: without exactQuery all three are active on any account tab.
+    { label: t('shell.profile'), icon: 'i-lucide-user', to: '/account', exactQuery: true },
+    { label: t('shell.security'), icon: 'i-lucide-shield', to: '/account?tab=security', exactQuery: true },
+    {
+      label: t('shell.sessions'),
+      icon: 'i-lucide-monitor-smartphone',
+      to: '/account?tab=sessions',
+      exactQuery: true,
+    },
     {
       label: t('shell.preferences'),
       icon: 'i-lucide-sliders-horizontal',
@@ -155,9 +181,9 @@ const accountItems = computed<DropdownMenuItem[][]>(() => [
           data-testid="workspace-switcher"
           :aria-label="t('tenancy.switcher.open', { name: workspaceLabel })"
         >
-          <span class="logo" aria-hidden="true">{{ appTitle.charAt(0) }}</span>
+          <PlatformBrandMark :variant="rail ? 'mark' : 'logo'" aria-hidden="true" />
           <span class="lbl">
-            <b>{{ appTitle }}</b>
+            <b data-testid="brand-name">{{ appTitle }}</b>
             <small>{{ workspaceLabel }}</small>
           </span>
           <UIcon
@@ -167,37 +193,25 @@ const accountItems = computed<DropdownMenuItem[][]>(() => [
         </button>
       </UDropdownMenu>
       <NuxtLink v-else to="/" class="brand">
-        <span class="logo" aria-hidden="true">{{ appTitle.charAt(0) }}</span>
+        <PlatformBrandMark :variant="rail ? 'mark' : 'logo'" aria-hidden="true" />
         <span class="lbl">
-          <b>{{ appTitle }}</b>
-          <small data-testid="workspace-name">{{ workspaceLabel }}</small>
+          <b data-testid="brand-name">{{ appTitle }}</b>
+          <!-- One workspace: nothing to tell apart, so the line under the name is the slogan. -->
+          <small v-if="brand.slogan" data-testid="brand-slogan">{{ brand.slogan }}</small>
         </span>
       </NuxtLink>
 
       <nav class="nav">
         <template v-for="group in nav.visibleGroups.value" :key="group.id">
           <div class="nav-g">{{ label(group.label) }}</div>
-          <UTooltip
-            v-for="item in group.items"
-            :key="item.id"
-            :text="label(item.label)"
-            :disabled="!rail"
-            :content="{ side: 'right', sideOffset: 10 }"
-          >
-            <NuxtLink
-              :to="item.to"
-              class="nav-a"
-              :class="{ on: isActive(item) }"
-              :aria-current="isActive(item) ? 'page' : undefined"
-              :aria-label="rail ? label(item.label) : undefined"
-            >
-              <UIcon v-if="item.icon" :name="item.icon" class="ico" />
-              <span class="lbl">{{ label(item.label) }}</span>
-              <span v-if="item.count != null" class="count mono" :class="{ hot: item.hot }">{{
-                item.count
-              }}</span>
-            </NuxtLink>
-          </UTooltip>
+          <PlatformNavTree
+            :items="group.items"
+            :rail="rail"
+            :open="openSet"
+            :active-id="activeItem?.id"
+            :trail-ids="trailIds"
+            @toggle="toggleOpen"
+          />
         </template>
       </nav>
 
@@ -335,19 +349,6 @@ const accountItems = computed<DropdownMenuItem[][]>(() => [
 .brand-switch:hover {
   background: var(--app-hover);
 }
-.logo {
-  display: grid;
-  width: 38px;
-  height: 38px;
-  flex: none;
-  place-items: center;
-  border-radius: calc(var(--app-r-sm) + 2px);
-  background: var(--app-grad);
-  color: var(--app-grad-fg);
-  font-size: 17px;
-  font-weight: 800;
-  box-shadow: 0 6px 16px -6px var(--app-grad-from);
-}
 .brand b,
 .me b {
   display: block;
@@ -383,63 +384,6 @@ const accountItems = computed<DropdownMenuItem[][]>(() => [
 :global(html:lang(lo)) .nav-g {
   letter-spacing: 0;
   text-transform: none;
-}
-.nav-a {
-  position: relative;
-  display: flex;
-  height: 38px;
-  align-items: center;
-  gap: 11px;
-  padding: 0 10px;
-  border-radius: var(--app-r-sm);
-  color: var(--app-muted);
-  font-size: 13.5px;
-  font-weight: 500;
-  text-decoration: none;
-  white-space: nowrap;
-  transition:
-    background-color var(--app-dur-base),
-    color var(--app-dur-base);
-}
-.nav-a .ico {
-  width: 18px;
-  height: 18px;
-  flex: none;
-}
-.nav-a:hover {
-  background: var(--app-hover);
-  color: var(--app-text);
-}
-.nav-a.on {
-  background: color-mix(in oklab, var(--app-accent) 11%, transparent);
-  color: var(--app-text);
-  font-weight: 600;
-}
-.nav-a.on .ico {
-  color: var(--app-accent);
-}
-.nav-a.on::before {
-  content: '';
-  position: absolute;
-  left: -12px;
-  top: 9px;
-  bottom: 9px;
-  width: 3px;
-  border-radius: 0 3px 3px 0;
-  background: var(--app-grad);
-}
-.count {
-  margin-left: auto;
-  padding: 1px 7px;
-  border-radius: 999px;
-  background: var(--app-surface-2);
-  color: var(--app-muted);
-  font-size: 11px;
-  font-weight: 600;
-}
-.count.hot {
-  background: var(--app-grad);
-  color: var(--app-grad-fg);
 }
 
 .side-foot {
@@ -496,23 +440,6 @@ const accountItems = computed<DropdownMenuItem[][]>(() => [
   display: block;
   height: 1px;
   background: var(--app-border);
-}
-.is-rail .nav-a {
-  justify-content: center;
-  padding: 0;
-}
-.is-rail .count {
-  display: none;
-}
-.is-rail .count.hot {
-  position: absolute;
-  top: 5px;
-  right: 9px;
-  display: block;
-  width: 8px;
-  height: 8px;
-  padding: 0;
-  font-size: 0;
 }
 .is-rail .brand,
 .is-rail .me {

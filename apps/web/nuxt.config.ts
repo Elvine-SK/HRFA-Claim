@@ -13,11 +13,15 @@ const areas = [
   'lists.',
   'live.',
   'notifications.',
+  'numbering.',
   'oidc.',
+  'org.',
   'records.',
+  'refdata.',
   'tenancy.',
   'transfer.',
   'webhooks.',
+  'wizard.',
   // The app's own strings (app.en.json, app.lo.json): created once by nelv, never updated.
   'app.',
 ]

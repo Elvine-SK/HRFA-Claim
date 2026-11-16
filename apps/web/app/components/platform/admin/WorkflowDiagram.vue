@@ -123,10 +123,36 @@ const APPROVER_ICONS = {
   group: 'i-lucide-users',
   user: 'i-lucide-user',
   resolver: 'i-lucide-git-fork',
+  unitRole: 'i-lucide-network',
+  supervisor: 'i-lucide-user-round-check',
 } as const
 
 function approver(a: ApproverSpec) {
-  const [kind, value] = (Object.entries(a)[0] ?? ['role', '']) as [keyof typeof APPROVER_ICONS, string]
+  if (a.unitRole) {
+    const { role, unitFact } = a.unitRole
+    return {
+      icon: APPROVER_ICONS.unitRole,
+      text:
+        role && unitFact
+          ? t('admin.workflows.diagram.unitRole', { role, fact: unitFact })
+          : t('admin.workflows.diagram.noApprover'),
+      missing: !role || !unitFact,
+    }
+  }
+  if (a.supervisor) {
+    const { personFact, level } = a.supervisor
+    return {
+      icon: APPROVER_ICONS.supervisor,
+      text: personFact
+        ? t('admin.workflows.diagram.supervisor', { level, fact: personFact })
+        : t('admin.workflows.diagram.noApprover'),
+      missing: !personFact,
+    }
+  }
+  const [kind, value] = (Object.entries(a)[0] ?? ['role', '']) as [
+    'role' | 'group' | 'user' | 'resolver',
+    string,
+  ]
   const named =
     kind === 'role'
       ? roleNames.value.get(value)

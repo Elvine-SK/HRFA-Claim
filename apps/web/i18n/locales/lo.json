@@ -6,6 +6,8 @@
     "mainNav": "ການນຳທາງຫຼັກ",
     "collapse": "ຫຍໍ້ແຖບຂ້າງ",
     "expand": "ຂະຫຍາຍແຖບຂ້າງ",
+    "navExpand": "ສະແດງ {name}",
+    "navCollapse": "ເຊື່ອງ {name}",
     "openMenu": "ເປີດເມນູ",
     "searchTrigger": "ຄົ້ນຫາ ຫຼື ໄປທີ່…",
     "appearance": "ຮູບແບບການສະແດງຜົນ",

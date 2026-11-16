@@ -173,6 +173,9 @@ async function create() {
                 <UBadge v-if="row.isDefault" color="primary" variant="subtle" size="sm">
                   {{ t('admin.workflows.default') }}
                 </UBadge>
+                <UBadge v-if="row.shipped" color="neutral" variant="subtle" size="sm">
+                  {{ t('admin.workflows.shipped') }}
+                </UBadge>
               </span>
               <span v-if="row.description" class="muted block truncate text-[12.5px]">{{
                 row.description

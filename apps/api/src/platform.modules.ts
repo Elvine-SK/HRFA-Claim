@@ -32,6 +32,7 @@ export interface PlatformOptions {
   jobs?: OptionsOf<typeof jobs>
   notifications?: OptionsOf<typeof notifications>
   files?: OptionsOf<typeof files>
+  approval?: OptionsOf<typeof approval>
 }
 
 /** Platform modules in registration order. */
@@ -45,7 +46,7 @@ export function platformModules() {
     views(),
     dashboard(),
     files(platformOptions.files),
-    approval(),
+    approval(platformOptions.approval),
     transfer(),
   ]
 }

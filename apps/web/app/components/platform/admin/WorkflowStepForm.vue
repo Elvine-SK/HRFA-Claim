@@ -11,6 +11,11 @@ const step = defineModel<DraftStep>({ required: true })
 const { t } = useI18n()
 
 const hasFields = computed(() => Object.keys(props.fields).length > 0)
+const stringFields = computed(() =>
+  Object.entries(props.fields)
+    .filter(([, f]) => f.type === 'string')
+    .map(([key]) => key),
+)
 const completionItems = computed(() => [
   { value: 'any', label: t('admin.workflows.completion.any') },
   { value: 'all', label: t('admin.workflows.completion.all') },
@@ -30,7 +35,12 @@ const completionItems = computed(() => [
         />
       </UFormField>
       <UFormField :label="t('admin.workflows.approvers')" size="sm">
-        <PlatformAdminApproverPicker v-model="step.approvers" :resolvers="resolvers" :disabled="disabled" />
+        <PlatformAdminApproverPicker
+          v-model="step.approvers"
+          :resolvers="resolvers"
+          :string-fields="stringFields"
+          :disabled="disabled"
+        />
       </UFormField>
     </div>
     <div class="flex flex-wrap items-end gap-x-5 gap-y-3">
@@ -74,7 +84,12 @@ const completionItems = computed(() => [
       :label="t('admin.workflows.escalateTo')"
       size="sm"
     >
-      <PlatformAdminApproverPicker v-model="step.escalateTo" :resolvers="resolvers" :disabled="disabled" />
+      <PlatformAdminApproverPicker
+        v-model="step.escalateTo"
+        :resolvers="resolvers"
+        :string-fields="stringFields"
+        :disabled="disabled"
+      />
     </UFormField>
     <div v-if="step.conditional" class="grid gap-1.5">
       <span class="text-[12.5px] font-medium">{{ t('admin.workflows.conditionLabel') }}</span>

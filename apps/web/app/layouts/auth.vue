@@ -2,12 +2,13 @@
 const { t, locale, locales } = useI18n()
 const theme = useTheme()
 const preferences = useLocalePreference()
+const { brand } = useBrand()
 
 const languageOptions = computed(() => locales.value.map((l) => ({ value: l.code, label: l.name ?? l.code })))
 const features = computed(() => [
-  { icon: 'i-lucide-stamp', title: t('auth.brand.f1'), text: t('auth.brand.f1Text') },
-  { icon: 'i-lucide-shield-check', title: t('auth.brand.f2'), text: t('auth.brand.f2Text') },
-  { icon: 'i-lucide-scroll-text', title: t('auth.brand.f3'), text: t('auth.brand.f3Text') },
+  { icon: 'i-lucide-stamp', title: brand.value.signIn.features[0], text: t('auth.brand.f1Text') },
+  { icon: 'i-lucide-shield-check', title: brand.value.signIn.features[1], text: t('auth.brand.f2Text') },
+  { icon: 'i-lucide-scroll-text', title: brand.value.signIn.features[2], text: t('auth.brand.f3Text') },
 ])
 </script>
 
@@ -15,8 +16,11 @@ const features = computed(() => [
   <div class="auth">
     <div class="auth-form">
       <header class="auth-top">
-        <span class="logo" aria-hidden="true">{{ t('shell.appName').charAt(0) }}</span>
-        <b>{{ t('shell.appName') }}</b>
+        <PlatformBrandMark :size="34" aria-hidden="true" />
+        <span class="auth-name">
+          <b data-testid="brand-name">{{ brand.name }}</b>
+          <small v-if="brand.slogan">{{ brand.slogan }}</small>
+        </span>
         <div class="auth-tools">
           <PlatformSegmented
             :model-value="locale"
@@ -43,9 +47,12 @@ const features = computed(() => [
 
     <aside class="auth-brand" aria-hidden="true">
       <div class="ab-in">
-        <div class="ab-logo">{{ t('shell.appName').charAt(0) }}</div>
-        <h2>{{ t('auth.brand.title') }}</h2>
-        <p>{{ t('auth.brand.text') }}</p>
+        <div class="ab-logo">
+          <img v-if="brand.images.mark" :src="brand.images.mark" alt="" />
+          <template v-else>{{ brand.shortName.charAt(0) }}</template>
+        </div>
+        <h2>{{ brand.signIn.title }}</h2>
+        <p>{{ brand.signIn.text }}</p>
         <div class="ab-cards">
           <div v-for="f in features" :key="f.icon" class="glass ab-feature">
             <UIcon :name="f.icon" class="size-5 flex-none" />
@@ -79,16 +86,15 @@ const features = computed(() => [
   font-size: 15px;
   font-weight: 700;
 }
-.logo {
-  display: grid;
-  width: 34px;
-  height: 34px;
-  place-items: center;
-  border-radius: calc(var(--app-r-sm) + 2px);
-  background: var(--app-grad);
-  color: var(--app-grad-fg);
-  font-size: 15px;
-  font-weight: 800;
+.auth-name {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+.auth-name small {
+  color: var(--app-muted);
+  font-size: 12px;
+  font-weight: 500;
 }
 .auth-tools {
   display: flex;
@@ -159,6 +165,11 @@ const features = computed(() => [
   font-size: 22px;
   font-weight: 800;
   backdrop-filter: blur(6px);
+}
+.ab-logo img {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
 }
 .ab-in h2 {
   margin: 0;

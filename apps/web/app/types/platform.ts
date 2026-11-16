@@ -28,6 +28,27 @@ export type {
 } from '@elvine-sk/platform-audit/schemas'
 export type { DashboardLayout, DashboardStat } from '@elvine-sk/platform-dashboard/schemas'
 export type { SavedView, ViewList } from '@elvine-sk/platform-views/schemas'
+export type {
+  MoveCounter,
+  NumberCounter,
+  NumberSequence,
+  NumberSequences,
+} from '@elvine-sk/platform-numbering/schemas'
+export type { OrgPersonView, OrgUnitView } from '@elvine-sk/platform-org/schemas'
+export type {
+  CorrectRefSheet,
+  CreateRefSheet,
+  RedateRefSheet,
+  RefColumnInfo,
+  RefLevel,
+  RefOption,
+  RefOptions,
+  RefRowView,
+  RefSheet,
+  RefSheets,
+  RefTable,
+  RefTables,
+} from '@elvine-sk/platform-refdata/schemas'
 export type { MyTenants, Tenant, TenantMember, TenantRef } from '@elvine-sk/platform-tenancy/schemas'
 export type {
   FileLimits,

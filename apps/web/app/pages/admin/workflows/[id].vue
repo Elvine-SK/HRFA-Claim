@@ -161,6 +161,40 @@ async function activate(versionId: string, version: number) {
   }
 }
 
+const shippedNote = computed(() => {
+  switch (wf.value?.shippedStatus) {
+    case 'edited':
+      return t('admin.workflows.shippedEdited')
+    case 'inactive':
+      return t('admin.workflows.shippedInactive')
+    case 'outdated':
+      return t('admin.workflows.shippedOutdated')
+    default:
+      return null
+  }
+})
+const canUseShipped = computed(
+  () => editable.value && (wf.value?.shippedStatus === 'edited' || wf.value?.shippedStatus === 'inactive'),
+)
+async function useShipped() {
+  if (!wf.value) return
+  const ok = await confirm({
+    title: t('admin.workflows.useShipped'),
+    description: t('admin.workflows.useShippedConfirm'),
+    confirmLabel: t('admin.workflows.useShipped'),
+  })
+  if (!ok) return
+  try {
+    const next = (await action.mutateAsync({
+      path: `/approval/workflows/${wf.value.id}/use-shipped`,
+    })) as WorkflowDetail
+    viewing.value = next.activeVersionId ?? undefined
+    notify.success(t('admin.workflows.useShippedDone'))
+  } catch (error) {
+    notify.error(error)
+  }
+}
+
 onBeforeRouteLeave(async () => {
   if (!dirty.value || !editable.value) return true
   return confirm({
@@ -189,12 +223,35 @@ onBeforeRouteLeave(async () => {
       :subtitle="wf?.key"
     >
       <template v-if="wf" #actions>
+        <UBadge v-if="wf.shipped" color="neutral" variant="subtle">{{ t('admin.workflows.shipped') }}</UBadge>
         <PlatformStatusBadge
           :tone="wf.activeVersionId ? 'success' : 'neutral'"
           :label="wf.activeVersionId ? t('admin.workflows.live') : t('admin.workflows.inactive')"
         />
       </template>
     </PlatformPageHeader>
+
+    <UAlert
+      v-if="wf && shippedNote"
+      class="mb-4"
+      color="warning"
+      variant="subtle"
+      icon="i-lucide-package"
+      :title="shippedNote"
+      role="status"
+    >
+      <template v-if="canUseShipped" #actions>
+        <UButton
+          size="sm"
+          color="neutral"
+          variant="outline"
+          :loading="action.isPending.value"
+          @click="useShipped"
+        >
+          {{ t('admin.workflows.useShipped') }}
+        </UButton>
+      </template>
+    </UAlert>
 
     <PlatformEmptyState
       v-if="detail.error.value"

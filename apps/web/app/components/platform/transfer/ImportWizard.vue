@@ -3,7 +3,8 @@ import type { ImportResult } from '@elvine-sk/platform-nuxt/utils'
 
 const MAX_BYTES = 5 * 1024 * 1024
 
-const props = defineProps<{ entity: string; entities?: string }>()
+// `target`: what the rows go into, for entities that import into one (e.g. a reference data sheet).
+const props = defineProps<{ entity: string; entities?: string; target?: string }>()
 const open = defineModel<boolean>('open', { default: false })
 const emit = defineEmits<{ imported: [result: ImportResult] }>()
 const { t } = useI18n()
@@ -80,7 +81,7 @@ async function run(dryRun: boolean) {
   starting.value = true
   try {
     phase.value = dryRun ? 'dry' : 'real'
-    jobId.value = await actions.startImport(props.entity, csv.value, dryRun)
+    jobId.value = await actions.startImport(props.entity, csv.value, dryRun, props.target)
     step.value = dryRun ? 'check' : 'done'
   } catch (error) {
     phase.value = null

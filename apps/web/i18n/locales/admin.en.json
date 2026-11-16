@@ -9,7 +9,9 @@
       "workflows": "Workflows",
       "jobs": "Jobs",
       "audit": "Audit log",
-      "webhooks": "Webhooks"
+      "webhooks": "Webhooks",
+      "menuMap": "Menu map",
+      "brand": "Brand"
     },
     "users": {
       "username": "Username",
@@ -368,7 +370,9 @@
         "fit": "Fit to view",
         "fullscreen": "Full screen",
         "exitFullscreen": "Exit full screen",
-        "removeStageText": "The stage and its {n} step(s) leave the draft. Nothing is saved until you save a new version."
+        "removeStageText": "The stage and its {n} step(s) leave the draft. Nothing is saved until you save a new version.",
+        "unitRole": "{role} in {fact}",
+        "supervisor": "{fact}, {level} up"
       },
       "jsonHint": "The workflow definition as JSON.",
       "facts": "Available facts",
@@ -405,7 +409,15 @@
         "pick_user": "Pick a user…",
         "pick_role": "Pick a role…",
         "pick_group": "Pick a group…",
-        "pick_resolver": "Pick a resolver…"
+        "pick_resolver": "Pick a resolver…",
+        "unitRole": "Role in unit",
+        "supervisor": "Supervisor",
+        "unitFact": "Unit field",
+        "pick_unitFact": "Field holding the unit code…",
+        "personFact": "Person field",
+        "pick_personFact": "Field holding the person code…",
+        "levelLabel": "Levels up",
+        "level": "{n} level up | {n} levels up"
       },
       "completion": {
         "label": "Completes when",
@@ -444,7 +456,14 @@
       "delete": "Delete workflow",
       "deleteTitle": "Delete {name}?",
       "deleteText": "It leaves the list and cannot be brought back. Requests that ran on it keep their history. The key {key} cannot be used for another workflow.",
-      "deleted": "Workflow deleted"
+      "deleted": "Workflow deleted",
+      "shipped": "Shipped with the app",
+      "shippedEdited": "This workflow differs from the version shipped with the app.",
+      "shippedInactive": "This workflow shipped with the app is turned off.",
+      "shippedOutdated": "A newer shipped version is applied on the next update.",
+      "useShipped": "Use shipped version",
+      "useShippedConfirm": "Publish the version shipped with the app as a new version and make it live?",
+      "useShippedDone": "Shipped version is live"
     },
     "jobs": {
       "stats": {
@@ -588,6 +607,87 @@
       "removeGroup": "Remove group",
       "emptyRoot": "No rules: matches every record.",
       "emptyGroup": "Empty group."
+    },
+    "menuMap": {
+      "title": "Menu map",
+      "subtitle": "Every menu item, where it comes from and who sees it. Read-only: change access on the Roles page.",
+      "viewAs": "View as",
+      "role": "Role",
+      "user": "User",
+      "pickRole": "Pick a role",
+      "pickUser": "Pick a user",
+      "pickHint": "Pick a role or a user to see what their menu shows and why an item is hidden.",
+      "openRoles": "Open in Roles",
+      "table": "Table",
+      "diagram": "Diagram",
+      "onlyHidden": "Only hidden",
+      "opensOnly": "opens only",
+      "anyone": "anyone signed in",
+      "missing": "Needs {keys}",
+      "grantedBy": "granted to {roles}",
+      "otherRoles": "{n} roles you cannot see",
+      "noRole": "no role grants it",
+      "noChildren": "No page, and none of its children are shown",
+      "columns": {
+        "item": "Menu item",
+        "route": "Route",
+        "source": "Source",
+        "needs": "Needs",
+        "result": "Sees it"
+      },
+      "state": {
+        "link": "Shown",
+        "toggle": "Shown, opens its children only",
+        "hidden": "Hidden"
+      }
+    },
+    "brand": {
+      "subtitle": "The name, logo and slogan people see. Empty fields and unused uploads keep what the app ships.",
+      "save": "Save",
+      "saved": "Brand saved",
+      "reset": "Reset",
+      "textsTitle": "Texts",
+      "textsHint": "Each text in English and Lao. A Lao reader sees the Lao text, else the English one, else what the app ships.",
+      "imagesTitle": "Images",
+      "imagesHint": "PNG, WebP or JPEG up to 1 MB. Switch each image between the one the app ships and your upload.",
+      "titleTitle": "Browser tab",
+      "titlePattern": "Title pattern",
+      "titlePatternHint": "{page} is the page title, {name} the app name.",
+      "preview": "Preview",
+      "previewSidebar": "Sidebar",
+      "previewSignIn": "Sign-in panel",
+      "shipped": "Shipped",
+      "uploaded": "Uploaded",
+      "letterTile": "Letter tile",
+      "noUpload": "No upload",
+      "upload": "Upload",
+      "replace": "Replace",
+      "removeUpload": "Remove upload",
+      "uploadFailed": "The image was not uploaded",
+      "useUploaded": "Use the uploaded {name}",
+      "fields": {
+        "name": "Name",
+        "shortName": "Short name",
+        "slogan": "Slogan",
+        "signInTitle": "Sign-in title",
+        "signInText": "Sign-in text",
+        "feature1": "Sign-in feature 1",
+        "feature2": "Sign-in feature 2",
+        "feature3": "Sign-in feature 3"
+      },
+      "slots": {
+        "logo": "Logo",
+        "logoHint": "Sidebar and sign-in page",
+        "logoDark": "Logo for dark mode",
+        "logoDarkHint": "Used instead of the logo in dark mode",
+        "mark": "Mark",
+        "markHint": "Square; the collapsed sidebar and the installed app",
+        "favicon": "Favicon",
+        "faviconHint": "The browser tab icon"
+      },
+      "loadFailed": "The brand could not be loaded",
+      "loadFailedText": "Saving is off until it loads, so the saved brand is not replaced by an empty one.",
+      "retry": "Try again"
     }
   }
 }

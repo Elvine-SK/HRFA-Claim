@@ -28,6 +28,10 @@ export interface ApproverSpec {
   role?: string
   group?: string
   resolver?: string
+  /** The holders of `role` in the unit named by an entity fact, or the nearest unit above that has one. */
+  unitRole?: { role: string; unitFact: string }
+  /** The user of the person `level` supervisors above the person named by an entity fact. */
+  supervisor?: { personFact: string; level: number }
 }
 
 export interface WorkflowStep {

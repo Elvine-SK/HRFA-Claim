@@ -14,9 +14,11 @@ function close() {
 }
 
 const groups = computed<CommandPaletteGroup<CommandPaletteItem>[]>(() => {
-  const pages: CommandPaletteItem[] = nav.items.value.map((item) => ({
+  const pages: CommandPaletteItem[] = nav.pages.value.map(({ item, trail }) => ({
     id: `page:${item.id}`,
     label: label(item.label),
+    // Child pages show where they sit: "Notes › Reports".
+    suffix: trail.length ? trail.map(label).join(' › ') : undefined,
     icon: item.icon,
     to: item.to,
     onSelect: close,

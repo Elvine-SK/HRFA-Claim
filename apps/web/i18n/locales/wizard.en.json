@@ -1,0 +1,19 @@
+{
+  "wizard": {
+    "stepOf": "Step {n} of {total}",
+    "draftSaved": "Draft saved {when}",
+    "back": "Back",
+    "continue": "Continue",
+    "saveDraft": "Save draft",
+    "cancel": "Cancel",
+    "summary": "Summary",
+    "next": "What happens next",
+    "edit": "Edit",
+    "review": "Review",
+    "reviewHint": "Check the details. You can still edit any step.",
+    "leaveTitle": "Leave without saving?",
+    "leaveText": "Your changes on this form will be lost.",
+    "leave": "Leave",
+    "empty": "—"
+  }
+}

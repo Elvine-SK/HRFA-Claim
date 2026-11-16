@@ -1,0 +1,57 @@
+{
+  "org": {
+    "nav": {
+      "org": "Organisation"
+    },
+    "admin": {
+      "subtitle": "The units and people that approval routing reads: who sits where, and who answers to whom.",
+      "readOnly": "The organisation comes from another system, so it is shown here but cannot be edited."
+    },
+    "fields": {
+      "code": "Code",
+      "name": "Name",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "units": {
+      "title": "Units",
+      "tree": "Units",
+      "add": "Add unit",
+      "edit": "Edit unit",
+      "hint": "A unit can sit under one other unit. Several top-level units are fine.",
+      "parent": "Parent unit",
+      "noParent": "No parent (top level)",
+      "none": "No units yet",
+      "noneHint": "Add the first unit, then put people in it.",
+      "added": "Unit {code} added",
+      "saved": "Unit {code} saved"
+    },
+    "people": {
+      "title": "People",
+      "inUnit": "People in {unit}",
+      "pickUnitFirst": "Pick a unit to see its people",
+      "none": "Nobody is in this unit.",
+      "add": "Add person",
+      "unit": "Unit",
+      "pickUnit": "Pick a unit…",
+      "supervisor": "Supervisor",
+      "supervisorHint": "Type 2 or more letters of a name or code",
+      "noSupervisor": "No supervisor",
+      "user": "Linked user",
+      "userHint": "The sign-in account of this person, if there is one",
+      "pickUser": "Pick a user…",
+      "unlink": "Remove the link to the user",
+      "added": "{name} was added",
+      "saved": "{name} was saved"
+    }
+  },
+  "errors": {
+    "org_invalid": "Check the code and the name. A code has letters, digits, dots, dashes or underscores.",
+    "org_cycle": "That would make a unit its own ancestor, or a person their own supervisor.",
+    "org_not_found": "That unit or person does not exist.",
+    "org_code_taken": "That code is already used.",
+    "org_user_linked": "That user is already linked to another person.",
+    "org_read_only": "The organisation comes from another system and cannot be edited here.",
+    "approval_org_missing": "The workflow needs the organisation, which is not installed."
+  }
+}

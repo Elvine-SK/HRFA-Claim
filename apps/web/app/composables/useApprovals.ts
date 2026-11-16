@@ -155,7 +155,23 @@ export function useApprovalActions() {
     onSuccess: () => invalidate(),
   })
 
-  return { act, bulk, delegate }
+  // Re-resolves the approvers of a waiting request against the current organisation.
+  const recalculate = useMutation<
+    { changed: boolean; stuck: boolean; reason?: string },
+    ApiError,
+    { id: string }
+  >({
+    mutationFn: async ({ id }) =>
+      (
+        await api<DataResponse<{ changed: boolean; stuck: boolean; reason?: string }>>(
+          `${requestPath(id)}/recalculate`,
+          { method: 'POST' },
+        )
+      ).data,
+    onSuccess: () => invalidate(),
+  })
+
+  return { act, bulk, delegate, recalculate }
 }
 
 export const REQUEST_STATUS_TONES = {
