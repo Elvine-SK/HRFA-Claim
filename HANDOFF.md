@@ -1,11 +1,13 @@
-# Handoff — hr-fam (2026-11-04)
+# Handoff — hr-fam (2026-11-16)
 
 Travel payment app for BCEL on nelvine-platform. Working name "HR-FAM" until the business names it (ຂ9).
 **Plans 1–6 are built** (local git only): plan 1 the app scaffold, the HRM read layer and sign-in from HRM;
 plan 2 the master data and the PM2 bundle; plan 3 the agreements (forms 1–4, REF, Doc.no, approval, cancel);
 plan 4 the payments (calculation, checking table, approval, posting batch and upload file); plan 5 the advance
 settlement (forms 5–6, approval chain, settlement and clearing files); plan 6 the dashboard, settlement reminders,
-PDF forms 1–6 and the carried fixes.
+PDF forms 1–6 and the carried fixes. Since then: print fixes, the three approval workflows shipped with the app,
+and a profile card in the sidebar ("After plan 6"). Platform: copied files at 1.1.0, linked packages at 1.3.0
+(see "Approach").
 Next: plan 7 (the transit form of regulation 4.7, once the business supplies its layout: question 13).
 
 ## Start here
@@ -226,31 +228,55 @@ Reviews: a security review of the sign-in (0 Critical, 5 Important, all fixed) a
 - Test fixtures: people `10120`–`10129` (head office) and `10130`–`10131` (888050); Doc.no years 2037–2040.
 - Not checked in a browser yet (same dev `.env` problem as plan 5): the widgets, and the PDF downloads.
 
+## After plan 6 (2026-11-04 to 2026-11-06)
+
+- Print fixes (`9e31ca9`): the members table of forms 1–4 at 8 pt, with widths that keep dates, 13-digit accounts and
+  EIDs on one line; the signature block moves whole to the next page; the travel group's box on forms 5–6 waits for
+  the leader unless step 2 is skipped. `agreements/scope.ts`: an employee with a branch-scoped role also reads the
+  agreements they travel on at other branches (the reminder links open).
+- Shipped workflows (`6ceb367`): each of `agreements`, `payments` and `settlements` declares its `workflow.json` as a
+  shipped workflow (`shared/shipped-workflow.ts`, `defineShippedWorkflow` from the platform's 1.2.0 approval
+  package, through the linked checkout). `migrate` creates, publishes and makes default the three workflows;
+  later admin edits are kept, and `approval:apply <key> --force` puts the file's version back. The manual workflow
+  set-up steps in [`docs/deploy-testing.md`](docs/deploy-testing.md) are gone. Test: `test/shipped-workflows.test.ts`.
+- Profile card (`6811a1c`): `components/MyProfileCard.vue` in the sidebar (`layouts/default.vue`), strings in en
+  and lo. No test (web only), not reviewed.
+
 ## Approach: app first, platform later
 
-nelvine-platform is at `1.0.0` and has none of the proposal's items released
-([`docs/proposals/2026-10-15-nelvine-platform-gaps.md`](docs/proposals/2026-10-15-nelvine-platform-gaps.md)).
-The app builds what it needs in its own modules, behind interfaces shaped like the proposal, and swaps each for
-the platform package once released.
+The app builds what the platform lacks in its own modules, behind interfaces shaped like the proposal
+([`docs/proposals/2026-10-15-nelvine-platform-gaps.md`](docs/proposals/2026-10-15-nelvine-platform-gaps.md)),
+and swaps each for the platform package once released.
 
-| Proposal item               | Platform state (2026-10-20)                                     | In this app                                                     |
-| --------------------------- | --------------------------------------------------------------- | --------------------------------------------------------------- |
-| M1 data sources             | On platform `main` (tasks 1–5 of 7), not released                | Used directly (`source('hrm')`); the app is linked to `../nelvine-platform` |
-| M2 portal sign-in handoff   | Next on the platform roadmap                                     | App module `auth-hrm` (built); swap later                       |
-| M3 document numbering       | Not started                                                      | REF counter and Doc.no parser in `agreements` (plan 3, built)   |
-| M4 reference data           | Not started                                                      | Effective-dated tables in `travel-master` (plan 2)              |
-| C1 org approval routing     | Not started                                                      | Approval resolvers in the app (plans 3–5)                       |
-| C2 XLSX writer              | Not started                                                      | App writer behind an interface (`payments/xlsx.ts`, plan 4, built) |
-| C4 money helpers            | Not started                                                      | App helper for decimals, rounding and the 13-digit guard (plans 2, 4) |
-| N1 calendar, N2 posting     | Not started                                                      | App code (posting batch built in plan 4; settlement in plan 5)  |
-| C5 date fields (2026-10-29) | Proposed                                                         | `AppDateInput.vue` (dd/mm/yyyy, model `YYYY-MM-DD`); swap later  |
+**Platform version (checked 2026-11-16).** `.nelvrc.json` says `platformVersion: 1.1.0` (templates, copied files,
+`docs/platform/`). The packages are `link:`ed to the checkout `../nelvine-platform`, which is at **1.3.0** (tag
+`v1.3.0`, 2026-11-09, plus 2 commits), so the app runs 1.3.0 package code against 1.1.0 copied files. The
+shipped-workflow change above already depends on 1.2.0. Next step: `nelv update` to 1.3.0 (merges copied files
+and `docs/platform/`, adds new template dependencies since 1.3.0), then typecheck and the DB tests. Released since
+1.1.0: 1.2.0 (2026-11-03/04) `platform-numbering`, `platform-refdata`, `platform-org` with `unitRole`/supervisor
+approvers and re-resolve, shipped workflows, `PlatformEntityDialog`; 1.3.0 (2026-11-07/09) `platform-brand`, side
+nav submenus, menu map, `PlatformFormWizard`, `useRecordSubmit`.
 
-The app depends on the platform checkout by absolute `link:` paths (`.nelvrc.json`, `apps/*/package.json`). When
-the platform releases data sources, run `nelv upgrade` to move to the registry version.
+| Proposal item             | Platform state (2026-11-16)                       | In this app                                                     |
+| ------------------------- | ------------------------------------------------- | --------------------------------------------------------------- |
+| M1 data sources           | Released 1.1.0                                    | Used (`source('hrm')`)                                          |
+| M2 portal sign-in handoff | Released 1.1.0 (`SIGN_IN_MODE=handoff`)           | Web uses the handoff sign-in mode; API module `auth-hrm` still the app's own |
+| C3 subject attributes     | Released 1.1.0 (`subjectAttributes` on a module)  | HRM branch, EID, head office as subject attributes (`auth-hrm`); branch scope still TypeScript |
+| M3 document numbering     | Released 1.2.0 (`platform-numbering`)             | REF counter and Doc.no parser in `agreements`; swap to consider |
+| M4 reference data         | Released 1.2.0 (`platform-refdata`)               | Effective-dated tables in `travel-master`; swap to consider     |
+| C1 org approval routing   | Released 1.2.0 (`platform-org`, `unitRole`)       | Approval resolvers in the app (plans 3–5); swap to consider     |
+| C6 shipped workflows      | Released 1.2.0                                    | Used (see "After plan 6")                                       |
+| C2 XLSX writer            | Not released                                      | App writer behind an interface (`payments/xlsx.ts`)             |
+| C4 money helpers          | Not released                                      | App helper for decimals, rounding and the 13-digit guard        |
+| N1 calendar, N2 posting   | Not released                                      | App code (`hrm/holidays.ts`, posting batches)                   |
+| C5 date fields            | Not released                                      | `AppDateInput.vue` (dd/mm/yyyy, model `YYYY-MM-DD`)             |
 
-Worth reporting to the platform team (feeds M2): an app needs a configurable sign-in URL in
-`@elvine-sk/platform-nuxt` (the app works around it with a middleware), `sourcePicker` answers 422 not 400, and
-PascalCase upstream columns do not survive `CamelCasePlugin`.
+The app depends on the platform checkout by absolute `link:` paths (`.nelvrc.json`, `apps/*/package.json`); move
+to the registry version with `nelv upgrade` when the server install needs it.
+
+Reported to the platform team earlier: `sourcePicker` answers 422 not 400 (open), PascalCase upstream columns and
+`CamelCasePlugin` (1.1.0 added `DATA_SOURCE_<NAME>_CAMEL_CASE=false`), missing web template dependencies after
+`nelv update` (fixed in 1.3.0).
 
 ## Plans
 
